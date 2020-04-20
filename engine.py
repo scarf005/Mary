@@ -23,15 +23,19 @@ def main():
     """
     객체 생성
     """
-    #플레이어 객체 생성
-    player = Entity(int(screen_width/2),int(screen_height/2),'@',libtcod.white)
+    #플레이어 객체 생성. 위치는 맵 중앙.
+    player = Entity(int(map_width/2),int(map_height/2),'@',libtcod.white)
     entities = [player]
 
     #지도 객체 생성
     game_map = GameMap(map_width, map_height)
+    game_map.make_map()
 
-    #디버그용 객체 생성
-    debug = Debug()
+    #디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
+    debug = Debug(showpos=True, passwall=True)
+
+    #디버그용 벽 통과
+
     
     #키보드, 마우스 입력 처리용 객체 생성
     key = libtcod.Key()
@@ -86,7 +90,12 @@ def main():
         #move변수에 대입된 값이 있을 시 이동
         if move:
             dx, dy = move
-            if not game_map.is_blocked(player.x + dx, player.y + dy):
+            if debug.passwall == False:
+                if not game_map.is_blocked(player.x + dx, player.y + dy):
+                    player.move(dx, dy)
+            else:
+                if game_map.is_blocked(player.x + dx, player.y + dy):
+                    print("You magically pass through solid wall.")
                 player.move(dx, dy)
 
         """
@@ -97,7 +106,7 @@ def main():
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
         #플레이어 위치 표시
-        debug.show_pos(player,'player')
+        if debug.showpos: debug.show_pos(player,'player')
 
 
 if __name__ == '__main__':
