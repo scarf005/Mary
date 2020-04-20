@@ -1,15 +1,45 @@
 import tcod as libtcod
+from entity import Entity
 from input_handlers import handle_keys
+from map_objects.game_map import GameMap
+from render_functions import clear_all, render_all
+
+from debugs import Debug
 
 #메인 루프
 def main():
     #스크린 가로/세로 크기
     screen_width = 40
     screen_height = 25
+    map_width = 30
+    map_height = 20
 
-    #플레이어 좌표는 화면 정가운데
-    player_x = int(screen_width/2)
-    player_y = int(screen_height/2)
+    #타일 색깔
+    colors = {
+        'dark_wall': libtcod.Color(0, 0, 100),
+        'dark_ground': libtcod.Color(50, 50, 150)
+    }
+
+    """
+    객체 생성
+    """
+    #플레이어 객체 생성
+    player = Entity(int(screen_width/2),int(screen_height/2),'@',libtcod.white)
+    entities = [player]
+
+    #지도 객체 생성
+    game_map = GameMap(map_width, map_height)
+
+    #디버그용 객체 생성
+    debug = Debug()
+    
+    #키보드, 마우스 입력 처리용 객체 생성
+    key = libtcod.Key()
+    mouse = libtcod.Mouse()
+
+    #콘솔 con 생성
+    con = libtcod.console_new(screen_width, screen_height)
+
 
 
     #폰트 설정: 10x10파일, 이미지 파일은 그레이스케일, 배열 방식은 TCOD
@@ -21,41 +51,30 @@ def main():
     #스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
     
-    #콘솔 con 생성
-    con = libtcod.console_new(screen_width, screen_height)
-    
-    #키보드, 마우스 입력
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
-
-    #디버그용 변수
-    frame = 0
 
     #TCOD 루프
     while not libtcod.console_is_window_closed():
+        """
+        입력
+        """
         #사용자 입력을 받음: 키 누를 시, 키보드, 마우스
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
         
-        #기본 글자색:'con' 콘솔, 색깔:하얀색
-        libtcod.console_set_default_foreground(con, libtcod.white) 
-        #기호 출력: 'con' 콘솔, x,y좌표, @기호, 배경색:없음 
-        libtcod.console_put_char(con, player_x, player_y, '@', libtcod.BKGND_NONE) 
-        
-        #변화 내용 갱신
-        libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+        """
+        화면 표시
+        """
+        #표시할 모든 객체를 화면에 배치함
+        render_all(con, entities, game_map, screen_width, screen_height, colors)
 
         #화면 출력
         libtcod.console_flush()
 
-        #기호 출력: 'con' 콘솔, x,y좌표, 기호 없음, 배경색:없음 
-        libtcod.console_put_char(con, player_x, player_y, ' ', libtcod.BKGND_NONE) 
+        #화면 초기화
+        clear_all(con, entities)
 
-        #디버그: 플레이어 위치 표시
-        frame += 1
-        if frame % 6 == 0:
-            print(F"player x: {player_x}, y: {player_y}")
-            frame = 0
-
+        """
+        입력에 대한 상호작용
+        """
         #action 변수에 키보드 입력값을 사전 형태로 받아옴
         action = handle_keys(key)
 
@@ -67,12 +86,18 @@ def main():
         #move변수에 대입된 값이 있을 시 이동
         if move:
             dx, dy = move
-            player_x += dx
-            player_y += dy
+            if not game_map.is_blocked(player.x + dx, player.y + dy):
+                player.move(dx, dy)
 
-        #최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환
+        """
+        기타
+        """
+        #최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
+        #플레이어 위치 표시
+        debug.show_pos(player,'player')
 
 
 if __name__ == '__main__':

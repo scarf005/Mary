@@ -2,7 +2,7 @@ import tcod as libtcod
 
 #사전 형식
 def handle_keys(key):
-    # 이동 키:상,하,좌,우 반환
+    #WASD
     if key.vk == libtcod.KEY_UP:
         return {'move': (0, -1)}
     elif key.vk == libtcod.KEY_DOWN:
@@ -12,12 +12,32 @@ def handle_keys(key):
     elif key.vk == libtcod.KEY_RIGHT:
         return {'move': (1, 0)}
 
+    #Numpad
+    elif key.vk == libtcod.KEY_KP8:
+        return {'move': (0, -1)}
+    elif key.vk == libtcod.KEY_KP2:
+        return {'move': (0, 1)}
+    elif key.vk == libtcod.KEY_KP4:
+        return {'move': (-1, 0)}
+    elif key.vk == libtcod.KEY_KP6:
+        return {'move': (1, 0)}
+
+    #Numpad Diagonal
+    elif key.vk == libtcod.KEY_KP9:
+        return {'move': (1, -1)}
+    elif key.vk == libtcod.KEY_KP7:
+        return {'move': (-1, -1)}
+    elif key.vk == libtcod.KEY_KP3:
+        return {'move': (1, 1)}
+    elif key.vk == libtcod.KEY_KP1:
+        return {'move': (-1, 1)}
+
+    #Alt + Enter
     if key.vk == libtcod.KEY_ENTER and key.lalt:
-        #Alt 키와 Enter 키가 동시에 눌리면:전체화면 반환
         return {'fullscreen': True}
 
-    elif key.vk == libtcod.KEY_ESCAPE:
-        #ESC 키가 눌리면: 종료 반환
+    #ESC
+    if key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
 
     #눌린 키가 없으면: 빈 값 반환
