@@ -32,7 +32,7 @@ def main():
     game_map.make_map()
 
     #디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
-    debug = Debug(showpos=True, passwall=True)
+    debug = Debug('passwall','showpos')
 
     #디버그용 벽 통과
 
@@ -95,7 +95,7 @@ def main():
                     player.move(dx, dy)
             else:
                 if game_map.is_blocked(player.x + dx, player.y + dy):
-                    print("You magically pass through solid wall.")
+                    debug.dbg_msg("You magically pass through solid wall.")
                 player.move(dx, dy)
 
         """
