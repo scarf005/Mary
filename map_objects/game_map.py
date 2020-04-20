@@ -1,3 +1,5 @@
+from random import randint
+
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 
@@ -8,7 +10,7 @@ class GameMap:
         self.height = height
 
         """
-        새로운 GameMap 객체가 생성되면 init_tiles() 함수를 실행한다.
+        새로운 GameMap 객체가 생성되면 initialize_tiles() 함수를 실행한다.
         실행하면 게임 화면 크기만큼 타일 객체가 생성되며,
         이 객체들을 GameMap 객체의 tiles 리스트에 대입한다.
         """
@@ -21,13 +23,63 @@ class GameMap:
         return tiles
 
 
-    def make_map(self):
-        # Create two rooms for demonstration purposes
-        room1 = Rect(1, 1, 5, 5)
-        room2 = Rect(12, 12, 4, 4)
+    def make_map(self, max_rooms, room_min_size, room_max_size, map_width, map_height, player):
+        """
+        지도 생성. 최대/최소 방 크기, 최대 방 수, 지도 너비/높이를 인자로 받는다. 
+        플레이어 객체도 인자로 받는데, 첫 방은 무조건 플레이어가 있는 곳 정중앙에 설치하기 때문이다.
+        """
+        rooms = []
+        num_rooms = 0
 
-        self.create_room(room1)
-        self.create_room(room2)
+        for r in range(max_rooms):
+            # random width and height
+            w = randint(room_min_size, room_max_size)
+            h = randint(room_min_size, room_max_size)
+
+            #지도를 나가지 않는 선에서 무작위 위치를 결정함
+            x = randint(0, map_width - w - 1)
+            y = randint(0, map_height - h - 1)
+
+            #방 객체들은 Rect 클래스로 편하게 정의할 수 있음
+            new_room = Rect(x, y, w, h)
+
+            # run through the other rooms and see if they intersect with this one
+            for other_room in rooms:
+                if new_room.intersect(other_room):
+                    break
+            else:
+                # this means there are no intersections, so this room is valid
+                # "paint" it to the map's tiles
+                self.create_room(new_room)
+
+                # center coordinates of new room, will be useful later
+                (new_x, new_y) = new_room.center()
+
+                if num_rooms == 0:
+                    # this is the first room, where the player starts at
+                    player.x = new_x
+                    player.y = new_y
+                else:
+                    # all rooms after the first:
+                    # connect it to the previous room with a tunnel
+
+                    # center coordinates of previous room
+                    (prev_x, prev_y) = rooms[num_rooms - 1].center()
+
+                    # flip a coin (random number that is either 0 or 1)
+                    if randint(0, 1) == 1:
+                        # first move horizontally, then vertically
+                        self.create_h_tunnel(prev_x, new_x, prev_y)
+                        self.create_v_tunnel(prev_y, new_y, new_x)
+                    else:
+                        # first move vertically, then horizontally
+                        self.create_v_tunnel(prev_y, new_y, prev_x)
+                        self.create_h_tunnel(prev_x, new_x, new_y)
+
+                # finally, append the new room to the list
+                rooms.append(new_room)
+                num_rooms += 1
+
 
     def create_room(self, room):
         """
@@ -67,7 +119,7 @@ class GameMap:
         """
 
     def create_h_tunnel(self, x1, x2, y):
-        #x1 과 x2 사이 y
+        #높이 y에서, x1 과 x2 사이 칸에 통로를 판다.
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.tiles[x][y].blocked = False
             self.tiles[x][y].block_sight = False

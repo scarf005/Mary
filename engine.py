@@ -9,10 +9,15 @@ from debugs import Debug
 #메인 루프
 def main():
     #스크린 가로/세로 크기
-    screen_width = 40
-    screen_height = 25
-    map_width = 30
-    map_height = 20
+    screen_width = 45
+    screen_height = 26
+    map_width = 40
+    map_height = 25
+
+    #방 최대/최소 크기, 최대 방 수
+    room_max_size = 8
+    room_min_size = 4
+    max_rooms = 15
 
     #타일 색깔
     colors = {
@@ -29,22 +34,21 @@ def main():
 
     #지도 객체 생성
     game_map = GameMap(map_width, map_height)
-    game_map.make_map()
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
 
     #디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
-    debug = Debug('passwall','showpos')
-
-    #디버그용 벽 통과
-
+    debug = Debug('showpos')
     
     #키보드, 마우스 입력 처리용 객체 생성
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
-    #콘솔 con 생성
+    #콘솔 con 객체 생성
     con = libtcod.console_new(screen_width, screen_height)
 
-
+    """
+    환경 설정
+    """
 
     #폰트 설정: 10x10파일, 이미지 파일은 그레이스케일, 배열 방식은 TCOD
     #libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
@@ -55,7 +59,9 @@ def main():
     #스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
     
-
+    """
+    메인 루프
+    """
     #TCOD 루프
     while not libtcod.console_is_window_closed():
         """
@@ -109,5 +115,6 @@ def main():
         if debug.showpos: debug.show_pos(player,'player')
 
 
+#이 파일을 직접 실행해야만 main() 함수가 실행됨
 if __name__ == '__main__':
     main()

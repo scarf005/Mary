@@ -7,6 +7,7 @@ def render_all(con, entities, game_map, screen_width, screen_height, colors):
             #wall 불리언에 tile의 block_sight이 True인지 여부를 대입
             wall = game_map.tiles[x][y].block_sight
 
+            #타일이 벽이면 짙은 색, 바닥이면 옅은 색깔로 출력한다.
             if wall:
                 libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
             else:
