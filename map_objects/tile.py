@@ -4,8 +4,11 @@ class Tile:
     """
     def __init__(self, blocked, block_sight=None):
         self.blocked = blocked
+
+        # 전장의 안개
+        self.explored = False
         
-        #기본적으로 타일이 통과 불가능하다면 불투명하다.
+        # 기본적으로 타일이 통과 불가능하다면 불투명하다.
         if block_sight is None:
             block_sight = blocked
         
