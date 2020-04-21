@@ -15,7 +15,7 @@ def main():
     map_height = 25
 
     #방 최대/최소 크기, 최대 방 수
-    room_max_size = 8
+    room_max_size = 6
     room_min_size = 4
     max_rooms = 15
 

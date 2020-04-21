@@ -36,47 +36,63 @@ class GameMap:
             w = randint(room_min_size, room_max_size)
             h = randint(room_min_size, room_max_size)
 
-            #지도를 나가지 않는 선에서 무작위 위치를 결정함
+            # 지도를 나가지 않는 선에서 무작위 위치를 결정함
             x = randint(0, map_width - w - 1)
             y = randint(0, map_height - h - 1)
+            """
+            randint(a,b)는 a, a+1, a+2, ... b-1, b까지 정수중 무작위로 한 수를 반환한다. 
+            range(a,b)함수와는 달리 끝점도 포함된다는 것에 유의하자.
 
-            #방 객체들은 Rect 클래스로 편하게 정의할 수 있음
+            지도 너비가 6 (x좌표는 0부터5)
+            방 너비가 3라고 하자.
+            x는 0부터 2까지 가능할 것이다.
+            (x가 3이면 3,4,5 x2는 5, 맵 경계에 방이 생기게 된다)
+            따라서 일반화하면
+            x는 0부터 map_width - w - 1 사이의 값이 될 것이다.
+            """
+
+            # 방 객체들은 Rect 클래스로 편하게 정의할 수 있다. 
+            # make_map에서 받아온 네 인자들을 new_room객체에 대입해 생성한다.
             new_room = Rect(x, y, w, h)
 
-            # run through the other rooms and see if they intersect with this one
+            #이 방과 기존에 있는 방들을 차례대로 대조해가면서 겹치는 방이 있는지를 검사한다.
             for other_room in rooms:
                 if new_room.intersect(other_room):
                     break
             else:
-                # this means there are no intersections, so this room is valid
-                # "paint" it to the map's tiles
+                """
+                for else 구문은 for문에서 break가 발생하지 않았다면 else구문을 실행하라는 뜻이다.
+                여기에서는 방이 다른 어떤 방과도 교차하지 않는다는 뜻이고, 즉 이 방은 생성해도 안전하다는 뜻이다.
+                """
+                #새로운 방을
                 self.create_room(new_room)
 
                 # center coordinates of new room, will be useful later
                 (new_x, new_y) = new_room.center()
 
                 if num_rooms == 0:
-                    # this is the first room, where the player starts at
+                    # 이 방이 첫 방이라면 이 방의 중심을 플레이어의 위치로 잡는다.
                     player.x = new_x
                     player.y = new_y
                 else:
-                    # all rooms after the first:
-                    # connect it to the previous room with a tunnel
+                    # 첫 방이 아닌 다른 모든 방들은 else 구문에 해당하는 경우다.
+                    # 전 방과 이 방을 굴로 연결한다.
 
-                    # center coordinates of previous room
+                    # 이 방 바로 전 방의 중심을 구한다.
                     (prev_x, prev_y) = rooms[num_rooms - 1].center()
 
-                    # flip a coin (random number that is either 0 or 1)
+                    # 1/2 확률로 가로 굴과 세로 굴을 뚫는 순서를 정한다.
                     if randint(0, 1) == 1:
-                        # first move horizontally, then vertically
+                        # 처음 가로 굴을 뚫고, 그 다음 세로 굴을 뚫는다.
                         self.create_h_tunnel(prev_x, new_x, prev_y)
                         self.create_v_tunnel(prev_y, new_y, new_x)
                     else:
-                        # first move vertically, then horizontally
+                        # 처음 세로 굴을 뚫고, 그 다음 가로 굴을 뚫는다.
                         self.create_v_tunnel(prev_y, new_y, prev_x)
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
-                # finally, append the new room to the list
+                # 마지막으로, 방들 리스트 목록에 이 방을 추가한다.
+                # 방들의 총 수는 1 증가한다.
                 rooms.append(new_room)
                 num_rooms += 1
 
