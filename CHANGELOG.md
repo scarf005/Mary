@@ -1,3 +1,6 @@
+#Alpha 0.007 - 2020.04/21
+* Finished TCOD tutorials, part 4.
+
 #Alpha 0.006 - 2020.04/20
 * Finished TCOD tutorials, part 3.
 
