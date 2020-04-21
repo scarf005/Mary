@@ -1,5 +1,6 @@
 import tcod as libtcod
 from entity import Entity
+from camera import Camera
 from fov_functions import initialize_fov, recompute_fov
 from input_handlers import handle_keys
 from map_objects.game_map import GameMap
@@ -29,7 +30,7 @@ def main():
     12: 제한적 투영
     13: ?
     """
-    # 시야각(FOV): 사용하는 시야각 알고리즘 번호, '보이는'벽 밝히기 여부, 시야 거리
+    # 시야각(FOV): 사용하는 시야각 알고리즘 번호, 바닥을 둘러싸는 벽들도 밝힐지 여부, 시야 거리
     fov_algorithm = 2   
     fov_light_walls = True
     fov_radius = 5
@@ -38,8 +39,9 @@ def main():
     colors = {
         'dark_wall': libtcod.Color(0, 0, 100),
         'dark_ground': libtcod.Color(50, 50, 150),
-        'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50)
+        'light_wall': libtcod.Color(80, 90, 40),
+        'light_ground': libtcod.Color(25, 25, 30),
+        'outside_camera': libtcod.Color(0,0,0)
     }
 
     """
@@ -52,6 +54,11 @@ def main():
     # 지도 객체 생성
     game_map = GameMap(map_width, map_height)
     game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
+
+    # 카메라 객체 생성
+    camera = Camera(0,0, map_width, map_height)
+
+    camera.update(player)
 
     """
     시야각 처리
@@ -72,7 +79,6 @@ def main():
     """
     LIBTCOD
     """
-
     # 키보드, 마우스 입력 처리용 객체 생성
     key = libtcod.Key()
     mouse = libtcod.Mouse()
@@ -88,7 +94,7 @@ def main():
     # libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
 
     # 폰트 설정: 32x32파일, 이미지 파일은 그레이스케일, 배열 방식은 CP437
-    libtcod.console_set_custom_font('terminal32x32.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
+    libtcod.console_set_custom_font('terminalRen32x32.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
 
     # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
     libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
@@ -111,7 +117,7 @@ def main():
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
         # 표시할 모든 객체를 화면에 배치함
-        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors, camera)
 
         # 기본적으로 시야각은 꼭 필요할 때 아니면 하지 않음
         fov_recompute = False
@@ -120,7 +126,7 @@ def main():
         libtcod.console_flush()
 
         # 화면 초기화
-        clear_all(con, entities)
+        clear_all(con, entities, camera)
 
         """
         입력에 대한 상호작용
@@ -139,11 +145,13 @@ def main():
             if debug.passwall == False:
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
                     player.move(dx, dy)
+                    camera.update(player)
                     fov_recompute = True
             else:
                 if game_map.is_blocked(player.x + dx, player.y + dy):
                     debug.dbg_msg("You magically pass through solid wall.")
                 player.move(dx, dy)
+                camera.update(player)
 
         """
         기타
@@ -154,8 +162,9 @@ def main():
 
         # 플레이어 위치 표시
         if debug.showpos: debug.show_pos(player,'player')
-
+        print(F"camera x:{camera.x} camera y:{camera.y}")
 
 # 이 파일을 직접 실행해야만 main() 함수가 실행됨
 if __name__ == '__main__':
+    
     main()
