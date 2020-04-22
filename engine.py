@@ -1,44 +1,31 @@
-import tcod as libtcod
+import tcod 
 import numpy as np
 
+#엔티티 및 컴포너트
 from entity import Entity
-from input_handlers import handle_keys
-
+from components.luminary import Luminary
 from map_objects.game_map import GameMap
-from render_functions import clear_all, render_all
-from fov_functions import initialize_fov, recompute_fov
 
+#렌더링 기능
+from renderer.lighting_functions import compute_light
+from renderer.render_functions import clear_all, render_all
+from renderer.fov_functions import initialize_fov, recompute_fov
+
+#조작 및 기타
+from input_handlers import handle_keys
 from debugs import Debug
 
-#메인 루프
+#변수 정보
+from data import *
+
 def main():
-    #스크린 가로/세로 크기
-    screen_width = 40
-    screen_height = 25
-
-    #지도
-    map_width = 10
-    map_height = 10
-
-    #FOV
-    fov_algorithm = 2
-    fov_light_walls = True
-    fov_radius = 12
-
-    #타일 색깔
-    colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
-        'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50),
-        'pitch_black': libtcod.Color(0,0,0,)
-    }
 
     """
     객체 생성
     """
     #플레이어 객체 생성. 위치는 맵 중앙.
-    player = Entity(int(map_width/2),int(map_height/2),'@',libtcod.white, 'player')
+    luminary_component = Luminary(luminosity=3)
+    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=False, luminary=luminary_component)
     entities = [player]
 
     #지도 객체 생성: y,x는 game_map 객체에서 알아서 처리
@@ -59,47 +46,61 @@ def main():
 
     
     #키보드, 마우스 입력 처리용 객체 생성
-    key = libtcod.Key()
-    mouse = libtcod.Mouse()
+    key = tcod.Key()
+    mouse = tcod.Mouse()
 
     #콘솔 con 생성
-    con = libtcod.console.Console(screen_width, screen_height)
+    con = tcod.console.Console(screen_width, screen_height)
 
 
 
     #폰트 설정: 10x10파일, 이미지 파일은 그레이스케일, 배열 방식은 TCOD
-    #libtcod.console_set_custom_font('arial10x10.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_TCOD)
+    #tcod.console_set_custom_font('arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
 
     #폰트 설정: 32x32파일, 이미지 파일은 그레이스케일, 배열 방식은 CP437
-    libtcod.console_set_custom_font('terminal32x32.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
+    tcod.console_set_custom_font('terminal32x32.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
 
     #스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
-    libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False, vsync=None)
+    tcod.console_init_root(screen_width, screen_height, 'tcod tutorial revised', False, vsync=True)
     
 
     #TCOD 루프
-    while not libtcod.console_is_window_closed():
+    while not tcod.console_is_window_closed():
         """
         입력
         """
         #사용자 입력을 받음: 키 누를 시, 키보드, 마우스
-        libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
+        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
         
         
         """
         화면 표시
         """
-        #fov
+        #플레이어 시야
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
+        """
+        광원 계산
+        """
+        for E in entities:
+            try:
+                #이 구문을 뚫으면 광원이 있는거. 루프를 돌려서 광원 지도를 구해온다.
+                #광원 지도는 fov_function을 이용할 것
+                compute_light(fov_map,E.x,E.y)
+            except:
+                pass
+        
+        """
+        화면 표시
+        """
         #표시할 모든 객체를 화면에 배치함
         render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
 
         fov_recompute = False
 
         #화면 출력
-        libtcod.console_flush()
+        tcod.console_flush()
 
         #화면 초기화
         clear_all(con, entities)
@@ -130,7 +131,7 @@ def main():
 
         #최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if fullscreen:
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
 
         """
         기타
@@ -152,6 +153,18 @@ def main():
         
         if create_luminary:
             game_map.create_luminary(entities, player.x, player.y)
+
+        
+        """
+        엔티티
+        """
+        #광원 없는 엔티티에게 호출하면 에러뜸
+        for E in entities:
+            try:
+                print (F"{E.name} luminosity:{E.luminary.luminosity}")
+            except:
+                print (F"{E.name} is not a lighting source")
+
 
 
 

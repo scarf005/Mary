@@ -2,7 +2,7 @@ class Tile:
     """
     지도에 표시되는 타일. 움직임 또는 시야를 막거나 막지 않을 수 있다.
     """
-    def __init__(self, blocked, block_sight=None):
+    def __init__(self, blocked, block_sight=None, brightness=0):
         self.blocked = blocked
         
         #기본적으로 타일이 통과 불가능하다면 불투명하다.
@@ -12,3 +12,5 @@ class Tile:
         self.block_sight = block_sight
 
         self.explored = False
+
+        self.brightness = brightness

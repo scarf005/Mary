@@ -1,4 +1,4 @@
-import tcod as libtcod
+import tcod 
 import numpy as np
 
 from entity import Entity
@@ -63,7 +63,7 @@ class GameMap:
         return False
 
     """
-    신규기능들
+    신규 기능들
     """
 
     def toggle_wall(self,x,y):
@@ -73,5 +73,5 @@ class GameMap:
 
     def create_luminary(self, entities, x ,y):
         luminary_component = Luminary(luminosity=10)
-        light = Entity(x, y, '&', libtcod.yellow, 'light source', blocks=False, luminary=luminary_component)
+        light = Entity(x, y, '&', tcod.yellow, 'light source', blocks=False, luminary=luminary_component)
         entities.append(light)
