@@ -1,8 +1,10 @@
 import tcod as libtcod
 from entity import Entity
 from input_handlers import handle_keys
+
 from map_objects.game_map import GameMap
 from render_functions import clear_all, render_all
+from fov_functions import initialize_fov, recompute_fov
 
 from debugs import Debug
 
@@ -14,27 +16,42 @@ def main():
     map_width = 30
     map_height = 20
 
+    #FOV
+    fov_algorithm = 2
+    fov_light_walls = True
+    fov_radius = 5
+
     #타일 색깔
     colors = {
         'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150)
+        'dark_ground': libtcod.Color(50, 50, 150),
+        'light_wall': libtcod.Color(130, 110, 50),
+        'light_ground': libtcod.Color(200, 180, 50)
     }
 
     """
     객체 생성
     """
     #플레이어 객체 생성. 위치는 맵 중앙.
-    player = Entity(int(map_width/2),int(map_height/2),'@',libtcod.white)
+    player = Entity(int(map_width/2),int(map_height/2),'@',libtcod.white, 'player')
     entities = [player]
 
     #지도 객체 생성
     game_map = GameMap(map_width, map_height)
     game_map.make_map()
 
-    #디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
-    debug = Debug('passwall','showpos')
+    #FOV
+    fov_recompute = True
 
-    #디버그용 벽 통과
+    fov_map = initialize_fov(game_map)
+
+    """
+    디버그 명령 목록
+    passwall: 벽 통과 가능
+    showpos: 플레이어 x,y좌표 표시. 다른 엔티티 좌표도 표시할 수 있게 고칠 것
+    """
+    #디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
+    debug = Debug()
 
     
     #키보드, 마우스 입력 처리용 객체 생성
@@ -67,8 +84,14 @@ def main():
         """
         화면 표시
         """
+        #fov
+        if fov_recompute:
+            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
+
         #표시할 모든 객체를 화면에 배치함
-        render_all(con, entities, game_map, screen_width, screen_height, colors)
+        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+
+        fov_recompute = False
 
         #화면 출력
         libtcod.console_flush()
@@ -93,20 +116,39 @@ def main():
             if debug.passwall == False:
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
                     player.move(dx, dy)
+                    fov_recompute = True
             else:
                 if game_map.is_blocked(player.x + dx, player.y + dy):
                     debug.dbg_msg("You magically pass through solid wall.")
                 player.move(dx, dy)
 
-        """
-        기타
-        """
         #최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
+        """
+        기타
+        """
+
         #플레이어 위치 표시
         if debug.showpos: debug.show_pos(player,'player')
+
+        #벽 설치
+        toggle_wall = action.get('toggle_wall')
+
+        #광원 설치
+        create_luminary = action.get('create_luminary')
+
+        if toggle_wall:
+            game_map.toggle_wall(player.x, player.y)
+        
+        if create_luminary:
+            game_map.create_luminary(entities, player.x, player.y)
+        
+        #엔티티들 이름
+        for i in entities:
+            print (i.name)
+
 
 
 if __name__ == '__main__':

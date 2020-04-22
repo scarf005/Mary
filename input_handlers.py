@@ -40,5 +40,13 @@ def handle_keys(key):
     if key.vk == libtcod.KEY_ESCAPE:
         return {'exit': True}
 
+    #벽 생성
+    if key.vk == libtcod.KEY_1:
+        return {'toggle_wall': True}
+
+    #광원 생성
+    if key.vk == libtcod.KEY_2:
+        return {'create_luminary': True}
+
     #눌린 키가 없으면: 빈 값 반환
     return {}
