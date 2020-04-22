@@ -27,12 +27,7 @@ class GameMap:
 
 
     def make_map(self):
-        # Create two rooms for demonstration purposes
-        room1 = Rect(1, 1, 5, 5)
-        room2 = Rect(12, 12, 4, 4)
-
-        self.create_room(room1)
-        self.create_room(room2)
+        pass
 
     def create_room(self, room):
         """
@@ -71,17 +66,9 @@ class GameMap:
     """
 
     def toggle_wall(self,x,y):
-        if self.tiles[x][y].blocked and self.tiles[x][y].block_sight:
-            self.tiles[x][y].blocked = False
-            self.tiles[x][y].block_sight = False
-        elif not (self.tiles[x][y].blocked and self.tiles[x][y].block_sight):
-            self.tiles[x][y].blocked = True
-            self.tiles[x][y].block_sight = True
-        
-        """
         self.tiles[x][y].blocked ^= 1
         self.tiles[x][y].block_sight ^= 1
-        """
+
 
     def create_luminary(self, entities, x ,y):
         luminary_component = Luminary(luminosity=10)

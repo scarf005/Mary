@@ -21,6 +21,8 @@ def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, sc
                         libtcod.console_set_char_background(con, x, y, colors.get('dark_wall'), libtcod.BKGND_SET)
                     else:
                         libtcod.console_set_char_background(con, x, y, colors.get('dark_ground'), libtcod.BKGND_SET)
+                else:
+                    libtcod.console_set_char_background(con, x, y, colors.get('pitch_black'), libtcod.BKGND_SET)
 
 
     #목록에 있는 모든 객체를 표시함.

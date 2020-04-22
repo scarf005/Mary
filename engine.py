@@ -1,4 +1,5 @@
 import tcod as libtcod
+
 from entity import Entity
 from input_handlers import handle_keys
 
@@ -13,6 +14,8 @@ def main():
     #스크린 가로/세로 크기
     screen_width = 40
     screen_height = 25
+
+    #지도
     map_width = 30
     map_height = 20
 
@@ -26,7 +29,8 @@ def main():
         'dark_wall': libtcod.Color(0, 0, 100),
         'dark_ground': libtcod.Color(50, 50, 150),
         'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50)
+        'light_ground': libtcod.Color(200, 180, 50),
+        'pitch_black': libtcod.Color(0,0,0,)
     }
 
     """
@@ -38,7 +42,6 @@ def main():
 
     #지도 객체 생성
     game_map = GameMap(map_width, map_height)
-    game_map.make_map()
 
     #FOV
     fov_recompute = True
@@ -116,6 +119,7 @@ def main():
             if debug.passwall == False:
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
                     player.move(dx, dy)
+
                     fov_recompute = True
             else:
                 if game_map.is_blocked(player.x + dx, player.y + dy):
@@ -141,13 +145,11 @@ def main():
 
         if toggle_wall:
             game_map.toggle_wall(player.x, player.y)
+            #지형이 변했으니 새로 지형 맵을 짜야 함
+            fov_map = initialize_fov(game_map)
         
         if create_luminary:
             game_map.create_luminary(entities, player.x, player.y)
-        
-        #엔티티들 이름
-        for i in entities:
-            print (i.name)
 
 
 
