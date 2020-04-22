@@ -17,8 +17,8 @@ def main():
     screen_height = 25
 
     #지도
-    map_width = 30
-    map_height = 20
+    map_width = 10
+    map_height = 10
 
     #FOV
     fov_algorithm = 2
@@ -41,8 +41,8 @@ def main():
     player = Entity(int(map_width/2),int(map_height/2),'@',libtcod.white, 'player')
     entities = [player]
 
-    #지도 객체 생성
-    game_map = GameMap(map_width, map_height)
+    #지도 객체 생성: y,x는 game_map 객체에서 알아서 처리
+    game_map = GameMap(map_width,map_height)
 
     #FOV
     fov_recompute = True
@@ -63,7 +63,7 @@ def main():
     mouse = libtcod.Mouse()
 
     #콘솔 con 생성
-    con = libtcod.console_new(screen_width, screen_height)
+    con = libtcod.console.Console(screen_width, screen_height)
 
 
 
@@ -74,7 +74,7 @@ def main():
     libtcod.console_set_custom_font('terminal32x32.png', libtcod.FONT_TYPE_GREYSCALE | libtcod.FONT_LAYOUT_CP437)
 
     #스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
-    libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False)
+    libtcod.console_init_root(screen_width, screen_height, 'libtcod tutorial revised', False, vsync=None)
     
 
     #TCOD 루프
@@ -84,6 +84,7 @@ def main():
         """
         #사용자 입력을 받음: 키 누를 시, 키보드, 마우스
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
+        
         
         """
         화면 표시
@@ -148,7 +149,6 @@ def main():
             game_map.toggle_wall(player.x, player.y)
             #지형이 변했으니 새로 지형 맵을 짜야 함
             fov_map = initialize_fov(game_map)
-            print (fov_map)
         
         if create_luminary:
             game_map.create_luminary(entities, player.x, player.y)
