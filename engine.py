@@ -1,4 +1,5 @@
 import tcod as libtcod
+import numpy as np
 
 from entity import Entity
 from input_handlers import handle_keys
@@ -22,7 +23,7 @@ def main():
     #FOV
     fov_algorithm = 2
     fov_light_walls = True
-    fov_radius = 5
+    fov_radius = 12
 
     #타일 색깔
     colors = {
@@ -147,6 +148,7 @@ def main():
             game_map.toggle_wall(player.x, player.y)
             #지형이 변했으니 새로 지형 맵을 짜야 함
             fov_map = initialize_fov(game_map)
+            print (fov_map)
         
         if create_luminary:
             game_map.create_luminary(entities, player.x, player.y)

@@ -12,4 +12,5 @@ def initialize_fov(game_map):
     return fov_map
 
 def recompute_fov(fov_map, x, y, radius, light_walls=True, algorithm=0):
-    libtcod.map_compute_fov(fov_map, x, y, radius, light_walls, algorithm)
+    #투명도: np.ndarray, 위치: Tuple[int, int]
+    libtcod.map.compute_fov(fov_map, (x, y), radius, light_walls, algorithm)
