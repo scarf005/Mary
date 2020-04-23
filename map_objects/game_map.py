@@ -9,7 +9,7 @@ from components.luminary import Luminary
 
 class GameMap:
     def __init__(self, width, height):
-        #맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
+        # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
         self.width = width
         self.height = height
 
@@ -20,8 +20,8 @@ class GameMap:
 
 
     def initialize_tiles(self):
-        #타일 리스트를 채운다. 타일(못지나감)을 채우는데, y에 대해 높이수만큼 쌓고, 그걸 또 너비수만큼 쌓는다.
-        #넘파이라서 y,x식으로 해야 함
+        # 타일 리스트를 채운다. 타일(못지나감)을 채우는데, y에 대해 높이수만큼 쌓고, 그걸 또 너비수만큼 쌓는다.
+        # 넘파이라서 y,x식으로 해야 함
  
         np_tiles = np.array([[Tile(False) for x in range(self.width)] for y in range(self.height)])
         return np_tiles
@@ -40,20 +40,20 @@ class GameMap:
                 self.tiles[y,x].block_sight = False
 
     def create_h_tunnel(self, x1, x2, y):
-        #x1 과 x2 사이 y
+        # x1 과 x2 사이 y
         for x in range(min(x1, x2), max(x1, x2) + 1):
             self.tiles[y,x].blocked = False
             self.tiles[y,x].block_sight = False
 
     def create_v_tunnel(self, y1, y2, x):
-        #
+        # 
         for y in range(min(y1, y2), max(y1, y2) + 1):
             self.tiles[y,x].blocked = False
             self.tiles[y,x].block_sight = False
 
     def is_blocked(self, x, y):
-        #게임맵 객체의 tiles리스트에서 찾은 후 막혔는지 확인한다.
-        #에러뜨면 그냥 못지나간다고 값을 돌려준다.
+        # 게임맵 객체의 tiles리스트에서 찾은 후 막혔는지 확인한다.
+        # 에러뜨면 그냥 못지나간다고 값을 돌려준다.
         try:
             if self.tiles[y,x].blocked:
                 return True
@@ -71,7 +71,7 @@ class GameMap:
         self.tiles[y,x].block_sight ^= 1
 
 
-    def create_luminary(self, entities, x ,y):
-        luminary_component = Luminary(luminosity=10)
+    def create_luminary(self, entities, x ,y, brightness=5):
+        luminary_component = Luminary(luminosity=brightness)
         light = Entity(x, y, '&', tcod.yellow, 'light source', blocks=False, luminary=luminary_component)
         entities.append(light)
