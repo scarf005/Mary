@@ -24,7 +24,7 @@ def main():
     객체 생성
     """
     # 플레이어 객체 생성. 위치는 맵 중앙.
-    luminary_component = Luminary(luminosity=0)
+    luminary_component = Luminary(luminosity=5)
     player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=False, luminary=luminary_component)
     entities = [player]
 
@@ -152,7 +152,7 @@ def main():
             light_recompute = True
         
         if create_luminary:
-            game_map.create_luminary(entities, player.x, player.y, 10)
+            game_map.create_luminary(entities, player.x, player.y, 30)
             # 광원이 새로 생겼으니 다시 계산
             light_recompute = True
         

@@ -5,6 +5,8 @@ from entity import Entity
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 
+from map_objects.map_generator.cellular_automata import cell_auto
+
 from components.luminary import Luminary
 
 class GameMap:
@@ -22,9 +24,18 @@ class GameMap:
     def initialize_tiles(self):
         # 타일 리스트를 채운다. 타일(못지나감)을 채우는데, y에 대해 높이수만큼 쌓고, 그걸 또 너비수만큼 쌓는다.
         # 넘파이라서 y,x식으로 해야 함
- 
-        np_tiles = np.array([[Tile(False) for x in range(self.width)] for y in range(self.height)])
-        return np_tiles
+        
+        while True:
+            wall_map = cell_auto(self.width,self.height, 6, 0.6)
+            if wall_map[int(self.height/2),int(self.width/2)] == 0:
+                break
+        
+        print (wall_map)
+        wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))
+        return wall_map
+        
+        #np_tiles = np.array([[Tile(False) for x in range(self.width)] for y in range(self.height)])
+        #return np_tiles
 
 
     def make_map(self):

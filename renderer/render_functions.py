@@ -6,7 +6,7 @@ from data import colors
 def render_all(con, entities, game_map, fov_map, light_map, fov_recompute, screen_width, screen_height, colors):
     # fov 재계산 시만
     if fov_recompute:
-        print(light_map)
+        #print(light_map)
         # 지도에 있는 모든 타일을 그림
         for y in range(game_map.height):
             for x in range(game_map.width):
