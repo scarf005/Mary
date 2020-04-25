@@ -11,6 +11,7 @@ def render_all(con, entities, game_map, fov_map, light_map, fov_recompute, scree
         for y in range(game_map.height):
             for x in range(game_map.width):
                 # wall 불리언에 tile의 block_sight이 True인지 여부를 대입
+                
                 visible = fov_map.fov[y,x]
                 wall = game_map.tiles[y,x].block_sight
                 
@@ -19,20 +20,19 @@ def render_all(con, entities, game_map, fov_map, light_map, fov_recompute, scree
                 else:
                     brightness = light_map[y,x]
                  
-
                 if visible:
-                    if wall:
-                        draw_background(con, x, y, 'light_wall', brightness, tcod.BKGND_SET)
-                    else:
-                        draw_background(con, x, y, 'light_ground', brightness, tcod.BKGND_SET)
                     game_map.tiles[y,x].explored = True
+                    if wall:
+                        draw_background(con, x, y, 'light_wall', brightness)
+                    else:
+                        draw_background(con, x, y, 'light_ground', brightness)                 
                 elif game_map.tiles[y,x].explored:
                     if wall:
-                        draw_background(con, x, y, 'dark_wall', brightness, tcod.BKGND_SET)
+                        draw_background(con, x, y, 'dark_wall')
                     else:
-                        draw_background(con, x, y, 'dark_ground', brightness, tcod.BKGND_SET)
-                else:
-                    draw_background(con,x,y,'pitch_black')
+                        draw_background(con, x, y, 'dark_ground')
+                elif not game_map.tiles[y,x].explored:
+                    draw_background(con, x, y, 'pitch_black')
 
 
     # 목록에 있는 모든 객체를 표시함.

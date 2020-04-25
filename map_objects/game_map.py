@@ -30,11 +30,18 @@ class GameMap:
             if wall_map[int(self.height/2),int(self.width/2)] == 0:
                 break
         
-        #print (wall_map)
-        wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))
-        return wall_map
+        #wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))
         
-        #np_tiles = np.array([[Tile(False) for x in range(self.width)] for y in range(self.height)])
+        np_tiles = np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
+        
+        for y in range(self.height):
+            for x in range(self.width):
+                if not wall_map[y,x]:
+                    np_tiles[y,x].blocked = False
+                    np_tiles[y,x].block_sight = False
+        return np_tiles
+        
+        
         #return np_tiles
 
 

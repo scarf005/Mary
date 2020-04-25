@@ -95,7 +95,7 @@ def main():
         render_all(con, entities, game_map, fov_map, light_map, fov_recompute, screen_width, screen_height, colors)
 
         fov_recompute = False
-        light_recompute = True
+        light_recompute = False
 
         # 화면 출력
         tcod.console_flush()
