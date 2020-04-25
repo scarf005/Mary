@@ -1,3 +1,21 @@
+##TODO: Reimplement camera and make it master
+
+#Alpha 0.010 - 2020/04/25
+* Proper map generation: Cave creation from cellular automata.
+* Fixed fov not working correctly.
+
+#Alpha 0.007 - 2020.04/21
+* Finished TCOD tutorials, part 4.
+
+#Alpha 0.006 - 2020.04/20
+* Finished TCOD tutorials, part 3.
+
+#Alpha 0.005 - 2020.04/20
+* Learning TCOD tutorials, part 3.
+
+#Alpha 0.004 - 2020.04/20
+* Finished TCOD tutorials, part 2.
+
 #Alpha 0.003 - 2020.04/20
 * Finished TCOD tutorials, part 1.
 * @ now moves.
