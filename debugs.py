@@ -9,6 +9,7 @@ class Debug:
         #기능들. 기본적으로는 꺼져 있다.
         self.passwall = False
         self.showpos = False
+        self.omni = False
 
         #디버그 객체를 생성할 때 인자를 인자 형태로 받아서 수정할 수 있다.
 

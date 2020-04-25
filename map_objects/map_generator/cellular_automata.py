@@ -1,6 +1,8 @@
 import random
 import numpy as np
 
+import time
+
 def display(matrix):
     for y in range(matrix.shape[0]):
         for x in range(matrix.shape[1]):
@@ -20,6 +22,7 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
 #TODO: change alive_neighbors counting mechanism so it doesn't break. Maybe add new func.
 #TODO: Fill too small rooms. Apply flood fill.
     for gen in range(generation + 1):
+        #print(F"{gen}번째 반복")
         #display(cell_map)
         for y in range(height):
             for x in range(width):
@@ -37,6 +40,9 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
                         cell_map[y,x] = 1
                     else:
                         cell_map[y,x] = 0
+        #print("\n\n")
+        #time.sleep(0.4)
+        
     
     #가장자리 벽으로 둘러싸기
     cell_map[0,:] = 1
@@ -47,8 +53,12 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
 
 
 if __name__ == '__main__':
-    for i in range (5):
-        print(F"{i + 1} iteration")
-        new_map = cell_auto(40, 20, 2, 0.35)
-        display(new_map)
-        print("")
+    start = input()
+    print("\n"*2)
+    new_map = cell_auto(40, 20, 2, 0.35)
+    print("최종 결과")
+    display(new_map)
+    print("\n"*2)
+    
+    quit = input()
+

@@ -62,7 +62,7 @@ def main():
     # tcod.console_set_custom_font('arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
 
     # 폰트 설정: 32x32파일, 이미지 파일은 그레이스케일, 배열 방식은 CP437
-    tcod.console_set_custom_font('terminal32x32.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
+    tcod.console_set_custom_font('terminal16x16.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
 
     # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
     tcod.console_init_root(screen_width, screen_height, 'tcod tutorial revised', False, vsync=True)
@@ -152,7 +152,7 @@ def main():
             light_recompute = True
         
         if create_luminary:
-            game_map.create_luminary(entities, player.x, player.y, 30)
+            game_map.create_luminary(entities, player.x, player.y, 10)
             # 광원이 새로 생겼으니 다시 계산
             light_recompute = True
         
