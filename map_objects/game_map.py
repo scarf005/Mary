@@ -26,11 +26,11 @@ class GameMap:
         # 넘파이라서 y,x식으로 해야 함
         
         while True:
-            wall_map = cell_auto(self.width,self.height, 6, 0.6)
+            wall_map = cell_auto(self.width,self.height, 3, 0.35)
             if wall_map[int(self.height/2),int(self.width/2)] == 0:
                 break
         
-        print (wall_map)
+        #print (wall_map)
         wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))
         return wall_map
         

@@ -4,7 +4,7 @@ import numpy as np
 def initialize_light(game_map, fov_map, entities):
     """
     광원 위치 결정: light_map (0은 광원, 999는 벽)
-    막힌 곳 표시: cost (1: 막힘 0: 빈 공간)
+    막힌 곳 표시: cost (0: 막힘 1: 빈 공간)
     시야 막힌것 표시할 때: fov_map
     """
     # cardinal, diagonal: 상하좌우 / 대각선 이동시 비용. 1.4로 하면 대각선 거리 반영됨
