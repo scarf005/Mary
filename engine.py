@@ -65,7 +65,7 @@ def main():
     tcod.console_set_custom_font('terminal16x16.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
 
     # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
-    tcod.console_init_root(screen_width, screen_height, 'tcod tutorial revised', False, vsync=True)
+    tcod.console_init_root(screen_width, screen_height, 'Mary', False, vsync=True)
     
 
     # TCOD 루프
