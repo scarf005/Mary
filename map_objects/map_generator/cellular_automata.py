@@ -22,8 +22,8 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
 #TODO: change alive_neighbors counting mechanism so it doesn't break. Maybe add new func.
 #TODO: Fill too small rooms. Apply flood fill.
     for gen in range(generation + 1):
-        print(F"{gen}번째 반복")
-        display(cell_map)
+        #print(F"{gen}번째 반복")
+        #display(cell_map)
         for y in range(height):
             for x in range(width):
                 alive_neighbors = cell_map[max(y-1, 0):min(y+2, height),max(x-1, 0):min(x+2, width)]
@@ -41,7 +41,7 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
                     else:
                         cell_map[y,x] = 0
         #print("\n\n")
-        time.sleep(0.8)
+        #time.sleep(0.8)
         
     
     #가장자리 벽으로 둘러싸기

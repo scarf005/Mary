@@ -7,12 +7,13 @@ from components.luminary import Luminary
 from map_objects.game_map import GameMap
 
 # 렌더링 기능
+from renderer.camera import Camera
+
 from renderer.lighting_functions import initialize_light
 from renderer.render_functions import clear_all, render_all
 from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
-from camera import Camera
 from input_handlers import handle_keys
 from debugs import Debug
 
@@ -44,7 +45,7 @@ def main():
     light_map = initialize_light(game_map, fov_map, entities)
 
     # 카메라 객체 생성
-    camera = Camera(0,0, map_width, map_height)
+    camera = Camera(0,0, map_width, map_height, False)
 
     camera.update(player)
     
@@ -98,7 +99,7 @@ def main():
         화면 표시
         """
         # 표시할 모든 객체를 화면에 배치함
-        render_all(con, entities, game_map, fov_map, light_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors)
 
         fov_recompute = False
         light_recompute = False
@@ -107,7 +108,7 @@ def main():
         tcod.console_flush()
 
         # 화면 초기화
-        clear_all(con, entities)
+        clear_all(con, entities, camera)
 
         """
         입력에 대한 상호작용
@@ -126,6 +127,7 @@ def main():
             if debug.passwall == False:
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
                     player.move(dx, dy)
+                    camera.update(player)
 
                     fov_recompute = True
                     light_recompute = True
@@ -133,6 +135,7 @@ def main():
                 if game_map.is_blocked(player.x + dx, player.y + dy):
                     debug.dbg_msg("You magically pass through solid wall.")
                 player.move(dx, dy)
+                camera.update(player)
 
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if fullscreen:
@@ -158,7 +161,7 @@ def main():
             light_recompute = True
         
         if create_luminary:
-            game_map.create_luminary(entities, player.x, player.y, 10)
+            game_map.create_luminary(entities, player.x, player.y, 15)
             # 광원이 새로 생겼으니 다시 계산
             light_recompute = True
         
