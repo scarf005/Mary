@@ -35,7 +35,7 @@ def main():
     entities = [player]
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
-    game_map = GameMap(map_width,map_height)
+    game_map = GameMap(map_width,map_height, entities)
 
     # FOV
     fov_recompute = True

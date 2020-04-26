@@ -1,27 +1,31 @@
 import tcod 
 import numpy as np
+from random import randint
 
 from entity import Entity
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 
-from map_objects.map_generator.cellular_automata import make_cave
+from map_objects.map_generator.cellular_automata import make_cave, find_nook
 
 from components.luminary import Luminary
 
 class GameMap:
-    def __init__(self, width, height):
+    def __init__(self, width, height, entities):
         # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
         self.width = width
         self.height = height
-        self.tiles = self.initialize_tiles()
+        self.tiles = self.initialize_tiles(entities)
 
-    def initialize_tiles(self):       
+    def initialize_tiles(self, entities):       
         #원래는 이걸 하고 싶었는데.
         #wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))                   
         np_tiles = np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
-        wall_map = make_cave(self.width, self.height, 2, 0.35)
-        #print (wall_map)
+        wall_map = make_cave(self.width, self.height, 3, 0.4)        
+        """
+        지금은 임시로 구석진 곳에 램프를 설치함
+        """    
+        self.place_lamp_at_nook(wall_map,entities)
         
         for y in range(self.height):
             for x in range(self.width):
@@ -29,6 +33,12 @@ class GameMap:
                     np_tiles[y,x].blocked = False
                     np_tiles[y,x].block_sight = False
         return np_tiles
+    
+    def place_lamp_at_nook(self, wall_map, entities):       
+        nooks = find_nook(wall_map)
+        for i in range(len(nooks)):
+            self.create_luminary(entities, nooks[i][1], nooks[i][0], 15)
+        
 
     def is_blocked(self, x, y):
         # 게임맵 객체의 tiles리스트에서 찾은 후 막혔는지 확인한다.
