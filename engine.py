@@ -45,7 +45,7 @@ def main():
     light_map = initialize_light(game_map, fov_map, entities)
 
     # 카메라 객체 생성
-    camera = Camera(0,0, map_width, map_height, False)
+    camera = Camera(0,0, map_width, map_height, True)
 
     camera.update(player)
     
