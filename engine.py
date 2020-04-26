@@ -10,7 +10,7 @@ from map_objects.game_map import GameMap
 from renderer.camera import Camera
 
 from renderer.lighting_functions import initialize_light
-from renderer.render_functions import clear_all, render_all
+from renderer.render_functions import clear_all_entities, render_all
 from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
@@ -81,8 +81,7 @@ def main():
         입력
         """
         # 사용자 입력을 받음: 키 누를 시, 키보드, 마우스
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)
-        
+        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)      
         
         """
         화면 표시
@@ -98,6 +97,9 @@ def main():
         """
         화면 표시
         """
+        # 화면 초기화
+        clear_all_entities(con, entities, camera)
+        
         # 표시할 모든 객체를 화면에 배치함
         render_all(con, entities, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors)
 
@@ -108,7 +110,7 @@ def main():
         tcod.console_flush()
 
         # 화면 초기화
-        clear_all(con, entities, camera)
+        clear_all_entities(con, entities, camera)
 
         """
         입력에 대한 상호작용
@@ -137,13 +139,12 @@ def main():
                 player.move(dx, dy)
                 camera.update(player)
 
-        # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
-        if fullscreen:
-            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
-
         """
         기타
         """
+        # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
+        if fullscreen:
+            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
 
         # 플레이어 위치 표시
         if debug.showpos: debug.show_pos(player,'player')

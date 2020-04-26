@@ -5,7 +5,7 @@ from entity import Entity
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
 
-from map_objects.map_generator.cellular_automata import cell_auto
+from map_objects.map_generator.cellular_automata import make_cave
 
 from components.luminary import Luminary
 
@@ -14,25 +14,14 @@ class GameMap:
         # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
         self.width = width
         self.height = height
-
-        """
-        넘파이 연습중
-        """
         self.tiles = self.initialize_tiles()
 
-
-    def initialize_tiles(self):
-        # 타일 리스트를 채운다. 타일(못지나감)을 채우는데, y에 대해 높이수만큼 쌓고, 그걸 또 너비수만큼 쌓는다.
-        # 넘파이라서 y,x식으로 해야 함
-        
-        while True:
-            wall_map = cell_auto(self.width,self.height, 3, 0.35)
-            if wall_map[int(self.height/2),int(self.width/2)] == 0:
-                break
-        
-        #wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))
-        
+    def initialize_tiles(self):       
+        #원래는 이걸 하고 싶었는데.
+        #wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))                   
         np_tiles = np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
+        wall_map = make_cave(self.width, self.height, 2, 0.4)
+        #print (wall_map)
         
         for y in range(self.height):
             for x in range(self.width):
@@ -40,34 +29,6 @@ class GameMap:
                     np_tiles[y,x].blocked = False
                     np_tiles[y,x].block_sight = False
         return np_tiles
-        
-        
-        #return np_tiles
-
-
-    def make_map(self):
-        pass
-
-    def create_room(self, room):
-        """
-        주어진 사각형 객체의 내부를 움직일 수 있는 빈 공간(바닥)으로 채운다.
-        """
-        for x in range(room.x1 + 1, room.x2):
-            for y in range(room.y1 + 1, room.y2):
-                self.tiles[y,x].blocked = False
-                self.tiles[y,x].block_sight = False
-
-    def create_h_tunnel(self, x1, x2, y):
-        # x1 과 x2 사이 y
-        for x in range(min(x1, x2), max(x1, x2) + 1):
-            self.tiles[y,x].blocked = False
-            self.tiles[y,x].block_sight = False
-
-    def create_v_tunnel(self, y1, y2, x):
-        # 
-        for y in range(min(y1, y2), max(y1, y2) + 1):
-            self.tiles[y,x].blocked = False
-            self.tiles[y,x].block_sight = False
 
     def is_blocked(self, x, y):
         # 게임맵 객체의 tiles리스트에서 찾은 후 막혔는지 확인한다.
@@ -81,13 +42,12 @@ class GameMap:
         return False
 
     """
-    신규 기능들
+    디버그 기능들
     """
 
     def toggle_wall(self,x,y):
         self.tiles[y,x].blocked ^= 1
         self.tiles[y,x].block_sight ^= 1
-
 
     def create_luminary(self, entities, x ,y, brightness=5):
         luminary_component = Luminary(luminosity=brightness)
