@@ -14,7 +14,7 @@ def render_all(con, entities, game_map, fov_map, light_map, camera, fov_recomput
                 Mapx = x + camera.x
                 Mapy = y + camera.y
                 
-                print(F"{camera.x},{camera.y}")
+                #print(F"{camera.x},{camera.y}")
                 
                 # wall 불리언에 tile의 block_sight이 True인지 여부를 대입                
                 visible = fov_map.fov[y,x]
