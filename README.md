@@ -1,6 +1,5 @@
 # Mary
 태어나서 처음으로 만드는 로그라이크. 
-First roguelike project ever.
 
 ## Long Term Goal
 - 절차적 생성으로 생성된 엔티티
