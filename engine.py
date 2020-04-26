@@ -12,6 +12,7 @@ from renderer.render_functions import clear_all, render_all
 from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
+from camera import Camera
 from input_handlers import handle_keys
 from debugs import Debug
 
@@ -42,6 +43,11 @@ def main():
 
     light_map = initialize_light(game_map, fov_map, entities)
 
+    # 카메라 객체 생성
+    camera = Camera(0,0, map_width, map_height)
+
+    camera.update(player)
+    
     """
     디버그 명령 목록
     passwall: 벽 통과 가능
