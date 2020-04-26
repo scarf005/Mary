@@ -33,22 +33,24 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
     generation = 반복 수
     init_chance = 벽 빈도
     """
-    cell_map = np.random.rand(height,width)
-    cell_map = np.where(cell_map < init_chance, 1, 0)
-
+    old_map = np.random.rand(height,width)
+    old_map = np.where(old_map < init_chance, 1, 0)
+    new_map = np.zeros((height,width),dtype='uint8')
+    
     #TODO: change alive_neighbors counting mechanism so it doesn't break. Maybe add new func.
     #TODO: Fill too small rooms. Apply flood fill.
     for gen in range(generation + 1):
         #print(F"{gen}번째 반복")
-        #display(cell_map)
-        new_map = np.zeros((height,width),dtype='uint8')
+        #display(old_map)
+        old_map[old_map > 1] = 1
+        new_map[:] = 0
         for y in range(height):
             for x in range(width):
-                #alive_neighbors = cell_map[max(y-1, 0):min(y+2, height),max(x-1, 0):min(x+2, width)]
+                #alive_neighbors = old_map[max(y-1, 0):min(y+2, height),max(x-1, 0):min(x+2, width)]
                 #walls_1away = len(np.where(alive_neighbors.flatten() == 1)[0])
-                walls_1away = adjacent_walls(cell_map, x,y)
+                walls_1away = adjacent_walls(old_map, x,y)
 
-                if cell_map[y,x]:
+                if new_map[y,x]:
                     if walls_1away < death_limit:
                         new_map[y,x] = 0
                     else:
@@ -59,17 +61,18 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
                         new_map[y,x] = 1
                     else:
                         new_map[y,x] = 0
-        cell_map += new_map 
-        #print("\n\n")
+        #print(new_map)
+        old_map += new_map 
+        #print("\n")
         #time.sleep(0.8)
         
     
     #가장자리 벽으로 둘러싸기
-    cell_map[0,:] = 1
-    cell_map[height-1,:] = 1
-    cell_map[:,0] = 1
-    cell_map[:,width-1] = 1
-    return cell_map
+    old_map[0,:] = 1
+    old_map[height-1,:] = 1
+    old_map[:,0] = 1
+    old_map[:,width-1] = 1
+    return old_map
 
 
 if __name__ == '__main__':

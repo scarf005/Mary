@@ -21,9 +21,7 @@ First roguelike project ever.
  - Inventory
 - 메세지 로그
  - Message log
-- 입력 함수 최신 메소드로 업데이트
- - Replace old input method to new
 
 ## To fix
-- 카메라 활성화 시 가장자리에서 벽이 번짐
- - Camera activation creates 'edge smearing' with walls
+- 동굴 생성 알고리즘이 작동을 제대로 하지 않음
+ - Cave algorithm is not working as intended

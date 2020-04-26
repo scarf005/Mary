@@ -20,7 +20,7 @@ class GameMap:
         #원래는 이걸 하고 싶었는데.
         #wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))                   
         np_tiles = np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
-        wall_map = make_cave(self.width, self.height, 2, 0.4)
+        wall_map = make_cave(self.width, self.height, 2, 0.35)
         #print (wall_map)
         
         for y in range(self.height):

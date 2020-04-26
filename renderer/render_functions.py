@@ -8,7 +8,6 @@ def render_all(con, entities, game_map, fov_map, light_map, camera, fov_recomput
     if fov_recompute:
         #tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
         con.clear()
-        
         for y in range(game_map.height):
             for x in range(game_map.width):
                 # 지도 위치

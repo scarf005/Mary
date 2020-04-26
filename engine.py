@@ -1,5 +1,6 @@
 import tcod 
 import numpy as np
+import sys, warnings
 
 # 엔티티 및 컴포너트
 from entity import Entity
@@ -19,6 +20,9 @@ from debugs import Debug
 
 # 변수 정보
 from data import *
+
+if not sys.warnoptions:
+    warnings.simplefilter("ignore")
 
 def main():
 
