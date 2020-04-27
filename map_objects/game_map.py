@@ -2,12 +2,15 @@ import tcod
 import numpy as np
 from random import randint
 
-from entity import Entity
+# 지도 
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
-
 from map_objects.map_generator.cellular_automata import make_cave, find_nook
 
+# 엔티티, 컴포넌트
+from entity import Entity
+from components.ai import BasicMonster
+from components.fighter import Fighter
 from components.luminary import Luminary
 
 class GameMap:
@@ -47,10 +50,17 @@ class GameMap:
             monster_num = len(nooks)
         
         for i in range(monster_num):
+            ai_component = BasicMonster()
+
             if randint(0, 100) < 80:
-                monster = Entity(nooks[i][1], nooks[i][0], '~', tcod.flame, 'crawling intestines', blocks=True)
+                fighter_component = Fighter(hp=10, defense=0, power=3)
+                monster = Entity(nooks[i][1], nooks[i][0], '~', tcod.flame, 'crawling intestines',
+                                 blocks=True, fighter=fighter_component, _Ai=ai_component)
             else:
-                monster = Entity(nooks[i][1], nooks[i][0], 'S', tcod.dark_green, 'giant spider', blocks=True)
+                fighter_component = Fighter(hp=16, defense=1, power=4)
+                monster = Entity(nooks[i][1], nooks[i][0], 'S', tcod.dark_green, 'giant spider',
+                                 blocks=True, fighter=fighter_component, _Ai=ai_component)
+            
             entities.append(monster)
         
         # 남는 공간이 있으면 램프 생성

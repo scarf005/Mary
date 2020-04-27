@@ -10,23 +10,25 @@ class Entity:
         self.name = name
         self.color = color
 
-        # 컴포넌트 추가
-        component_list = {'_Luminary':None, 'blocks':False}        
-        for key,value in component_list.items() :
-            print("kwargs")
-            print (kwargs)
-            if key in kwargs.keys():
-                print (F"kwargs:{kwargs[key]}")
+        # 기타 속성들
+        component_list = {'blocks':False, '_Luminary':None, '_Fighter':None, '_Ai':None}
+        for key,value in component_list.items():
+            #print("kwargs")
+            #print (kwargs)
+            if key in kwargs.keys():                
                 setattr(self, key, kwargs[key])
-            else:
-                print (F"key{key},value:{value}")
+            else:                
                 setattr(self, key, value)
-                
-        print(self.__dict__)
-        #((k, v) for k, v in if k in component_list.keys())
         
+        # 컴포넌트 소유주 추가
         if self._Luminary:
             self._Luminary.owner = self
+        
+        if self._Fighter:
+            self._Fighter.owner = self
+
+        if self._Ai:
+            self._Ai.owner = self
 
 
     def move(self, dx, dy):

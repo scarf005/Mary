@@ -2,10 +2,14 @@ import tcod
 import numpy as np
 import sys, warnings
 
-# 엔티티 및 컴포너트
-from entity import Entity, get_blocking_entities_at_location
-from components.luminary import Luminary
+# 게임 지도
 from map_objects.game_map import GameMap
+
+# 앤티티와 컴포넌트
+from entity import Entity, get_blocking_entities_at_location
+from components.fighter import Fighter
+from components.luminary import Luminary
+
 
 # 렌더링 기능
 from renderer.camera import Camera
@@ -31,8 +35,9 @@ def main():
     객체 생성
     """
     # 플레이어 객체 생성. 위치는 맵 중앙.
+    fighter_component = Fighter(hp=30, defense=2, power=5)
     luminary_component = Luminary(luminosity=10)
-    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, _Luminary=luminary_component)
+    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, _Luminary=luminary_component, _Fighter=fighter_component)
     entities = [player]
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
@@ -181,7 +186,8 @@ def main():
                     if entity.name == 'light source':
                         message.log(F"The {entity.name} is glowing")
                     else:
-                        message.log(F'The {entity.name} ponders the meaning of existence')
+                        if entity._Ai:
+                            entity._Ai.take_turn(message)
 
             game_state = GameStates.PLAYERS_TURN
         
