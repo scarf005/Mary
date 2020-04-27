@@ -10,7 +10,32 @@ class RenderOrder(Enum):
     ITEM = 2
     ACTOR = 3
 
-def render_all(con, entities, player, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors):
+def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
+    bar_width = int(float(value) / maximum * total_width)
+
+    tcod.console_set_default_background(panel, back_color)
+    tcod.console_rect(panel, x, y, total_width, 1, False, tcod.BKGND_SCREEN)
+
+    tcod.console_set_default_background(panel, bar_color)
+    if bar_width > 0:
+        tcod.console_rect(panel, x, y, bar_width, 1, False, tcod.BKGND_SCREEN)
+
+    tcod.console_set_default_foreground(panel, tcod.white)
+    tcod.console_print_ex(panel, int(x + total_width / 2), y, tcod.BKGND_NONE, tcod.CENTER,
+                             '{0}: {1}/{2}'.format(name, value, maximum))
+    
+def get_names_under_mouse(mouse, camera, entities, fov_map):
+    #카메라
+    (x, y) = (mouse.cx - camera.x, mouse.cy - camera.y)
+
+    names = [entity.name for entity in entities
+             if entity.x == x and entity.y == y and fov_map.fov[entity.y, entity.x]]
+    names = ', '.join(names)
+
+    return names.capitalize()
+
+def render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map, camera, message_log, 
+               fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     # fov 재계산 시만
     if fov_recompute:
         #tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
@@ -53,11 +78,26 @@ def render_all(con, entities, player, game_map, fov_map, light_map, camera, fov_
     for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, camera)
     
-    tcod.console_set_default_foreground(con, tcod.white)
-    tcod.console_print_ex(con, 1, screen_height - 2, tcod.BKGND_NONE, tcod.LEFT,
-                         'HP: {0:02}/{1:02}'.format(player._Fighter.hp, player._Fighter.max_hp))
-
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+    
+    tcod.console_set_default_background(panel, tcod.black)
+    tcod.console_clear(panel)
+    
+    # Print the game messages, one line at a time
+    y = 1
+    for message in message_log.messages:
+        tcod.console_set_default_foreground(panel, message.color)
+        tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
+        y += 1
+
+    render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
+               tcod.light_red, tcod.darker_red)
+    
+    tcod.console_set_default_foreground(panel, tcod.light_gray)
+    tcod.console_print_ex(panel, 1, 0, tcod.BKGND_NONE, tcod.LEFT,
+                            get_names_under_mouse(mouse, camera, entities, fov_map))
+
+    tcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
 
 def clear_all_entities(con, entities, camera):

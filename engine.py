@@ -19,10 +19,11 @@ from renderer.render_functions import clear_all_entities, render_all, RenderOrde
 from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
+from game_messages import MessageLog
 from game_states import GameStates
 from input_handlers import handle_keys
 from debugs import Debug
-from message import Message
+
 
 # 변수 정보
 from data import *
@@ -70,7 +71,7 @@ def main():
     debug = Debug()
 
     # 메세지 출력용 객체 생성.
-    message_log = Message()
+    message_log = MessageLog(message_x, message_width, message_height)
     
     # 키보드, 마우스 입력 처리용 객체 생성
     key = tcod.Key()
@@ -79,8 +80,9 @@ def main():
     # 순서 결정용 객체 생성
     game_state = GameStates.PLAYERS_TURN
 
-    # 콘솔 con 생성
+    # 콘솔, 패널 생성
     con = tcod.console.Console(screen_width, screen_height)
+    panel = libtcod.console_new(screen_width, panel_height)
 
     # 폰트 설정: 10x10파일, 이미지 파일은 그레이스케일, 배열 방식은 TCOD
     # tcod.console_set_custom_font('arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
@@ -98,7 +100,7 @@ def main():
         입력
         """
         # 사용자 입력을 받음: 키 누를 시, 키보드, 마우스
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS, key, mouse)      
+        tcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)      
         
         """
         화면 표시
@@ -118,7 +120,10 @@ def main():
         clear_all_entities(con, entities, camera)
         
         # 표시할 모든 객체를 화면에 배치함
-        render_all(con, entities, player, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map, 
+                   camera, message_log, fov_recompute, 
+                   screen_width, screen_height, 
+                   bar_width, panel_height, panel_y, colors)
 
         fov_recompute = False
         light_recompute = False
@@ -203,7 +208,8 @@ def main():
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity.name == 'light source':
-                    message_log.log(F"The {entity.name} is glowing")
+                    pass
+                    #message_log.log(F"The {entity.name} is glowing")
                 elif entity._Ai:
                     enemy_turn_results = entity._Ai.take_turn(player, 
                                                               fov_map, game_map, entities)
@@ -231,8 +237,6 @@ def main():
             else:
                 game_state = GameStates.PLAYERS_TURN
         
-        # 메세지 출력
-        message_log.cout()
         
         """
         디버그 기능들

@@ -1,3 +1,6 @@
+import tcod
+
+from game_messages import Message
 from random import randint
 
 class Fighter:
@@ -24,8 +27,9 @@ class Fighter:
 
         entity_name = self.owner.name.capitalize()
         if damage > 0:
-            results.append({'message':F'{entity_name} attacks {target.name} for {damage} hit points.'})
+            results.append({'message': Message(F'{entity_name} attacks {target.name} for {damage} hit points.',
+                           tcod.white)})
             results.extend(target._Fighter.take_damage(damage))
         else:
-            results.append({'message':F'{entity_name} attacks {target.name} but does no damage.'})
+            results.append({'message': Message(F'{entity_name} attacks {target.name} but does no damage.',tcod.white)})
         return results
