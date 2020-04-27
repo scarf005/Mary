@@ -7,6 +7,7 @@ from map_objects.game_map import GameMap
 
 # 앤티티와 컴포넌트
 from entity import Entity, get_blocking_entities_at_location
+from death_functions import kill_monster, kill_player
 from components.fighter import Fighter
 from components.luminary import Luminary
 
@@ -14,7 +15,7 @@ from components.luminary import Luminary
 # 렌더링 기능
 from renderer.camera import Camera
 from renderer.lighting_functions import initialize_light
-from renderer.render_functions import clear_all_entities, render_all
+from renderer.render_functions import clear_all_entities, render_all, RenderOrder
 from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
@@ -37,7 +38,7 @@ def main():
     # 플레이어 객체 생성. 위치는 맵 중앙.
     fighter_component = Fighter(hp=30, defense=2, power=5)
     luminary_component = Luminary(luminosity=10)
-    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, _Luminary=luminary_component, _Fighter=fighter_component)
+    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component)
     entities = [player]
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
@@ -69,7 +70,7 @@ def main():
     debug = Debug()
 
     # 메세지 출력용 객체 생성.
-    message = Message()
+    message_log = Message()
     
     # 키보드, 마우스 입력 처리용 객체 생성
     key = tcod.Key()
@@ -117,7 +118,7 @@ def main():
         clear_all_entities(con, entities, camera)
         
         # 표시할 모든 객체를 화면에 배치함
-        render_all(con, entities, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, player, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors)
 
         fov_recompute = False
         light_recompute = False
@@ -135,35 +136,37 @@ def main():
         action = handle_keys(key)
 
         # action 변수에 입력한 키워드에 대응한 값을 move 변수에 대입
-        move = action.get('move') 
-        exit = action.get('exit')
-        fullscreen = action.get('fullscreen')
+        if action.get('exit'):
+            return True
         
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
-        if fullscreen:
+        if action.get('fullscreen'):
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
 
         """
         플레이어 차례에 플레이어가 할 수 있는 행동들
         """
+        player_turn_results = []
+        
         # move변수에 대입된 값이 있을 시 이동
-        if move and game_state == GameStates.PLAYERS_TURN:
-            dx, dy = move
+        if action.get('move') and game_state == GameStates.PLAYERS_TURN:
+            dx, dy = action.get('move')
             destix = player.x + dx
             destiy = player.y + dy
+            
             if debug.passwall == False:
-                if not game_map.is_blocked(player.x + dx, player.y + dy):
+                if not game_map.is_blocked(destix, destiy):
                     target = get_blocking_entities_at_location(entities, destix, destiy)
+                    
                     if target:
-                        print(player._Fighter.power)
-                        player._Fighter.attack(message, target)
-                        #message.log(F"You kick {target.name}, much to its annoyance!")
+                        attack_results = player._Fighter.attack(target)
+                        player_turn_results.extend(attack_results)                        
+
                     else:
                         player.move(dx, dy)
                         camera.update(player)
-
-                    fov_recompute = True
-                    light_recompute = True
+                        fov_recompute = True
+                        light_recompute = True
                     
                     game_state = GameStates.ENEMY_TURN
             else:
@@ -179,22 +182,57 @@ def main():
                 player._Luminary.luminosity = player._Luminary.init_luminosity
             light_recompute = True
         
+        for r in player_turn_results:
+            message = r.get('message')
+            dead_entity = r.get('dead')
+ 
+            if message:
+                message_log.log(message)
+                
+            if dead_entity:
+                if dead_entity == player:
+                    message, game_state = kill_player(dead_entity)
+                else:
+                    message = kill_monster(dead_entity)
+
+                message_log.log(message)
+        
         """
         적의 차례에 적이 할 수 있는 행동들
         """             
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity != player:
-                    if entity.name == 'light source':
-                        message.log(F"The {entity.name} is glowing")
-                    else:
-                        if entity._Ai:
-                            entity._Ai.take_turn(message, player, fov_map, game_map, entities)
+                if entity.name == 'light source':
+                    message_log.log(F"The {entity.name} is glowing")
+                elif entity._Ai:
+                    enemy_turn_results = entity._Ai.take_turn(player, 
+                                                              fov_map, game_map, entities)
 
-            game_state = GameStates.PLAYERS_TURN
+                    for er in enemy_turn_results:
+                        message = er.get('message')
+                        dead_entity = er.get('dead')
+
+                        if message:
+                            message_log.log(message)
+
+                        if dead_entity:
+                            if dead_entity == player:
+                                message, game_state = kill_player(dead_entity)
+                            else:
+                                message = kill_monster(dead_entity)
+
+                            message_log.log(message)
+
+                            if game_state == GameStates.PLAYER_DEAD:
+                                break
+                    if game_state == GameStates.PLAYER_DEAD:
+                                break
+
+            else:
+                game_state = GameStates.PLAYERS_TURN
         
         # 메세지 출력
-        message.cout()
+        message_log.cout()
         
         """
         디버그 기능들
@@ -213,17 +251,6 @@ def main():
             game_map.create_luminary(entities, player.x, player.y, 15)
             # 광원이 새로 생겼으니 다시 계산
             light_recompute = True
-        
-        """
-        엔티티
-        """
-        """
-        for E in entities:
-            try:
-                print (F"{E.name} L:{E._Luminary.luminosity}")
-            except:
-                print (F"{E.name} is not a lighting source")
-        """
 
 
 if __name__ == '__main__':

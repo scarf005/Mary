@@ -1,3 +1,5 @@
+from random import randint
+
 class Fighter:
     def __init__(self, hp, defense, power):
         """
@@ -9,14 +11,21 @@ class Fighter:
         self.power = power
         
     def take_damage(self, amount):
+        results = []
         self.hp -= amount
+
+        if self.hp <= 0:
+            results.append({'dead': self.owner})
+        return results
         
-    def attack(self, message, target):
-        damage = self.power - target._Fighter.defense
+    def attack(self, target):
+        results = []
+        damage = randint(0,self.power) - randint(0,target._Fighter.defense)
 
         entity_name = self.owner.name.capitalize()
         if damage > 0:
-            target._Fighter.take_damage(damage)
-            message.log(F'{entity_name} attacks {target.name} for {damage} hit points.')
+            results.append({'message':F'{entity_name} attacks {target.name} for {damage} hit points.'})
+            results.extend(target._Fighter.take_damage(damage))
         else:
-            message.log(F'{entity_name} attacks {target.name} but does no damage.')
+            results.append({'message':F'{entity_name} attacks {target.name} but does no damage.'})
+        return results

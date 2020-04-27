@@ -1,9 +1,16 @@
 import tcod 
+from enum import Enum
 
 from renderer.lighting_functions import mix_rgb
 from data import colors
 
-def render_all(con, entities, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors):
+class RenderOrder(Enum):
+    # 높을수록 위에 표시한다. 즉 높이
+    CORPSE = 1
+    ITEM = 2
+    ACTOR = 3
+
+def render_all(con, entities, player, game_map, fov_map, light_map, camera, fov_recompute, screen_width, screen_height, colors):
     # fov 재계산 시만
     if fov_recompute:
         #tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
@@ -41,8 +48,14 @@ def render_all(con, entities, game_map, fov_map, light_map, camera, fov_recomput
 
 
     # 목록에 있는 모든 객체를 표시함.
-    for entity in entities:
+    entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
+    
+    for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, camera)
+    
+    tcod.console_set_default_foreground(con, tcod.white)
+    tcod.console_print_ex(con, 1, screen_height - 2, tcod.BKGND_NONE, tcod.LEFT,
+                         'HP: {0:02}/{1:02}'.format(player._Fighter.hp, player._Fighter.max_hp))
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 

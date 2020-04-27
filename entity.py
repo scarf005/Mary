@@ -1,6 +1,8 @@
 import tcod
 import math
 
+from renderer.render_functions import RenderOrder
+
 class Entity:
     """
     플레이어, 적, 아이템 등등 모든 것을 표현할 때 쓰는 객체.
@@ -14,7 +16,8 @@ class Entity:
         self.color = color
 
         # 기타 속성들
-        component_list = {'blocks':False, '_Luminary':None, '_Fighter':None, '_Ai':None}
+        component_list = {'blocks':False, 'render_order':RenderOrder.CORPSE,
+                          '_Luminary':None, '_Fighter':None, '_Ai':None}
         for key,value in component_list.items():
             #print("kwargs")
             #print (kwargs)
