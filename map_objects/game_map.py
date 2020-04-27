@@ -56,7 +56,7 @@ class GameMap:
         # 남는 공간이 있으면 램프 생성
         if not len(nooks) - monster_num == 0:
             for i in range(len(nooks) - monster_num):
-                create_luminary(entities, nooks[i][1], nooks[i][0], 15)
+                self.create_luminary(entities, nooks[i][1], nooks[i][0], 15)
 
     def is_blocked(self, x, y):
         # 게임맵 객체의 tiles리스트에서 찾은 후 막혔는지 확인한다.
@@ -79,5 +79,5 @@ class GameMap:
 
     def create_luminary(self, entities, x ,y, brightness=5):
         luminary_component = Luminary(luminosity=brightness)
-        light = Entity(x, y, '&', tcod.yellow, 'light source', blocks=False, luminary=luminary_component)
+        light = Entity(x, y, '&', tcod.yellow, 'light source',luminary=luminary_component)
         entities.append(light)

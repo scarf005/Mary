@@ -175,7 +175,10 @@ def main():
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity != player:
-                    print(F'The {entity.name} ponders the meaning of existence.')
+                    if entity.name == 'light source':
+                        print(F"The {entity.name} is glowing.")
+                    else:
+                        print(F'The {entity.name} ponders the meaning of existence.')
 
             game_state = GameStates.PLAYERS_TURN
         
