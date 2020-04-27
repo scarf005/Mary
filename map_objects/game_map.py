@@ -79,5 +79,5 @@ class GameMap:
 
     def create_luminary(self, entities, x ,y, brightness=5):
         luminary_component = Luminary(luminosity=brightness)
-        light = Entity(x, y, '&', tcod.yellow, 'light source',luminary=luminary_component)
+        light = Entity(x, y, '&', tcod.yellow, 'light source',_Luminary=luminary_component)
         entities.append(light)

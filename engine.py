@@ -17,6 +17,7 @@ from renderer.fov_functions import initialize_fov, recompute_fov
 from game_states import GameStates
 from input_handlers import handle_keys
 from debugs import Debug
+from message import Message
 
 # 변수 정보
 from data import *
@@ -31,7 +32,7 @@ def main():
     """
     # 플레이어 객체 생성. 위치는 맵 중앙.
     luminary_component = Luminary(luminosity=10)
-    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, luminary=luminary_component)
+    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, _Luminary=luminary_component)
     entities = [player]
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
@@ -62,6 +63,8 @@ def main():
     # 디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
     debug = Debug()
 
+    # 메세지 출력용 객체 생성.
+    message = Message()
     
     # 키보드, 마우스 입력 처리용 객체 생성
     key = tcod.Key()
@@ -147,7 +150,7 @@ def main():
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
                     target = get_blocking_entities_at_location(entities, destix, destiy)
                     if target:
-                        print (F"You kick {target.name}, much to its annoyance!")
+                        message.log(F"You kick {target.name}, much to its annoyance!")
                     else:
                         player.move(dx, dy)
                         camera.update(player)
@@ -163,10 +166,10 @@ def main():
                 camera.update(player)
         
         if action.get('toggle_light'):
-            if player.luminary.luminosity:
-                player.luminary.luminosity = 0
+            if player._Luminary.luminosity:
+                player._Luminary.luminosity = 0
             else:
-                player.luminary.luminosity = player.luminary.init_luminosity
+                player._Luminary.luminosity = player._Luminary.init_luminosity
             light_recompute = True
         
         """
@@ -176,11 +179,14 @@ def main():
             for entity in entities:
                 if entity != player:
                     if entity.name == 'light source':
-                        print(F"The {entity.name} is glowing.")
+                        message.log(F"The {entity.name} is glowing")
                     else:
-                        print(F'The {entity.name} ponders the meaning of existence.')
+                        message.log(F'The {entity.name} ponders the meaning of existence')
 
             game_state = GameStates.PLAYERS_TURN
+        
+        # 메세지 출력
+        message.cout()
         
         """
         디버그 기능들
@@ -206,7 +212,7 @@ def main():
         """
         for E in entities:
             try:
-                print (F"{E.name} L:{E.luminary.luminosity}")
+                print (F"{E.name} L:{E._Luminary.luminosity}")
             except:
                 print (F"{E.name} is not a lighting source")
         """

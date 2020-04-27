@@ -23,8 +23,8 @@ def initialize_light(game_map, fov_map, entities):
     # 광원 엔티티 생성
     for E in entities:
         try:
-            if E.luminary.luminosity:
-                light_map[E.y, E.x] = -E.luminary.luminosity
+            if E._Luminary.luminosity:
+                light_map[E.y, E.x] = -E._Luminary.luminosity
         except:
             pass
 
