@@ -65,7 +65,7 @@ class GameMap:
         
         # 남는 공간이 있으면 램프 생성
         if not len(nooks) - monster_num == 0:
-            for i in range(len(nooks) - monster_num):
+            for i in range(monster_num+1,len(nooks) - monster_num):
                 self.create_luminary(entities, nooks[i][1], nooks[i][0], 15)
 
     def is_blocked(self, x, y):
