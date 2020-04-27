@@ -155,7 +155,9 @@ def main():
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
                     target = get_blocking_entities_at_location(entities, destix, destiy)
                     if target:
-                        message.log(F"You kick {target.name}, much to its annoyance!")
+                        print(player._Fighter.power)
+                        player._Fighter.attack(message, target)
+                        #message.log(F"You kick {target.name}, much to its annoyance!")
                     else:
                         player.move(dx, dy)
                         camera.update(player)

@@ -55,11 +55,11 @@ class GameMap:
             if randint(0, 100) < 80:
                 fighter_component = Fighter(hp=10, defense=0, power=3)
                 monster = Entity(nooks[i][1], nooks[i][0], '~', tcod.flame, 'crawling intestines',
-                                 blocks=True, fighter=fighter_component, _Ai=ai_component)
+                                blocks=True, _Fighter=fighter_component, _Ai=ai_component)
             else:
                 fighter_component = Fighter(hp=16, defense=1, power=4)
                 monster = Entity(nooks[i][1], nooks[i][0], 'S', tcod.dark_green, 'giant spider',
-                                 blocks=True, fighter=fighter_component, _Ai=ai_component)
+                                blocks=True, _Fighter=fighter_component, _Ai=ai_component)
             
             entities.append(monster)
         
