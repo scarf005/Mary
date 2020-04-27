@@ -54,7 +54,7 @@ def clear_all_entities(con, entities, camera):
 
 def draw_entity(con, entity, fov_map, camera):
     #시야 안에 객체가 들어올 때만 객체를 그림
-    if tcod.map_is_in_fov(fov_map, entity.x, entity.y):
+    if fov_map.fov[entity.y, entity.x]:
         # 객체를 표시함. 앞줄은 글자색, 뒷줄은 글자 배치.
         tcod.console_set_default_foreground(con, entity.color)
         tcod.console_put_char(con, entity.x + camera.x, entity.y + camera.y, entity.char, tcod.BKGND_NONE)

@@ -187,7 +187,7 @@ def main():
                         message.log(F"The {entity.name} is glowing")
                     else:
                         if entity._Ai:
-                            entity._Ai.take_turn(message)
+                            entity._Ai.take_turn(message, player, fov_map, game_map, entities)
 
             game_state = GameStates.PLAYERS_TURN
         

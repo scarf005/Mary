@@ -1,3 +1,6 @@
+import tcod
+import math
+
 class Entity:
     """
     플레이어, 적, 아이템 등등 모든 것을 표현할 때 쓰는 객체.
@@ -29,16 +32,39 @@ class Entity:
 
         if self._Ai:
             self._Ai.owner = self
-
+            
+    def distance_to(self, other):
+            dx = other.x - self.x
+            dy = other.y - self.y
+            return math.sqrt(dx ** 2 + dy ** 2)
 
     def move(self, dx, dy):
         #  엔티티를 지정한 양 만큼 이동시킴
         self.x += dx
         self.y += dy
+        
+    def move_towards(self, target_x, target_y, game_map, entities):
+        dx = target_x - self.x
+        dy = target_y - self.y
+        distance = math.sqrt(dx ** 2 + dy ** 2)
 
-# 클래스 밖 함수   
+        dx = int(round(dx / distance))
+        dy = int(round(dy / distance))
+
+        if not (game_map.is_blocked(self.x + dx, self.y + dy) or
+                    get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
+            self.move(dx, dy)
+            
+    
+
+
+"""
+클래스 밖 함수   
+"""
+
 def get_blocking_entities_at_location(entities, destination_x, destination_y):
     for entity in entities:
         if entity.blocks and entity.x == destination_x and entity.y == destination_y:
             return entity
     return None
+

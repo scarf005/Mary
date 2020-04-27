@@ -1,29 +1,34 @@
+LOG = 0
+TIMES = 1
+TYPE = 2
+
 class Message:
     def __init__(self, init_log = None):
-        # 구성: [메세지][횟수]
+        # 구성: [메세지][횟수][종류]        
         self.logs = []
         self.old_logs = []
         if init_log:
             self.add_log(init_log)
     
-    def log(self, message, amount=1):
+    def log(self, message, msg_type=None, amount=1):
         # 로그가 비어 있으면 그냥 추가
         if not len(self.logs):
             self.logs.append([message,amount])
         # 이 로그가 마지막 로그랑 같으면 그 로그 수를 늘림
         else:
-            if self.logs[len(self.logs)-1][0] == message:
-                self.logs[len(self.logs)-1][1] += 1
+            if self.logs[len(self.logs)-1][LOG] == message:
+                self.logs[len(self.logs)-1][TIMES] += 1
             else:
-                self.logs.append([message,amount])
+                self.logs.append([message,amount,msg_type])
             
     def cout(self):
         if self.logs:
+            print("\n")
             for log in self.logs:
                 if not log[1] == 1:
-                    print (F"{log[0]}. x {log[1]}")
+                    print (F"{log[LOG]} x {log[TIMES]}")
                 else:
-                    print (F"{log[0]}.")
+                    print (F"{log[LOG]}")
         self.old_logs.extend(self.logs)
         self.logs.clear()
         
