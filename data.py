@@ -1,21 +1,24 @@
 import tcod as libtcod
 
 #스크린 가로/세로 크기
-screen_width = 50
-screen_height = 40
+screen_width = 40
+screen_height = 30
 
 #지도
-map_width = 25
+map_width = 40
 map_height = 20
 
-#인터페이스
+"""
+인터페이스
+"""
+# 체력 바
 bar_width = 20
 panel_height = 7
 panel_y = screen_height - panel_height
 
-message_x = bar_width + 2
-message_width = screen_width - bar_width - 2
-message_height = panel_height - 1
+message_x = 1
+message_width = screen_width - 2 #- bar_width - 2
+message_height = panel_height - 2 #1
 
 #FOV
 fov_algorithm = 2

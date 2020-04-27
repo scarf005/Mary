@@ -84,7 +84,7 @@ def render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map
     tcod.console_clear(panel)
     
     # Print the game messages, one line at a time
-    y = 1
+    y = 2
     for message in message_log.messages:
         tcod.console_set_default_foreground(panel, message.color)
         tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)

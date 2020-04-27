@@ -14,7 +14,7 @@ def kill_player(player):
 def kill_monster(monster):
     death_message = Message(F"{monster.name.capitalize()} is dead!", tcod.orange)
     
-    monster.name = F"remains of {monster.name}"
+    monster.name = F"what is left of {monster.name}"
     monster.char = '%'
     monster.color = tcod.dark_red
     monster.blocks = False
