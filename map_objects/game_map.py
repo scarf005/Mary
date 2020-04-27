@@ -11,33 +11,48 @@ from map_objects.map_generator.cellular_automata import make_cave, find_nook
 from components.luminary import Luminary
 
 class GameMap:
-    def __init__(self, width, height, entities):
+    def __init__(self, width, height):
         # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
         self.width = width
         self.height = height
-        self.tiles = self.initialize_tiles(entities)
-
-    def initialize_tiles(self, entities):       
-        #원래는 이걸 하고 싶었는데.
-        #wall_map = np.where(wall_map == 1 , Tile(True), Tile(False))                   
-        np_tiles = np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
-        wall_map = make_cave(self.width, self.height, 3, 0.4)        
-        """
-        지금은 임시로 구석진 곳에 램프를 설치함
-        """    
-        self.place_lamp_at_nook(wall_map,entities)
+        self.tiles = self.initialize_tiles()
         
+
+    def initialize_tiles(self):                  
+        return np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
+        
+    def create_map_cave(self, entities, min_nook, max_entities):
+        while True:
+            wall_map = make_cave(self.width, self.height, 3, 0.4)  
+            if len(find_nook(wall_map)) >= min_nook: break
+
         for y in range(self.height):
             for x in range(self.width):
                 if not wall_map[y,x]:
-                    np_tiles[y,x].blocked = False
-                    np_tiles[y,x].block_sight = False
-        return np_tiles
+                    self.tiles[y,x].blocked = False
+                    self.tiles[y,x].block_sight = False
+        self.place_entities_at_nook(entities, min_nook, max_entities)
     
-    def place_lamp_at_nook(self, wall_map, entities):       
+    def place_entities_at_nook(self, entities, min_monsters, max_monsters):      
+        wall_map = np.zeros((self.height,self.width),dtype='uint8')    
+    
+        for y in range(self.height):
+            for x in range(self.width):
+                wall_map[y,x] = 1 if self.tiles[y,x].blocked else 0
+                
         nooks = find_nook(wall_map)
-        for i in range(len(nooks)):
-            self.create_luminary(entities, nooks[i][1], nooks[i][0], 15)
+        monster_num = randint(min_monsters, max_monsters)
+        
+        if len(nooks) < monster_num:
+            monster_num = len(nooks)
+        
+        for i in range(monster_num):
+            if randint(0, 100) < 80:
+                monster = Entity(nooks[i][1], nooks[i][0], '~', tcod.flame, 'crawling intestines', blocks=True)
+            else:
+                monster = Entity(nooks[i][1], nooks[i][0], 'S', tcod.dark_green, 'giant spider', blocks=True)
+            
+            entities.append(monster)
         
 
     def is_blocked(self, x, y):

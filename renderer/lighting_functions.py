@@ -56,7 +56,7 @@ def initialize_light(game_map, fov_map, entities):
 def mix_rgb(color,brightness):
     color_setting = -(brightness * 10 **0.5)
     C = np.array(list(color))
-    L = np.array([int((color_setting)/ ((i+1)**0.5)) for i in range(3)])
+    L = np.array([int((color_setting)/ ((i+1)**2)) for i in range(3)])
     T = C + L - 30 # 기본 밝기
     #값이 8비트를 초과하면 오버플로우 막기
     T[T>255] = 255

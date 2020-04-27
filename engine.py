@@ -3,7 +3,7 @@ import numpy as np
 import sys, warnings
 
 # 엔티티 및 컴포너트
-from entity import Entity
+from entity import Entity, get_blocking_entities_at_location
 from components.luminary import Luminary
 from map_objects.game_map import GameMap
 
@@ -30,12 +30,13 @@ def main():
     객체 생성
     """
     # 플레이어 객체 생성. 위치는 맵 중앙.
-    luminary_component = Luminary(luminosity=5)
-    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=False, luminary=luminary_component)
+    luminary_component = Luminary(luminosity=10)
+    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, luminary=luminary_component)
     entities = [player]
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
-    game_map = GameMap(map_width,map_height, entities)
+    game_map = GameMap(map_width,map_height)
+    game_map.create_map_cave(entities, 3, 10)
 
     # FOV
     fov_recompute = True
@@ -130,10 +131,16 @@ def main():
         # move변수에 대입된 값이 있을 시 이동
         if move:
             dx, dy = move
+            destix = player.x + dx
+            destiy = player.y + dy
             if debug.passwall == False:
                 if not game_map.is_blocked(player.x + dx, player.y + dy):
-                    player.move(dx, dy)
-                    camera.update(player)
+                    target = get_blocking_entities_at_location(entities, destix, destiy)
+                    if target:
+                        print (F"You kick {target.name}!")
+                    else:
+                        player.move(dx, dy)
+                        camera.update(player)
 
                     fov_recompute = True
                     light_recompute = True
@@ -158,6 +165,9 @@ def main():
 
         # 광원 설치
         create_luminary = action.get('create_luminary')
+        
+        # 전등 토글
+        toggle_light = action.get('toggle_light')
 
         if toggle_wall:
             game_map.toggle_wall(player.x, player.y)
@@ -168,6 +178,13 @@ def main():
         if create_luminary:
             game_map.create_luminary(entities, player.x, player.y, 15)
             # 광원이 새로 생겼으니 다시 계산
+            light_recompute = True
+            
+        if toggle_light:
+            if player.luminary.luminosity:
+                player.luminary.luminosity = 0
+            else:
+                player.luminary.luminosity = player.luminary.init_luminosity
             light_recompute = True
         
         """

@@ -15,8 +15,14 @@ class Entity:
         if self.luminary:
             self.luminary.owner = self
 
-
     def move(self, dx, dy):
         #  엔티티를 지정한 양 만큼 이동시킴
         self.x += dx
         self.y += dy
+
+# 클래스 밖 함수   
+def get_blocking_entities_at_location(entities, destination_x, destination_y):
+    for entity in entities:
+        if entity.blocks and entity.x == destination_x and entity.y == destination_y:
+            return entity
+    return None

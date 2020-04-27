@@ -21,6 +21,6 @@ colors = {
     'dark_wall': libtcod.Color(0, 0, 100),
     'dark_ground': libtcod.Color(50, 50, 150),
     'light_wall': libtcod.Color(50, 50, 30),
-    'light_ground': libtcod.Color(80, 80, 60),
+    'light_ground': libtcod.Color(60, 60, 40),
     'pitch_black': libtcod.Color(0,0,0,)
 }
