@@ -13,7 +13,7 @@ def kill_player(player):
 
 def kill_monster(monster):
     death_message = Message(F"{monster.name.capitalize()} is dead!", tcod.orange)
-    
+
     monster.name = F"what is left of {monster.name}"
     monster.char = '%'
     monster.color = tcod.dark_red
@@ -21,5 +21,5 @@ def kill_monster(monster):
     monster.render_order = RenderOrder.CORPSE
     monster._Fighter = None
     monster._Ai = None
-    
+
     return death_message

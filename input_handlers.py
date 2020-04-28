@@ -3,7 +3,7 @@ import tcod as libtcod
 #사전 형식
 def handle_keys(key):
     key_char = chr(key.c)
-    
+
     #WASD
     if key.vk == libtcod.KEY_UP or key_char ==  'w':
         return {'move': (0, -1)}
@@ -49,7 +49,7 @@ def handle_keys(key):
     #광원 생성
     if key.vk == libtcod.KEY_2:
         return {'create_luminary': True}
-    
+
     #전등 토글
     if key_char ==  'q':
         return {'toggle_light': True}

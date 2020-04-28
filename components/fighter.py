@@ -12,7 +12,7 @@ class Fighter:
         self.hp = hp
         self.defense = defense
         self.power = power
-        
+
     def take_damage(self, amount):
         results = []
         self.hp -= amount
@@ -20,7 +20,7 @@ class Fighter:
         if self.hp <= 0:
             results.append({'dead': self.owner})
         return results
-        
+
     def attack(self, target):
         results = []
         damage = randint(0,self.power) - randint(0,target._Fighter.defense)

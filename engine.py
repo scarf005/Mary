@@ -1,4 +1,4 @@
-import tcod 
+import tcod
 import numpy as np
 import sys, warnings
 
@@ -44,7 +44,7 @@ def main():
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
     game_map = GameMap(map_width,map_height)
-    game_map.create_map_cave(entities, 3, 10)
+    game_map.create_map_cave(entities, 3, 10, 6)
 
     # FOV
     fov_recompute = True
@@ -61,7 +61,7 @@ def main():
     camera = Camera(0,0, map_width, map_height, True)
 
     camera.update(player)
-    
+
     """
     디버그 명령 목록
     passwall: 벽 통과 가능
@@ -72,11 +72,11 @@ def main():
 
     # 메세지 출력용 객체 생성.
     message_log = MessageLog(message_x, message_width, message_height)
-    
+
     # 키보드, 마우스 입력 처리용 객체 생성
     key = tcod.Key()
     mouse = tcod.Mouse()
-    
+
     # 순서 결정용 객체 생성
     game_state = GameStates.PLAYERS_TURN
 
@@ -92,7 +92,7 @@ def main():
 
     # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
     tcod.console_init_root(screen_width, screen_height, 'Mary', False, vsync=True)
-    
+
 
     # TCOD 루프
     while not tcod.console_is_window_closed():
@@ -100,29 +100,29 @@ def main():
         입력
         """
         # 사용자 입력을 받음: 키 누를 시, 키보드, 마우스
-        tcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)      
-        
+        tcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+
         """
         화면 표시
         """
         # 플레이어 시야
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
-            
+
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
-            
+
         """
         화면 표시
         """
         # 화면 초기화
         clear_all_entities(con, entities, camera)
-        
+
         # 표시할 모든 객체를 화면에 배치함
-        render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map, 
-                   camera, message_log, fov_recompute, 
-                   screen_width, screen_height, 
+        render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map,
+                   camera, message_log, fov_recompute,
+                   screen_width, screen_height,
                    bar_width, panel_height, panel_y, colors)
 
         fov_recompute = False
@@ -143,7 +143,7 @@ def main():
         # action 변수에 입력한 키워드에 대응한 값을 move 변수에 대입
         if action.get('exit'):
             return True
-        
+
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if action.get('fullscreen'):
             tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
@@ -152,48 +152,48 @@ def main():
         플레이어 차례에 플레이어가 할 수 있는 행동들
         """
         player_turn_results = []
-        
+
         # move변수에 대입된 값이 있을 시 이동
         if action.get('move') and game_state == GameStates.PLAYERS_TURN:
             dx, dy = action.get('move')
             destix = player.x + dx
             destiy = player.y + dy
-            
+
             if debug.passwall == False:
                 if not game_map.is_blocked(destix, destiy):
                     target = get_blocking_entities_at_location(entities, destix, destiy)
-                    
+
                     if target:
                         attack_results = player._Fighter.attack(target)
-                        player_turn_results.extend(attack_results)                        
+                        player_turn_results.extend(attack_results)
 
                     else:
                         player.move(dx, dy)
                         camera.update(player)
                         fov_recompute = True
                         light_recompute = True
-                    
+
                     game_state = GameStates.ENEMY_TURN
             else:
                 if game_map.is_blocked(player.x + dx, player.y + dy):
                     debug.dbg_msg("You magically pass through solid wall.")
                 player.move(dx, dy)
                 camera.update(player)
-        
+
         if action.get('toggle_light'):
             if player._Luminary.luminosity:
                 player._Luminary.luminosity = 0
             else:
                 player._Luminary.luminosity = player._Luminary.init_luminosity
             light_recompute = True
-        
+
         for r in player_turn_results:
             message = r.get('message')
             dead_entity = r.get('dead')
- 
+
             if message:
                 message_log.log(message)
-                
+
             if dead_entity:
                 if dead_entity == player:
                     message, game_state = kill_player(dead_entity)
@@ -201,17 +201,17 @@ def main():
                     message = kill_monster(dead_entity)
 
                 message_log.log(message)
-        
+
         """
         적의 차례에 적이 할 수 있는 행동들
-        """             
+        """
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity.name == 'light source':
                     pass
                     #message_log.log(F"The {entity.name} is glowing")
                 elif entity._Ai:
-                    enemy_turn_results = entity._Ai.take_turn(player, 
+                    enemy_turn_results = entity._Ai.take_turn(player,
                                                               fov_map, game_map, entities)
 
                     for er in enemy_turn_results:
@@ -236,21 +236,21 @@ def main():
 
             else:
                 game_state = GameStates.PLAYERS_TURN
-        
-        
+
+
         """
         디버그 기능들
         """
         # 플레이어 위치 표시
         if debug.showpos: debug.show_pos(player,'player')
-        
+
         # 벽 설치
         if action.get('toggle_wall'):
             game_map.toggle_wall(player.x, player.y)
             # 지형이 변했으니 새로 지형 맵을 짜야 함
             fov_map = initialize_fov(game_map)
             light_recompute = True
-        
+
         if action.get('create_luminary'):
             game_map.create_luminary(entities, player.x, player.y, 15)
             # 광원이 새로 생겼으니 다시 계산

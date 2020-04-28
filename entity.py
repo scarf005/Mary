@@ -21,21 +21,21 @@ class Entity:
         for key,value in component_list.items():
             #print("kwargs")
             #print (kwargs)
-            if key in kwargs.keys():                
+            if key in kwargs.keys():
                 setattr(self, key, kwargs[key])
-            else:                
+            else:
                 setattr(self, key, value)
-        
+
         # 컴포넌트 소유주 추가
         if self._Luminary:
             self._Luminary.owner = self
-        
+
         if self._Fighter:
             self._Fighter.owner = self
 
         if self._Ai:
             self._Ai.owner = self
-            
+
     def distance_to(self, other):
             dx = other.x - self.x
             dy = other.y - self.y
@@ -45,7 +45,7 @@ class Entity:
         #  엔티티를 지정한 양 만큼 이동시킴
         self.x += dx
         self.y += dy
-        
+
     def move_towards(self, target_x, target_y, game_map, entities):
         dx = target_x - self.x
         dy = target_y - self.y
@@ -57,7 +57,7 @@ class Entity:
         if not (game_map.is_blocked(self.x + dx, self.y + dy) or
                     get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
             self.move(dx, dy)
-            
+
     def move_astar(self, target, entities, game_map):
         # Create a FOV map that has the dimensions of the map
         fov_map = tcod.map.Map(width=game_map.width, height=game_map.height)
@@ -65,7 +65,7 @@ class Entity:
         # Scan the current map each turn and set all the walls as unwalkable
         for y1 in range(game_map.height):
             for x1 in range(game_map.width):
-                fov_map.transparent[y1,x1] = not game_map.tiles[y1,x1].block_sight 
+                fov_map.transparent[y1,x1] = not game_map.tiles[y1,x1].block_sight
                 fov_map.walkable[y1,x1] = not game_map.tiles[y1,x1].blocked
 
         # Scan all the objects to see if there are objects that must be navigated around
@@ -101,7 +101,7 @@ class Entity:
 
 
 """
-클래스 밖 함수   
+클래스 밖 함수
 """
 
 def get_blocking_entities_at_location(entities, destination_x, destination_y):
