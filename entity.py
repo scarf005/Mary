@@ -48,6 +48,9 @@ class Entity:
             dy = other.y - self.y
             return math.sqrt(dx ** 2 + dy ** 2)
 
+    def distance(self, x, y):
+        return math.sqrt((x - self.x) ** 2 + (y - self.y) ** 2)
+
     def move(self, dx, dy):
         #  엔티티를 지정한 양 만큼 이동시킴
         self.x += dx

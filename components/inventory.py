@@ -32,14 +32,19 @@ class Inventory:
         if item_component.use_function is None:
             results.append({'message': Message(F'The {item_entity.name} cannot be used', tcod.light_crimson)})
         else:
-            kwargs = {**item_component.function_kwargs, **kwargs}
-            item_use_results = item_component.use_function(self.owner, **kwargs)
+            # 타게팅 중
+            if item_component.targeting and not (kwargs.get('target_x') or kwargs.get('target_y')):
+                results.append({'targeting': item_entity})
+            # 타게팅 하지 않는 아이템
+            else:
+                kwargs = {**item_component.function_kwargs, **kwargs}
+                item_use_results = item_component.use_function(self.owner, **kwargs)
 
-            for item_use_result in item_use_results:
-                if item_use_result.get('consumed'):
-                    self.remove_item(item_entity)
+                for item_use_result in item_use_results:
+                    if item_use_result.get('consumed'):
+                        self.remove_item(item_entity)
 
-            results.extend(item_use_results)
+                results.extend(item_use_results)
 
         return results
 

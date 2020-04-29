@@ -2,6 +2,8 @@ import tcod
 import numpy as np
 from random import randint, shuffle
 
+from game_messages import Message
+
 # 지도
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
@@ -9,7 +11,7 @@ from map_objects.map_generator.cellular_automata import make_cave, find_nook
 
 # 엔티티, 컴포넌트
 from entity import Entity
-from item_functions import heal, read, talisman
+from item_functions import heal, read, talisman, cast_spell, cast_fireball
 
 from components.ai import BasicMonster
 from components.fighter import Fighter
@@ -57,7 +59,6 @@ class GameMap:
         nooks = find_nook(wall_map)
         monster_num = randint(min_monsters, max_monsters)
 
-
         # 몬스터 배치
         for j in range(monster_num):
             if j <= len(nooks):
@@ -68,15 +69,21 @@ class GameMap:
                 my, mx = self.np_find_empty_cell(entities, wall_map)
 
             ai_comp = BasicMonster()
+            monster_chance = randint(0, 100)
 
-            if randint(0, 100) < 80:
+            if monster_chance < 60:
                 f_comp = Fighter(hp=10, defense=0, power=3)
-                monster = self.create_monster(mx,my, '~', tcod.flame, 'crawling intestines',
+                monster = self.create_monster(mx,my, '~', tcod.flame, 'crawling intestine',
                                             f_comp, ai_comp)
-            else:
+            elif monster_chance < 90:
                 f_comp = Fighter(hp=16, defense=1, power=4)
                 monster = self.create_monster(mx,my, 'S', tcod.dark_green, 'giant spider',
                                             f_comp, ai_comp)
+            else:
+                f_comp = Fighter(hp=20, defense=0, power=7)
+                monster = self.create_monster(mx,my, 'X', tcod.Color(128, 5, 5),
+                                              'crawling abomination',
+                                              f_comp, ai_comp)
             entities.append(monster)
 
         # 아이템 배치, 아직 임시
@@ -87,7 +94,7 @@ class GameMap:
             ix = i_nooks[i][1]
             iy = i_nooks[i][0]
 
-            kinds = randint(1,3)
+            kinds = randint(4,4)
             if kinds == 1:
                 i_comp = Item(use_function=heal, amount=10)
                 item = self.create_item(ix, iy, '!', tcod.violet, 'Potion of Regeneration',item=i_comp)
@@ -95,8 +102,13 @@ class GameMap:
                 i_comp = Item(use_function=heal, amount=2)
                 item = self.create_item(ix, iy, '!', tcod.orange, 'Fruit Juice',item=i_comp)
             elif kinds == 3:
-                i_comp = Item()
+                i_comp = Item(use_function=cast_spell, damage=20, maximum_range=5)
                 item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Spell Cards',item=i_comp)
+            elif kinds == 4:
+                i_comp = Item(use_function=cast_fireball, targeting=True,
+                              targeting_message=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
+                              damage=15, radius=3)
+                item = self.create_item(ix, iy, '?', tcod.red, 'Manuscript of Hurl Flaming Sphere',item=i_comp)
             entities.append(item)
 
         """

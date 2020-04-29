@@ -36,6 +36,12 @@ def get_names_under_mouse(mouse, camera, entities, fov_map):
 
     return names.capitalize()
 
+def draw_explosion(con, camera, screen_width, screen_height, x, y):
+    MapX = x + camera.x
+    MapY = y + camera.y
+    draw_background(con, MapX, MapY, 'explosion', 30)
+
+
 def render_all(game_state, con, panel, mouse, entities, player,
                game_map, fov_map, light_map,camera, message_log, fov_recompute,
                screen_width, screen_height, bar_width, panel_height, panel_y, colors):

@@ -1,4 +1,4 @@
-import tcod as libtcod
+import tcod
 
 #스크린 가로/세로 크기
 screen_width = 40
@@ -21,7 +21,8 @@ message_width = screen_width - 2 #- bar_width - 2
 message_height = panel_height - 2 #1
 
 #FOV
-fov_algorithm = 3
+fov_algorithm_lit = 2
+fov_algorithm_dark = 3
 fov_light_walls = True
 max_fov_radius = 12
 
@@ -30,10 +31,11 @@ light_radius = 3
 
 #타일 색깔
 colors = {
-    'dark_wall': libtcod.Color(0, 0, 100),
-    'dark_ground': libtcod.Color(50, 50, 150),
-    'light_wall': libtcod.Color(50, 50, 30),
-    'light_ground': libtcod.Color(60, 60, 40),
-    'pitch_black': libtcod.Color(0,0,0,)
+    'dark_wall': tcod.Color(0, 0, 100),
+    'dark_ground': tcod.Color(50, 50, 150),
+    'light_wall': tcod.Color(50, 50, 30),
+    'light_ground': tcod.Color(60, 60, 40),
+    'pitch_black': tcod.Color(0,0,0),
+    'explosion': tcod.Color(255, 52, 20)
 }
 

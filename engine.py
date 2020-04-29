@@ -25,7 +25,7 @@ from renderer.fov_functions import initialize_fov, recompute_fov
 # 조작 및 기타
 from game_messages import Message, MessageLog
 from game_states import GameStates
-from input_handlers import handle_keys
+from input_handlers import handle_keys, handle_mouse
 from debugs import Debug
 
 
@@ -65,9 +65,8 @@ def main():
 
     # FOV
     fov_radius = max_fov_radius
-
+    fov_algorithm = fov_algorithm_lit
     fov_recompute = True
-
     fov_map = initialize_fov(game_map)
 
     # 광원, light_map은 numpy 리스트
@@ -102,7 +101,7 @@ def main():
 
     # 콘솔, 패널 생성
     con = tcod.console.Console(screen_width, screen_height)
-    panel = libtcod.console_new(screen_width, panel_height)
+    panel = tcod.console_new(screen_width, panel_height)
 
     # 폰트 설정: 10x10파일, 이미지 파일은 그레이스케일, 배열 방식은 TCOD
     # tcod.console_set_custom_font('arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
@@ -120,7 +119,7 @@ def main():
         입력
         """
         # 사용자 입력을 받음: 키 누를 시, 키보드, 마우스
-        tcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
+        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
 
         """
         화면 표시
@@ -159,6 +158,10 @@ def main():
         """
         # action 변수에 키보드 입력값을 사전 형태로 받아옴
         action = handle_keys(key, game_state)
+        mouse_action = handle_mouse(mouse)
+
+        left_click = mouse_action.get('left_click')
+        right_click = mouse_action.get('right_click')
 
         move = action.get('move')
         rest = action.get('rest')
@@ -175,6 +178,8 @@ def main():
         if exit:
             if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
                 game_state = previous_game_state
+            elif game_state == GameStates.TARGETING:
+                player_turn_results.append({'targeting_cancelled': True})
             else:
                 return True
 
@@ -228,10 +233,11 @@ def main():
             if player._Luminary.luminosity:
                 player._Luminary.luminosity = 0
                 fov_radius = 1
+                fov_algorithm = fov_algorithm_dark
             else:
                 player._Luminary.luminosity = player._Luminary.init_luminosity
                 fov_radius = max_fov_radius
-            light_map = initialize_light(game_map, fov_map, entities)
+                fov_algorithm = fov_algorithm_lit
 
             fov_recompute = True
             light_recompute = True
@@ -251,9 +257,20 @@ def main():
             item = player._Inventory.items[inventory_index]
 
             if game_state == GameStates.SHOW_INVENTORY:
-                player_turn_results.extend(player._Inventory.use(item))
+                player_turn_results.extend(player._Inventory.use(item, console=con, entities=entities, fov_map=fov_map))
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player._Inventory.drop_item(item))
+
+        if game_state == GameStates.TARGETING:
+            if left_click:
+                target_x, target_y = left_click
+
+                item_use_results = player._Inventory.use(targeting_item, entities=entities, fov_map=fov_map,
+                                                        camera=camera, screen_width = screen_width, screen_height = screen_height,
+                                                        target_x=target_x, target_y=target_y)
+                player_turn_results.extend(item_use_results)
+            elif right_click:
+                player_turn_results.append({'targeting_cancelled': True})
 
         if rest:
             game_state = GameStates.ENEMY_TURN
@@ -265,9 +282,15 @@ def main():
             item_consumed = r.get('consumed')
             item_used = r.get('used')
             item_dropped = r.get('item_dropped')
+            targeting = r.get('targeting')
+            targeting_cancelled = r.get('targeting_cancelled')
 
             if message:
                 message_log.log(message)
+
+            if targeting_cancelled:
+                game_state = previous_game_state
+                message_log.log(Message('Targeting cancelled'))
 
             if dead_entity:
                 if dead_entity == player:
@@ -286,8 +309,15 @@ def main():
 
             if item_dropped:
                 entities.append(item_dropped)
-
                 game_state = GameStates.ENEMY_TURN
+
+            if targeting:
+                previous_game_state = GameStates.PLAYERS_TURN
+                game_state = GameStates.TARGETING
+
+                targeting_item = targeting
+
+                message_log.log(targeting_item._Item.targeting_message)
 
         """
         적의 차례에 적이 할 수 있는 행동들
