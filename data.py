@@ -21,9 +21,9 @@ message_width = screen_width - 2 #- bar_width - 2
 message_height = panel_height - 2 #1
 
 #FOV
-fov_algorithm = 2
+fov_algorithm = 3
 fov_light_walls = True
-fov_radius = 12
+max_fov_radius = 12
 
 #광원
 light_radius = 3

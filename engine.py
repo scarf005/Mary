@@ -64,6 +64,8 @@ def main():
     game_map.create_map_cave(entities, 3, 10, 6)
 
     # FOV
+    fov_radius = max_fov_radius
+
     fov_recompute = True
 
     fov_map = initialize_fov(game_map)
@@ -159,12 +161,14 @@ def main():
         action = handle_keys(key, game_state)
 
         move = action.get('move')
+        rest = action.get('rest')
         pickup = action.get('pickup')
         show_inventory = action.get('show_inventory')
         inventory_index = action.get('inventory_index')
         drop_inventory = action.get('drop_inventory')
 
-        toggle_light = action.get('toggle_light')
+        toggle_light  = action.get('toggle_light')
+        create_luminary = action.get('create_light')
         toggle_wall  = action.get('toggle_wall')
         exit = action.get('exit')
 
@@ -220,6 +224,20 @@ def main():
             else:
                 message_log.log(Message('There is nothing here to pick up.', tcod.yellow))
 
+        if toggle_light:
+            if player._Luminary.luminosity:
+                player._Luminary.luminosity = 0
+                fov_radius = 1
+            else:
+                player._Luminary.luminosity = player._Luminary.init_luminosity
+                fov_radius = max_fov_radius
+            light_map = initialize_light(game_map, fov_map, entities)
+
+            fov_recompute = True
+            light_recompute = True
+
+            game_state = GameStates.ENEMY_TURN
+
         if show_inventory:
             previous_game_state = game_state
             game_state = GameStates.SHOW_INVENTORY
@@ -237,12 +255,8 @@ def main():
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player._Inventory.drop_item(item))
 
-        if toggle_light:
-            if player._Luminary.luminosity:
-                player._Luminary.luminosity = 0
-            else:
-                player._Luminary.luminosity = player._Luminary.init_luminosity
-            light_recompute = True
+        if rest:
+            game_state = GameStates.ENEMY_TURN
 
         for r in player_turn_results:
             message = r.get('message')
@@ -324,7 +338,7 @@ def main():
             fov_map = initialize_fov(game_map)
             light_recompute = True
 
-        if toggle_light:
+        if create_luminary:
             game_map.create_luminary(entities, player.x, player.y, 15)
             # 광원이 새로 생겼으니 다시 계산
             light_recompute = True

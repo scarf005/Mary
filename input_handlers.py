@@ -67,6 +67,9 @@ def handle_player_turn_keys(key):
     elif key_char == ',':
         return {'pickup': True}
 
+    elif key_char == '.':
+        return {'rest': True}
+
     elif key_char == 'i':
         return {'show_inventory': True}
 

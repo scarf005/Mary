@@ -105,9 +105,9 @@ def render_all(game_state, con, panel, mouse, entities, player,
     # 인벤토리
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         if game_state == GameStates.SHOW_INVENTORY:
-            inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
+            inventory_title = 'Use which? (Esc to exit)\n'
         else:
-            inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
+            inventory_title = 'Drop which? , or Esc to cancel.\n'
         inventory_menu(con, inventory_title,player._Inventory, screen_width-2, screen_width, screen_height)
 
 
