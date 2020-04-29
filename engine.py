@@ -182,7 +182,8 @@ def main():
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled': True})
             else:
-                return True
+                pass
+                #return True
 
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if action.get('fullscreen'):
@@ -257,7 +258,7 @@ def main():
             item = player._Inventory.items[inventory_index]
 
             if game_state == GameStates.SHOW_INVENTORY:
-                player_turn_results.extend(player._Inventory.use(item, console=con, camera=camera,
+                player_turn_results.extend(player._Inventory.use(item, camera=camera,
                                                                  entities=entities, fov_map=fov_map,
                                                                  screen_width = screen_width,
                                                                  screen_height = screen_height))
