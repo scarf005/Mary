@@ -17,7 +17,8 @@ class Entity:
 
         # 기타 속성들
         component_list = {'blocks':False, 'render_order':RenderOrder.CORPSE,
-                          '_Luminary':None, '_Fighter':None, '_Ai':None}
+                          '_Luminary':None, '_Fighter':None, '_Ai':None,
+                          '_Item':None, '_Inventory':None}
         for key,value in component_list.items():
             #print("kwargs")
             #print (kwargs)
@@ -35,6 +36,12 @@ class Entity:
 
         if self._Ai:
             self._Ai.owner = self
+
+        if self._Item:
+            self._Item.owner = self
+
+        if self._Inventory:
+            self._Inventory.owner = self
 
     def distance_to(self, other):
             dx = other.x - self.x

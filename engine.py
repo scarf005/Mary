@@ -8,8 +8,12 @@ from map_objects.game_map import GameMap
 # 앤티티와 컴포넌트
 from entity import Entity, get_blocking_entities_at_location
 from death_functions import kill_monster, kill_player
+
 from components.fighter import Fighter
+from components.inventory import Inventory
 from components.luminary import Luminary
+from components.item import Item
+from item_functions import heal, read, talisman
 
 
 # 렌더링 기능
@@ -19,7 +23,7 @@ from renderer.render_functions import clear_all_entities, render_all, RenderOrde
 from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
-from game_messages import MessageLog
+from game_messages import Message, MessageLog
 from game_states import GameStates
 from input_handlers import handle_keys
 from debugs import Debug
@@ -37,10 +41,23 @@ def main():
     객체 생성
     """
     # 플레이어 객체 생성. 위치는 맵 중앙.
+
     fighter_component = Fighter(hp=30, defense=2, power=5)
     luminary_component = Luminary(luminosity=10)
-    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'player', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component)
+    inventory_component = Inventory(26)
+    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
     entities = [player]
+
+    i_comp = Item(use_function=read,about='about activities of you and your best friend, Mary')
+    Journal = Entity(player.x,player.y, ':', tcod.darkest_red,
+                     'Swallowstone Journal', render_order=RenderOrder.ITEM, _Item = i_comp)
+
+    i_comp = Item(use_function=talisman)
+    Talisman = Entity(player.x,player.y, '*', tcod.lighter_purple,
+                      'Passionflower Talisman', render_order=RenderOrder.ITEM, _Item = i_comp)
+
+    player._Inventory.items.append(Journal)
+    player._Inventory.items.append(Talisman)
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
     game_map = GameMap(map_width,map_height)
@@ -79,6 +96,7 @@ def main():
 
     # 순서 결정용 객체 생성
     game_state = GameStates.PLAYERS_TURN
+    previous_game_state = game_state
 
     # 콘솔, 패널 생성
     con = tcod.console.Console(screen_width, screen_height)
@@ -120,8 +138,8 @@ def main():
         clear_all_entities(con, entities, camera)
 
         # 표시할 모든 객체를 화면에 배치함
-        render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map,
-                   camera, message_log, fov_recompute,
+        render_all(game_state, con, panel, mouse, entities, player,
+                   game_map, fov_map, light_map, camera, message_log, fov_recompute,
                    screen_width, screen_height,
                    bar_width, panel_height, panel_y, colors)
 
@@ -138,11 +156,23 @@ def main():
         입력에 대한 상호작용
         """
         # action 변수에 키보드 입력값을 사전 형태로 받아옴
-        action = handle_keys(key)
+        action = handle_keys(key, game_state)
 
-        # action 변수에 입력한 키워드에 대응한 값을 move 변수에 대입
-        if action.get('exit'):
-            return True
+        move = action.get('move')
+        pickup = action.get('pickup')
+        show_inventory = action.get('show_inventory')
+        inventory_index = action.get('inventory_index')
+        drop_inventory = action.get('drop_inventory')
+
+        toggle_light = action.get('toggle_light')
+        toggle_wall  = action.get('toggle_wall')
+        exit = action.get('exit')
+
+        if exit:
+            if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+                game_state = previous_game_state
+            else:
+                return True
 
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if action.get('fullscreen'):
@@ -154,7 +184,7 @@ def main():
         player_turn_results = []
 
         # move변수에 대입된 값이 있을 시 이동
-        if action.get('move') and game_state == GameStates.PLAYERS_TURN:
+        if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = action.get('move')
             destix = player.x + dx
             destiy = player.y + dy
@@ -180,7 +210,34 @@ def main():
                 player.move(dx, dy)
                 camera.update(player)
 
-        if action.get('toggle_light'):
+        elif pickup and game_state == GameStates.PLAYERS_TURN:
+            for entity in entities:
+                if entity._Item and entity.x == player.x and entity.y == player.y:
+                    pickup_results = player._Inventory.add_item(entity)
+                    player_turn_results.extend(pickup_results)
+
+                    break
+            else:
+                message_log.log(Message('There is nothing here to pick up.', tcod.yellow))
+
+        if show_inventory:
+            previous_game_state = game_state
+            game_state = GameStates.SHOW_INVENTORY
+
+        if drop_inventory:
+            previous_game_state = game_state
+            game_state = GameStates.DROP_INVENTORY
+
+        if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(
+                player._Inventory.items):
+            item = player._Inventory.items[inventory_index]
+
+            if game_state == GameStates.SHOW_INVENTORY:
+                player_turn_results.extend(player._Inventory.use(item))
+            elif game_state == GameStates.DROP_INVENTORY:
+                player_turn_results.extend(player._Inventory.drop_item(item))
+
+        if toggle_light:
             if player._Luminary.luminosity:
                 player._Luminary.luminosity = 0
             else:
@@ -190,6 +247,10 @@ def main():
         for r in player_turn_results:
             message = r.get('message')
             dead_entity = r.get('dead')
+            item_added = r.get('item_added')
+            item_consumed = r.get('consumed')
+            item_used = r.get('used')
+            item_dropped = r.get('item_dropped')
 
             if message:
                 message_log.log(message)
@@ -201,6 +262,18 @@ def main():
                     message = kill_monster(dead_entity)
 
                 message_log.log(message)
+
+            if item_added:
+                entities.remove(item_added)
+                game_state = GameStates.ENEMY_TURN
+
+            if item_consumed or item_used:
+                game_state = GameStates.ENEMY_TURN
+
+            if item_dropped:
+                entities.append(item_dropped)
+
+                game_state = GameStates.ENEMY_TURN
 
         """
         적의 차례에 적이 할 수 있는 행동들
@@ -245,13 +318,13 @@ def main():
         if debug.showpos: debug.show_pos(player,'player')
 
         # 벽 설치
-        if action.get('toggle_wall'):
+        if toggle_wall:
             game_map.toggle_wall(player.x, player.y)
             # 지형이 변했으니 새로 지형 맵을 짜야 함
             fov_map = initialize_fov(game_map)
             light_recompute = True
 
-        if action.get('create_luminary'):
+        if toggle_light:
             game_map.create_luminary(entities, player.x, player.y, 15)
             # 광원이 새로 생겼으니 다시 계산
             light_recompute = True

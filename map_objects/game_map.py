@@ -9,8 +9,11 @@ from map_objects.map_generator.cellular_automata import make_cave, find_nook
 
 # 엔티티, 컴포넌트
 from entity import Entity
+from item_functions import heal, read, talisman
+
 from components.ai import BasicMonster
 from components.fighter import Fighter
+from components.item import Item
 from components.luminary import Luminary
 
 # 렌더링
@@ -84,21 +87,16 @@ class GameMap:
             ix = i_nooks[i][1]
             iy = i_nooks[i][0]
 
-            if i == 1:
-                item = Entity(ix, iy, ']', tcod.darkest_red, 'Swallowstone Journal', render_order=RenderOrder.ITEM)
-            elif i == 2:
-                item = Entity(ix, iy, '*', tcod.lighter_purple, 'Passionflower Talisman', render_order=RenderOrder.ITEM)
-            else:
-                kinds = randint(1,3)
-                if kinds == 1:
-                    item = Entity(ix, iy, '!', tcod.violet, 'Healing Potion',
-                                  render_order=RenderOrder.ITEM)
-                elif kinds == 2:
-                    item = Entity(ix, iy, '!', tcod.orange, 'Fruit Juice',
-                                  render_order=RenderOrder.ITEM)
-                elif kinds == 3:
-                    item = Entity(ix, iy, '?', tcod.green, 'Manuscript of Spell Cards',
-                                  render_order=RenderOrder.ITEM)
+            kinds = randint(1,3)
+            if kinds == 1:
+                i_comp = Item(use_function=heal, amount=10)
+                item = self.create_item(ix, iy, '!', tcod.violet, 'Potion of Regeneration',item=i_comp)
+            elif kinds == 2:
+                i_comp = Item(use_function=heal, amount=2)
+                item = self.create_item(ix, iy, '!', tcod.orange, 'Fruit Juice',item=i_comp)
+            elif kinds == 3:
+                i_comp = Item()
+                item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Spell Cards',item=i_comp)
             entities.append(item)
 
         """
@@ -111,6 +109,9 @@ class GameMap:
     def create_monster(self, x, y, char, color, name, fighter, ai):
         return Entity(x,y, char, color, name, blocks=True,
                       render_order=RenderOrder.ACTOR, _Fighter=fighter, _Ai=ai)
+
+    def create_item(self, x, y, char, color, name, item):
+        return Entity(x,y, char, color, name, render_order=RenderOrder.ITEM, _Item=item)
 
     def np_find_empty_cell(self, entities, game_map):
         while True:

@@ -1,8 +1,10 @@
-import tcod 
+import tcod
 from enum import Enum
 
 from renderer.lighting_functions import mix_rgb
 from data import colors
+from game_states import GameStates
+from menus import inventory_menu
 
 class RenderOrder(Enum):
     # 높을수록 위에 표시한다. 즉 높이
@@ -23,7 +25,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     tcod.console_set_default_foreground(panel, tcod.white)
     tcod.console_print_ex(panel, int(x + total_width / 2), y, tcod.BKGND_NONE, tcod.CENTER,
                              '{0}: {1}/{2}'.format(name, value, maximum))
-    
+
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
     (x, y) = (mouse.cx - camera.x, mouse.cy - camera.y)
@@ -34,8 +36,9 @@ def get_names_under_mouse(mouse, camera, entities, fov_map):
 
     return names.capitalize()
 
-def render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map, camera, message_log, 
-               fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
+def render_all(game_state, con, panel, mouse, entities, player,
+               game_map, fov_map, light_map,camera, message_log, fov_recompute,
+               screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     # fov 재계산 시만
     if fov_recompute:
         #tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
@@ -45,24 +48,24 @@ def render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map
                 # 지도 위치
                 Mapx = x + camera.x
                 Mapy = y + camera.y
-                
+
                 #print(F"{camera.x},{camera.y}")
-                
-                # wall 불리언에 tile의 block_sight이 True인지 여부를 대입                
+
+                # wall 불리언에 tile의 block_sight이 True인지 여부를 대입
                 visible = fov_map.fov[y,x]
                 wall = game_map.tiles[y,x].block_sight
-                
+
                 if light_map[y,x] == 999:
                     brightness = 0
                 else:
                     brightness = light_map[y,x]
-                 
+
                 if visible:
                     game_map.tiles[y,x].explored = True
                     if wall:
                         draw_background(con, Mapx, Mapy, 'light_wall', brightness)
                     else:
-                        draw_background(con, Mapx, Mapy, 'light_ground', brightness)                 
+                        draw_background(con, Mapx, Mapy, 'light_ground', brightness)
                 elif game_map.tiles[y,x].explored:
                     if wall:
                         draw_background(con, Mapx, Mapy, 'dark_wall')
@@ -74,15 +77,15 @@ def render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map
 
     # 목록에 있는 모든 객체를 표시함.
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
-    
+
     for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, camera)
-    
+
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
-    
+
     tcod.console_set_default_background(panel, tcod.black)
     tcod.console_clear(panel)
-    
+
     # Print the game messages, one line at a time
     y = 2
     for message in message_log.messages:
@@ -92,12 +95,20 @@ def render_all(con, panel, mouse, entities, player, game_map, fov_map, light_map
 
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
                tcod.light_red, tcod.darker_red)
-    
+
     tcod.console_set_default_foreground(panel, tcod.light_gray)
     tcod.console_print_ex(panel, 1, 0, tcod.BKGND_NONE, tcod.LEFT,
                             get_names_under_mouse(mouse, camera, entities, fov_map))
 
     tcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
+
+    # 인벤토리
+    if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+        if game_state == GameStates.SHOW_INVENTORY:
+            inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
+        else:
+            inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
+        inventory_menu(con, inventory_title,player._Inventory, screen_width-2, screen_width, screen_height)
 
 
 def clear_all_entities(con, entities, camera):
