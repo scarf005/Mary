@@ -9,7 +9,9 @@
 - 간단한 전투와 사망 구현
   - Simple combat and death implemented.
 - 간단한 메세지 로그
-  - Simple message log
+  - Simple message log implemented.
+- 간단한 아이템 및 인벤토리
+  - Simple item and inventory implemented.
 
 ## Changed
 - 타일셋 크기 32x32에서 16x16로 변경. 32x32도 남아는 있지만 한동안은 16x16 쓸 예정.
