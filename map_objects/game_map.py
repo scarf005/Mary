@@ -60,8 +60,9 @@ class GameMap:
         monster_num = randint(min_monsters, max_monsters)
 
         # 몬스터 배치
+        Tm = 0
         for j in range(monster_num):
-            if j <= len(nooks):
+            if j < len(nooks):
                 mx = nooks[j][1]
                 my = nooks[j][0]
             else:
@@ -81,20 +82,24 @@ class GameMap:
                                             f_comp, ai_comp)
             else:
                 f_comp = Fighter(hp=20, defense=0, power=7)
-                monster = self.create_monster(mx,my, 'X', tcod.Color(128, 5, 5),
-                                              'crawling abomination',
+                monster = self.create_monster(mx,my, '@', tcod.Color(128, 5, 5),
+                                              'something that disgustingly resembles human',
                                               f_comp, ai_comp)
             entities.append(monster)
+            Tm +=1
+        print(Tm)
 
         # 아이템 배치, 아직 임시
         i_nooks = nooks
         shuffle(i_nooks)
+        if max_items > len(i_nooks):
+            max_items = len(i_nooks)
 
-        for i in range(max_items):
+        for i in range(len(i_nooks)):
             ix = i_nooks[i][1]
             iy = i_nooks[i][0]
 
-            kinds = randint(4,4)
+            kinds = randint(3,4)
             if kinds == 1:
                 i_comp = Item(use_function=heal, amount=10)
                 item = self.create_item(ix, iy, '!', tcod.violet, 'Potion of Regeneration',item=i_comp)
@@ -102,12 +107,12 @@ class GameMap:
                 i_comp = Item(use_function=heal, amount=2)
                 item = self.create_item(ix, iy, '!', tcod.orange, 'Fruit Juice',item=i_comp)
             elif kinds == 3:
-                i_comp = Item(use_function=cast_spell, damage=20, maximum_range=5)
+                i_comp = Item(use_function=cast_spell, damage=(1,20), maximum_range=5)
                 item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Spell Cards',item=i_comp)
             elif kinds == 4:
                 i_comp = Item(use_function=cast_fireball, targeting=True,
                               targeting_message=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
-                              damage=15, radius=3)
+                              damage=(3,8,5), radius=3)
                 item = self.create_item(ix, iy, '?', tcod.red, 'Manuscript of Hurl Flaming Sphere',item=i_comp)
             entities.append(item)
 

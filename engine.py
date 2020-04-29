@@ -61,7 +61,7 @@ def main():
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
     game_map = GameMap(map_width,map_height)
-    game_map.create_map_cave(entities, 3, 10, 6)
+    game_map.create_map_cave(entities, 3, 10, 10)
 
     # FOV
     fov_radius = max_fov_radius
@@ -98,6 +98,7 @@ def main():
     # 순서 결정용 객체 생성
     game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
+    targeting_item = None
 
     # 콘솔, 패널 생성
     con = tcod.console.Console(screen_width, screen_height)
@@ -148,7 +149,7 @@ def main():
         light_recompute = False
 
         # 화면 출력
-        tcod.console_flush()
+        tcod.console_flush(keep_aspect=True)
 
         # 화면 초기화
         clear_all_entities(con, entities, camera)
@@ -224,7 +225,6 @@ def main():
                 if entity._Item and entity.x == player.x and entity.y == player.y:
                     pickup_results = player._Inventory.add_item(entity)
                     player_turn_results.extend(pickup_results)
-
                     break
             else:
                 message_log.log(Message('There is nothing here to pick up.', tcod.yellow))
@@ -257,7 +257,10 @@ def main():
             item = player._Inventory.items[inventory_index]
 
             if game_state == GameStates.SHOW_INVENTORY:
-                player_turn_results.extend(player._Inventory.use(item, console=con, entities=entities, fov_map=fov_map))
+                player_turn_results.extend(player._Inventory.use(item, console=con, camera=camera,
+                                                                 entities=entities, fov_map=fov_map,
+                                                                 screen_width = screen_width,
+                                                                 screen_height = screen_height))
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player._Inventory.drop_item(item))
 
@@ -314,9 +317,7 @@ def main():
             if targeting:
                 previous_game_state = GameStates.PLAYERS_TURN
                 game_state = GameStates.TARGETING
-
                 targeting_item = targeting
-
                 message_log.log(targeting_item._Item.targeting_message)
 
         """

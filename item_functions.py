@@ -1,8 +1,9 @@
 import tcod
+from dice import roll_dice
 
 from random import randint
 from game_messages import Message
-from renderer.render_functions import draw_explosion
+from renderer.render_functions import draw_animation
 
 
 def heal(*args, **kwargs):
@@ -59,14 +60,17 @@ def talisman(*args, **kwargs):
     return results
 
 def cast_spell(*args, **kwargs):
+    results = []
+    camera = kwargs.get('camera')
+    con = kwargs.get('console')
+    screen_width = kwargs.get('screen_width')
+    screen_height = kwargs.get('screen_height')
+    fov_map = kwargs.get('fov_map')
+
     caster = args[0]
     entities = kwargs.get('entities')
-    fov_map = kwargs.get('fov_map')
-    max_damage = kwargs.get('damage')
-    damage = randint(1,max_damage)
+    damage = roll_dice(kwargs.get('damage'))
     maximum_range = kwargs.get('maximum_range')
-
-    results = []
 
     target = None
     closest_distance = maximum_range + 1
@@ -80,48 +84,49 @@ def cast_spell(*args, **kwargs):
                 closest_distance = distance
 
     if target:
-        results.append({'consumed': True, 'target': target, 'message': Message(F'A crackling bursts of stars hits {target.name} with a loud thunder for {damage} hitpoints!')})
-        results.extend(target.__Fighter.take_damage(damage))
+        draw_animation(con, camera, screen_width, screen_height, target.x, target.y, 'flash')
+        tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+        tcod.console_flush(keep_aspect=True)
+
+        results.append({'consumed': True, 'target': target,
+                        'message': Message(F'A crackling stream of energy hits {target.name} for {damage} hit points.')})
+        results.extend(target._Fighter.take_damage(damage))
     else:
         results.append({'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', tcod.red)})
 
     return results
 
 def cast_fireball(*args, **kwargs):
+    results = []
     camera = kwargs.get('camera')
-
+    con = kwargs.get('console')
     screen_width = kwargs.get('screen_width')
     screen_height = kwargs.get('screen_height')
     fov_map = kwargs.get('fov_map')
-    con = kwargs.get('console')
 
     entities = kwargs.get('entities')
-
-    max_damage = kwargs.get('damage')
+    damage_dice = kwargs.get('damage')
     radius = kwargs.get('radius')
     r = int((radius-1) / 2)
     target_x = kwargs.get('target_x') - camera.x
     target_y = kwargs.get('target_y') - camera.y
 
-    damage = randint(1,max_damage)
-
-    results = []
     if not fov_map.fov[target_y, target_x]:
-        results.append({'consumed': False, 'message': Message('You cannot target a tile outside your field of view.', tcod.yellow)})
+        results.append({'consumed': False,
+                        'message': Message('You cannot target a tile outside your field of view.', tcod.yellow)})
         return results
 
     for x in range(target_x - r, target_x + r + 1):
         for y in range(target_y - r, target_y + r + 1):
-            draw_explosion(con, camera, screen_width, screen_height, x,y)
+            draw_animation(con, camera, screen_width, screen_height, x,y, 'explosion')
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
-    tcod.console_flush()
-
-    results.append({'consumed': True, 'message': Message(F'The fireball explodes, burning everything within {radius} tiles!', tcod.orange)})
-
+    tcod.console_flush(keep_aspect=True)
+    results.append({'consumed': True,
+                    'message': Message(F'The flaming sphere explodes!', tcod.orange)})
     for entity in entities:
         if entity.distance(target_x, target_y) <= radius and entity._Fighter:
-            results.append({'message': Message(F'The {entity.name} gets burned for {damage} hit points.', tcod.orange)})
+            damage = roll_dice(damage_dice)
+            results.append({'message': Message(F'{entity.name} gets blasted for {damage} hit points.', tcod.orange)})
             results.extend(entity._Fighter.take_damage(damage))
-
     return results
