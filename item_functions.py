@@ -62,7 +62,6 @@ def talisman(*args, **kwargs):
 def cast_spell(*args, **kwargs):
     results = []
     camera = kwargs.get('camera')
-    con = kwargs.get('console')
     screen_width = kwargs.get('screen_width')
     screen_height = kwargs.get('screen_height')
     fov_map = kwargs.get('fov_map')
@@ -84,8 +83,8 @@ def cast_spell(*args, **kwargs):
                 closest_distance = distance
 
     if target:
-        draw_animation(con, camera, screen_width, screen_height, target.x, target.y, 'flash')
-        tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+        draw_animation(0, camera, screen_width, screen_height, target.x, target.y, 'flash')
+        tcod.console_blit(0, 0, 0, screen_width, screen_height, 0, 0, 0)
         tcod.console_flush(keep_aspect=True)
 
         results.append({'consumed': True, 'target': target,
@@ -99,7 +98,6 @@ def cast_spell(*args, **kwargs):
 def cast_fireball(*args, **kwargs):
     results = []
     camera = kwargs.get('camera')
-    con = kwargs.get('console')
     screen_width = kwargs.get('screen_width')
     screen_height = kwargs.get('screen_height')
     fov_map = kwargs.get('fov_map')
@@ -118,9 +116,9 @@ def cast_fireball(*args, **kwargs):
 
     for x in range(target_x - r, target_x + r + 1):
         for y in range(target_y - r, target_y + r + 1):
-            draw_animation(con, camera, screen_width, screen_height, x,y, 'explosion')
+            draw_animation(0, camera, screen_width, screen_height, x,y, 'explosion')
 
-    tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+    tcod.console_blit(0, 0, 0, screen_width, screen_height, 0, 0, 0)
     tcod.console_flush(keep_aspect=True)
     results.append({'consumed': True,
                     'message': Message(F'The flaming sphere explodes!', tcod.orange)})

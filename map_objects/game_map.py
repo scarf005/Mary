@@ -22,12 +22,13 @@ from components.luminary import Luminary
 from renderer.render_functions import RenderOrder
 
 class GameMap:
-    def __init__(self, width, height):
+    def __init__(self, width, height, depths=1):
         # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
 
+        self.depths = 1
 
     def initialize_tiles(self):
         return np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
@@ -38,7 +39,7 @@ class GameMap:
         max_monsters, max_items: 더 이상의 자세한 설명은 생략한다.
         """
         while True:
-            wall_map = make_cave(self.width, self.height, 3, 0.4)
+            wall_map = make_cave(self.width, self.height, 2, 0.4)
             if len(find_nook(wall_map)) >= min_nook: break
 
         for y in range(self.height):
@@ -83,7 +84,7 @@ class GameMap:
             else:
                 f_comp = Fighter(hp=20, defense=0, power=7)
                 monster = self.create_monster(mx,my, '@', tcod.Color(128, 5, 5),
-                                              'something that disgustingly resembles human',
+                                              'flesh abomination',
                                               f_comp, ai_comp)
             entities.append(monster)
             Tm +=1

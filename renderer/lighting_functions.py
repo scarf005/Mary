@@ -1,4 +1,4 @@
-import tcod 
+import tcod
 import numpy as np
 
 def initialize_light(game_map, fov_map, entities):
@@ -16,7 +16,7 @@ def initialize_light(game_map, fov_map, entities):
     """
     광원 위치 지도 생성
     """
-    # 광원 위치 결정용 light_map 생성. 
+    # 광원 위치 결정용 light_map 생성.
     # [넘파이 array, 높이:H 너비:W 채울 값(full):999]
     light_map = np.full((H,W),999)
 

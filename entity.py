@@ -16,10 +16,12 @@ class Entity:
         self.color = color
 
         # 기타 속성들
-        component_list = {'blocks':False, 'render_order':RenderOrder.CORPSE,
-                          '_Luminary':None, '_Fighter':None, '_Ai':None,
-                          '_Item':None, '_Inventory':None}
-        for key,value in component_list.items():
+        args_list = {'blocks':False, 'render_order':RenderOrder.CORPSE}
+        entity_component_list = {'_Luminary':None, '_Fighter':None, '_Ai':None,
+                          '_Item':None, '_Inventory':None, '_Portal':None}
+        total_list = {**args_list, **entity_component_list}
+        #print(total_list)
+        for key,value in total_list.items():
             #print("kwargs")
             #print (kwargs)
             if key in kwargs.keys():
@@ -27,7 +29,14 @@ class Entity:
             else:
                 setattr(self, key, value)
 
+
         # 컴포넌트 소유주 추가
+        """
+        for key, value in entity_component_list.items():
+            if getattr(self, key):
+                setattr(self, F'{key}.owner', self)
+        """
+
         if self._Luminary:
             self._Luminary.owner = self
 
@@ -42,6 +51,9 @@ class Entity:
 
         if self._Inventory:
             self._Inventory.owner = self
+
+        if self._Portal:
+            self._Portal.owner = self
 
     def distance_to(self, other):
             dx = other.x - self.x

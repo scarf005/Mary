@@ -6,12 +6,14 @@ import time
 def display(matrix):
     for y in range(matrix.shape[0]):
         for x in range(matrix.shape[1]):
-            if matrix[y,x] == 1:
+            if matrix[y,x] == 0:
+                char = "."
+            elif matrix[y,x] == 1:
                 char = "#"
             elif matrix[y,x] == 2:
                 char = "$"
             else:
-                char = "."
+                char = matrix[y,x]
             print(char, end='')
         print()
 
@@ -30,7 +32,7 @@ def find_nook(wall_map, limit=5):
                 if adjacent_walls(wall_map, x,y) >= limit:
                     # y,x 형식에 유의
                     places.append((y,x))
-                
+
     return places
 
 def adjacent_walls(wall_map, x,y):
@@ -50,17 +52,17 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
     init_chance = 벽 빈도
     """
     debug = False
-    
+
     old_map = np.random.rand(height,width)
     old_map = np.where(old_map < init_chance, 1, 0)
-    
+
     new_map = np.zeros((height,width),dtype='uint8')
-    
+
     #TODO: Fill too small rooms. Apply flood fill.
-    for gen in range(generation + 1):      
+    for gen in range(generation + 1):
         old_map[old_map > 1] = 1
         new_map[:] = 0
-        
+
         for y in range(height):
             for x in range(width):
                 walls_1away = adjacent_walls(old_map, x,y)
@@ -78,7 +80,7 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
                     else:
                         new_map[y,x] = 0
         old_map[:] = 0
-        old_map += new_map 
+        old_map += new_map
     return old_map
 
 def make_cave(width, height, generation, init_chance, birth_limit = 4, death_limit = 3):
@@ -91,19 +93,48 @@ def make_cave(width, height, generation, init_chance, birth_limit = 4, death_lim
                 cave_map[height-1,:] = 1
                 cave_map[:,0] = 1
                 cave_map[:,width-1] = 1
+                #uint8 로 형변환하기
+                cave_map = cave_map.astype('uint8')
                 return cave_map
+
+def flood_fill(matrix, x,y, fill_num):
+    if matrix[y,x] == 0: # 0일 때, 즉 비었을 때
+        matrix[y,x] = fill_num
+        # 함수 재귀 실행
+        where = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
+        for i in range(8):
+            try:
+                flood_fill(matrix, x+where[i][0], y + where[i][1], fill_num)
+            except:
+                pass
+
+def find_caverns(matrix):
+    calc_matrix = np.zeros(matrix.shape, dtype='uint8')
+    calc_matrix += matrix
+    current_num = 10
+    for y in range(calc_matrix.shape[0]):
+        for x in range(calc_matrix.shape[1]):
+            if calc_matrix[y,x] == 0:
+                flood_fill(calc_matrix, x,y, current_num)
+                current_num += 1
+    caverns = current_num - 10
+    return caverns
 
 if __name__ == '__main__':
     #start = input()
     print("\n"*2)
-    new_map = make_cave(40, 40, 2, 0.4)
+    new_map = make_cave(20, 20, 2, 0.4)
+    """
     treasures = find_nook(new_map)
     print (treasures)
     for i in range(len(treasures)):
         new_map[treasures[i][0],treasures[i][1]] = 2
+    """
+    display(new_map)
+    print(F"동굴수:{find_caverns(new_map)}")
     print("최종 결과")
     display(new_map)
     #print("\n"*2)
-    
+
     quit = input()
 
