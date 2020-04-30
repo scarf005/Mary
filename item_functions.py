@@ -1,4 +1,5 @@
 import tcod
+import math, time
 from dice import roll_dice
 
 from random import randint
@@ -90,6 +91,7 @@ def cast_spell(*args, **kwargs):
         results.append({'consumed': True, 'target': target,
                         'message': Message(F'A crackling stream of energy hits {target.name} for {damage} hit points.')})
         results.extend(target._Fighter.take_damage(damage))
+        time.sleep(0.1)
     else:
         results.append({'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', tcod.red)})
 
@@ -122,9 +124,11 @@ def cast_fireball(*args, **kwargs):
     tcod.console_flush(keep_aspect=True)
     results.append({'consumed': True,
                     'message': Message(F'The flaming sphere explodes!', tcod.orange)})
+    time.sleep(0.1)
     for entity in entities:
-        if entity.distance(target_x, target_y) <= radius and entity._Fighter:
+        #print(F"{entity.name} {entity.distance(target_x, target_y)}")
+        if entity.distance(target_x, target_y) <= math.sqrt(2*(r**2)) and entity._Fighter:
             damage = roll_dice(damage_dice)
-            results.append({'message': Message(F'{entity.name} gets blasted for {damage} hit points.', tcod.orange)})
+            results.append({'message': Message(F'{entity.name} is blasted for {damage} hit points.', tcod.orange)})
             results.extend(entity._Fighter.take_damage(damage))
     return results

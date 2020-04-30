@@ -37,6 +37,7 @@ colors = {
     'light_ground': tcod.Color(60, 60, 40),
     'pitch_black': tcod.Color(0,0,0),
     'explosion': tcod.Color(255, 52, 20),
-    'flash' : tcod.Color(74, 177, 255)
+    'flash' : tcod.Color(74, 177, 255),
+    '*ambient_light' : -30
 }
 

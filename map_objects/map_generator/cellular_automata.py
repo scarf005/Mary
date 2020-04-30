@@ -97,9 +97,15 @@ def make_cave(width, height, generation, init_chance, birth_limit = 4, death_lim
                 cave_map = cave_map.astype('uint8')
                 return cave_map
 
-def flood_fill(matrix, x,y, fill_num):
+def flood_fill(matrix, x,y, fill_num=None):
     if matrix[y,x] == 0: # 0일 때, 즉 비었을 때
-        matrix[y,x] = fill_num
+        if fill_num == None:
+            matrix[y,x] = 1
+        else:
+            matrix[y,x] = fill_num[0]
+            fill_num[1] += 1
+            if fill_num[2] == [0,0]:
+                fill_num[2] = [x,y]
         # 함수 재귀 실행
         where = [(-1,-1),(-1,0),(-1,1),(0,-1),(0,1),(1,-1),(1,0),(1,1)]
         for i in range(8):
@@ -111,30 +117,51 @@ def flood_fill(matrix, x,y, fill_num):
 def find_caverns(matrix):
     calc_matrix = np.zeros(matrix.shape, dtype='uint8')
     calc_matrix += matrix
-    current_num = 10
+
+    cavern_list = [] #[번호, 크기, 시작 위치]
+    cavern_now = [10,0,[0,0]]
+
     for y in range(calc_matrix.shape[0]):
         for x in range(calc_matrix.shape[1]):
             if calc_matrix[y,x] == 0:
-                flood_fill(calc_matrix, x,y, current_num)
-                current_num += 1
-    caverns = current_num - 10
-    return caverns
+                flood_fill(calc_matrix, x,y, cavern_now)
+
+                cavern_list.append([cavern_now[0]-10,cavern_now[1],cavern_now[2]])
+                cavern_now[0] += 1
+                cavern_now[1] = 0
+                cavern_now[2] = [0,0]
+
+    caverns = len(cavern_list)
+    return caverns, cavern_list
+
+def fill_cavern(matrix,cavern_list, min_size):
+    for i in range(len(cavern_list)):
+        if cavern_list[i][1] < min_size:
+            x = cavern_list[i][2][0]
+            y = cavern_list[i][2][1]
+            flood_fill(matrix, x,y)
 
 if __name__ == '__main__':
     #start = input()
     print("\n"*2)
-    new_map = make_cave(20, 20, 2, 0.4)
-    """
-    treasures = find_nook(new_map)
-    print (treasures)
-    for i in range(len(treasures)):
-        new_map[treasures[i][0],treasures[i][1]] = 2
-    """
-    display(new_map)
-    print(F"동굴수:{find_caverns(new_map)}")
+    while True:
+        new_map = make_cave(20, 20, 2, 0.4)
+        display(new_map)
+
+        num_caverns = find_caverns(new_map)[0]
+        print(F"동굴수:{num_caverns}")
+        if num_caverns == 1:
+            break
+
     print("최종 결과")
     display(new_map)
     #print("\n"*2)
 
     quit = input()
 
+"""
+treasures = find_nook(new_map)
+print (treasures)
+for i in range(len(treasures)):
+    new_map[treasures[i][0],treasures[i][1]] = 2
+"""

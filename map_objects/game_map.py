@@ -7,7 +7,7 @@ from game_messages import Message
 # 지도
 from map_objects.rectangle import Rect
 from map_objects.tile import Tile
-from map_objects.map_generator.cellular_automata import make_cave, find_nook
+from map_objects.map_generator.cellular_automata import make_cave, find_caverns, find_nook
 
 # 엔티티, 컴포넌트
 from entity import Entity
@@ -40,7 +40,7 @@ class GameMap:
         """
         while True:
             wall_map = make_cave(self.width, self.height, 2, 0.4)
-            if len(find_nook(wall_map)) >= min_nook: break
+            if len(find_nook(wall_map)) >= min_nook and find_caverns(wall_map)[0] == 1: break
 
         for y in range(self.height):
             for x in range(self.width):
