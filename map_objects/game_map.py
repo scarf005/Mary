@@ -100,7 +100,7 @@ class GameMap:
             ix = i_nooks[i][1]
             iy = i_nooks[i][0]
 
-            kinds = randint(3,4)
+            kinds = randint(1,4)
             if kinds == 1:
                 i_comp = Item(use_function=heal, amount=10)
                 item = self.create_item(ix, iy, '!', tcod.violet, 'Potion of Regeneration',item=i_comp)

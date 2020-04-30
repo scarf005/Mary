@@ -37,10 +37,6 @@ def inventory_menu(con, header, inventory, inventory_width, screen_width, screen
         options = []
         print(inventory.items)
         for item in inventory.items:
-            # 단수, 복수 확인
-            name = item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}"
-            print(F"item {name}")
-            options.append(name)
-        print(options)
+            options.append(item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}")
 
     menu(con, header, options, inventory_width, screen_width, screen_height)

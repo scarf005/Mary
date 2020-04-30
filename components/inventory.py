@@ -29,9 +29,7 @@ class Inventory:
                     if item.name == name_in_list:
 
                         self.items[j]._Item.quantity += 1
-                        print(self.items[j]._Item.quantity)
             else:
-                print("No duplicates")
                 self.items.append(item)
 
         return results
