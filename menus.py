@@ -35,7 +35,6 @@ def inventory_menu(con, header, inventory, inventory_width, screen_width, screen
         options = ['Inventory is empty.']
     else:
         options = []
-        print(inventory.items)
         for item in inventory.items:
             options.append(item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}")
 

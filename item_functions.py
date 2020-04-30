@@ -13,11 +13,11 @@ def heal(*args, **kwargs):
 
     results = []
 
-    if entity.__Fighter.hp == entity.__Fighter.max_hp:
+    if entity._Fighter.hp == entity._Fighter.max_hp:
         results.append({'consumed': False, 'message': Message('You are already at full health', tcod.yellow)})
     else:
-        entity.__Fighter.heal(amount)
-        results.append({'consumed': True, 'message': Message('Your wounds start to feel better!', tcod.green)})
+        entity._Fighter.heal(amount)
+        results.append({'consumed': True, 'message': Message('Your feel better.', tcod.green)})
 
     return results
 
