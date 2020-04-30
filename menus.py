@@ -35,5 +35,6 @@ def inventory_menu(con, header, inventory, inventory_width, screen_width, screen
         options = ['Inventory is empty.']
     else:
         options = [item.name for item in inventory.items]
+        #print(options)
 
     menu(con, header, options, inventory_width, screen_width, screen_height)

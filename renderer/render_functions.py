@@ -41,13 +41,10 @@ def draw_animation(con, camera, screen_width, screen_height, x, y, color):
     MapY = y + camera.y
     draw_background(con, MapX, MapY, color, 30)
 
-
 def render_all(game_state, con, panel, mouse, entities, player,
                game_map, fov_map, light_map,camera, message_log, fov_recompute,
                screen_width, screen_height, bar_width, panel_height, panel_y, colors):
-    # fov 재계산 시만
     if fov_recompute:
-        #tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
         con.clear()
         for y in range(game_map.height):
             for x in range(game_map.width):
@@ -57,11 +54,10 @@ def render_all(game_state, con, panel, mouse, entities, player,
 
                 #print(F"{camera.x},{camera.y}")
 
-                # wall 불리언에 tile의 block_sight이 True인지 여부를 대입
                 visible = fov_map.fov[y,x]
                 wall = game_map.tiles[y,x].block_sight
 
-                if light_map[y,x] == 999:
+                if light_map[y,x] == 999: # 다익스트라 알고리즘 최댓값
                     brightness = 0
                 else:
                     brightness = light_map[y,x]

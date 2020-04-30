@@ -20,7 +20,19 @@ class Inventory:
                 'message': Message(F'You pick up {item.name}.', tcod.light_green)
             })
 
-            self.items.append(item)
+            item_names = []
+            for i in self.items:
+                item_names.append(i.name)
+
+            if item.name in item_names:
+                for j, name_in_list in enumerate(item_names):
+                    if item.name == name_in_list:
+
+                        self.items[j]._Item.quantity += 1
+                        print(self.items[j]._Item.quantity)
+            else:
+                print("No duplicates")
+                self.items.append(item)
 
         return results
 
@@ -42,7 +54,8 @@ class Inventory:
 
                 for item_use_result in item_use_results:
                     if item_use_result.get('consumed'):
-                        self.remove_item(item_entity)
+                        if not item_component.quantity == 1: item_component.quantity -= 1
+                        else: self.remove_item(item_entity)
 
                 results.extend(item_use_results)
 
