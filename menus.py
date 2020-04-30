@@ -19,7 +19,7 @@ def menu(con, header, options, width, screen_width, screen_height):
     y = header_height
     letter_index = ord('a')
     for option_text in options:
-        text = '(' + chr(letter_index) + ') ' + option_text
+        text = F"({chr(letter_index)}) {option_text}"
         tcod.console_print_ex(window, 0, y, tcod.BKGND_NONE, tcod.LEFT, text)
         y += 1
         letter_index += 1
@@ -34,7 +34,13 @@ def inventory_menu(con, header, inventory, inventory_width, screen_width, screen
     if len(inventory.items) == 0:
         options = ['Inventory is empty.']
     else:
-        options = [item.name for item in inventory.items]
-        #print(options)
+        options = []
+        print(inventory.items)
+        for item in inventory.items:
+            # 단수, 복수 확인
+            name = item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}"
+            print(F"item {name}")
+            options.append(name)
+        print(options)
 
     menu(con, header, options, inventory_width, screen_width, screen_height)

@@ -109,12 +109,12 @@ class GameMap:
                 item = self.create_item(ix, iy, '!', tcod.orange, 'Fruit Juice',item=i_comp)
             elif kinds == 3:
                 i_comp = Item(use_function=cast_spell, damage=(1,20), maximum_range=5)
-                item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Spell Cards',item=i_comp)
+                item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Spell Card',item=i_comp)
             elif kinds == 4:
                 i_comp = Item(use_function=cast_fireball, targeting=True,
                               targeting_message=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
                               damage=(3,8,5), radius=3)
-                item = self.create_item(ix, iy, '?', tcod.red, 'Manuscript of Hurl Flaming Sphere',item=i_comp)
+                item = self.create_item(ix, iy, '?', tcod.red, 'Manuscript of Hurl Fireball',item=i_comp)
             entities.append(item)
 
         """

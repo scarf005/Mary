@@ -110,7 +110,7 @@ def render_all(game_state, con, panel, mouse, entities, player,
             inventory_title = 'Use which? (Esc to exit)\n'
         else:
             inventory_title = 'Drop which? , or Esc to cancel.\n'
-        inventory_menu(con, inventory_title,player._Inventory, screen_width-2, screen_width, screen_height)
+        inventory_menu(con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height)
 
 
 def clear_all_entities(con, entities, camera):
