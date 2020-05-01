@@ -8,6 +8,10 @@ screen_height = 35
 map_width = 42
 map_height = 20
 
+#폰트
+font_width = 16
+font_height = 16
+
 """
 인터페이스
 """

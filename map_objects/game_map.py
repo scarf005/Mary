@@ -71,7 +71,7 @@ class GameMap:
         max_monster, max_items = 10, 10
 
         self.tiles = self.initialize_tiles()
-        self.create_map_cave(player, entities, min_nook, max_monster, max_items)
+        self.create_map_cave(player, entities, min_nook)
         player._Fighter.heal_sanity_capacity(player._Fighter.max_sanity // 2)
         self.create_portal(entities, 10, player)
 
@@ -134,7 +134,7 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        item_chance = {'BK': 20, 'FJ':60, 'REG':30,'SC':20,"FB":10}
+        item_chance = {'FJ':60, 'REG':30,'SC':20,"FB":10} #'BK': 20
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)

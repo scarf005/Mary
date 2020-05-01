@@ -1,4 +1,6 @@
 import tcod
+import tcod.tileset
+import tcod.context
 import numpy as np
 import sys, warnings
 import math, random
@@ -81,7 +83,6 @@ def main():
 
     # 카메라 객체 생성
     camera = Camera(0,0, map_width, map_height, True)
-
     camera.update(player)
 
     """
@@ -89,10 +90,8 @@ def main():
     passwall: 벽 통과 가능
     showpos: 플레이어 x,y좌표 표시. 다른 엔티티 좌표도 표시할 수 있게 고칠 것
     """
-    # 디버그용 객체 생성. 디버그 기능들은 기본적으로 꺼져 있고, 인자를 넣으면 활성화
-    debug = Debug()
-
     # 메세지 출력용 객체 생성.
+    debug = Debug()
     message_log = MessageLog(message_x, message_width, message_height)
 
     # 키보드, 마우스 입력 처리용 객체 생성
@@ -108,18 +107,20 @@ def main():
     con = tcod.console.Console(screen_width, screen_height)
     panel = tcod.console_new(screen_width, panel_height)
 
-    # 폰트 설정: 10x10파일, 이미지 파일은 그레이스케일, 배열 방식은 TCOD
-    # tcod.console_set_custom_font('arial10x10.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_TCOD)
-
     # 폰트 설정: 32x32파일, 이미지 파일은 그레이스케일, 배열 방식은 CP437
-    tcod.console_set_custom_font('terminal16x16.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
+    TILESET_TTF = tcod.tileset.load_truetype_font('D2Coding.ttf', 32, 32)
+    #tcod.console_set_custom_font('terminal16x16.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
 
     # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
+    """
     tcod.console_init_root(screen_width, screen_height, 'Mary', False, vsync=True)
-
-
+    """
+    tcod.context.new_terminal(screen_width, screen_height,
+                            renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
+                            vsync=True, title="MARY")
     # TCOD 루프
-    while not tcod.console_is_window_closed():
+    #while not tcod.console_is_window_closed():
+    while True:
         """
         입력
         """
@@ -153,7 +154,8 @@ def main():
         light_recompute = False
 
         # 화면 출력
-        tcod.console_flush(keep_aspect=True)
+        #tcod.console_flush(keep_aspect=True) Deprecated
+        
 
         # 화면 초기화
         clear_all_entities(con, entities, camera)
