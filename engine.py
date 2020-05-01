@@ -107,19 +107,19 @@ def main():
     con = tcod.console.Console(screen_width, screen_height)
     panel = tcod.console_new(screen_width, panel_height)
 
-    # 폰트 설정: 32x32파일, 이미지 파일은 그레이스케일, 배열 방식은 CP437
-    TILESET_TTF = tcod.tileset.load_truetype_font('D2Coding.ttf', 32, 32)
+    TILESET_TTF = tcod.tileset.load_truetype_font('NGCB.ttf', font_width, font_height)
     #tcod.console_set_custom_font('terminal16x16.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
 
     # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
     """
     tcod.console_init_root(screen_width, screen_height, 'Mary', False, vsync=True)
     """
-    tcod.context.new_terminal(screen_width, screen_height,
+    context = tcod.context.new_window(screen_width*font_width, screen_height*font_height,
                             renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
                             vsync=True, title="MARY")
     # TCOD 루프
     #while not tcod.console_is_window_closed():
+
     while True:
         """
         입력
@@ -133,7 +133,6 @@ def main():
         # 플레이어 시야
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
-
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
@@ -155,7 +154,7 @@ def main():
 
         # 화면 출력
         #tcod.console_flush(keep_aspect=True) Deprecated
-        
+        context.present(con, keep_aspect=True, integer_scaling=True)
 
         # 화면 초기화
         clear_all_entities(con, entities, camera)

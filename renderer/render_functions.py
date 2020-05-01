@@ -24,8 +24,8 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
         tcod.console_rect(panel, x, y, bar_width, 1, False, tcod.BKGND_SCREEN)
 
     tcod.console_set_default_foreground(panel, tcod.white)
-    tcod.console_print_ex(panel, int(x + total_width / 2), y, tcod.BKGND_NONE, tcod.CENTER,
-                             f'{name}: {value}/{maximum}')
+    #tcod.console_print_ex(panel, int(x + total_width / 2), y, tcod.BKGND_NONE, tcod.CENTER,
+    #                         f'{name}: {value}/{maximum}')
 
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
@@ -85,8 +85,8 @@ def render_all(game_state, con, panel, mouse, entities, player,
         draw_entity(con, entity, fov_map, game_map, camera)
 
     tcod.console_set_default_foreground(con, tcod.white)
-    tcod.console_print_ex(con, 0, 0, tcod.BKGND_NONE, tcod.LEFT,
-                             f'Depth {game_map.depth}')
+    #tcod.console_print_ex(con, 0, 0, tcod.BKGND_NONE, tcod.LEFT,
+    #                         f'Depth {game_map.depth}')
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
@@ -97,7 +97,7 @@ def render_all(game_state, con, panel, mouse, entities, player,
     y = 2
     for message in message_log.messages:
         tcod.console_set_default_foreground(panel, message.color)
-        tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
+        #tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
         y += 1
 
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
@@ -108,8 +108,8 @@ def render_all(game_state, con, panel, mouse, entities, player,
 
 
     tcod.console_set_default_foreground(panel, tcod.light_gray)
-    tcod.console_print_ex(panel, 1, 0, tcod.BKGND_NONE, tcod.LEFT,
-                            get_names_under_mouse(mouse, camera, entities, fov_map))
+    #tcod.console_print_ex(panel, 1, 0, tcod.BKGND_NONE, tcod.LEFT,
+    #                        get_names_under_mouse(mouse, camera, entities, fov_map))
 
     tcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
