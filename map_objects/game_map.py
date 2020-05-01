@@ -4,6 +4,7 @@ import numpy as np
 from random import randint, shuffle
 
 from game_messages import Message
+from yaml_data.yaml_loader import open_yaml
 
 # 지도
 from map_objects.rectangle import Rect
