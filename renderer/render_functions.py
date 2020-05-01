@@ -103,7 +103,7 @@ def render_all(game_state, con, panel, mouse, entities, player,
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
                tcod.light_red, tcod.darker_red)
 
-    render_bar(panel, screen_width- (bar_width+1), 1, bar_width, 'SANITY', player._Fighter.sanity, player._Fighter.max_sanity,
+    render_bar(panel, screen_width- (bar_width+1), 1, bar_width, 'SANITY', player._Fighter.sanity, player._Fighter.cap_sanity,
                tcod.light_blue, tcod.darker_blue)
 
 

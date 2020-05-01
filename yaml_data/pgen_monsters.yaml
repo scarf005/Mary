@@ -1,18 +1,27 @@
-p_crawling_intestine:
+# 미리 생성된 적들
+# 서식:
+#
+# 이름: [이름]
+# 색: [tcod.color] 또는 [r,g,b]
+# 특성 부품
+# 싸움꾼 부품
+# 인공지능 부품: AI_comp : (기본) BasicMonster()
+
+crawling_intestine:
   name: "Crawling Intestine"
   color: "flame"
   char: '~'
+
   Trait_comp:
     - vision: 0
     - hearing: 2
+
   F_comp:
     - hp: 10
     - defense: 0
     - power: 3
 
-  AI_comp: BasicMonster()
-
-p_venom_hunter:
+venom_hunter:
   name: "Venom Hunter"
   color: "dark_green"
   char: 'S'
@@ -26,11 +35,9 @@ p_venom_hunter:
     - defense: 1
     - power: 4
 
-  AI_comp: BasicMonster()
-
-p_flesh_abomination:
+flesh_abomination:
   name: "Flesh Abomination"
-  color: Color(128, 5, 5)
+  color: [128, 5, 5]
   char: 'S'
 
   Trait_comp:
@@ -41,6 +48,3 @@ p_flesh_abomination:
     - hp: 16
     - defense: 1
     - power: 4
-
-  AI_comp: BasicMonster()
-

@@ -17,12 +17,16 @@ class Fighter:
         self.defense = defense
         self.power = power
 
-    def take_damage(self, amount):
+    def take_damage(self, amount, dmg_type='hp'):
         results = []
-        self.hp -= amount
+        if dmg_type == 'hp':
+            self.hp -= amount
 
-        if self.hp <= 0:
-            results.append({'dead': self.owner})
+            if self.hp <= 0:
+                results.append({'dead': self.owner})
+        elif dmg_type == 'sanity':
+            self.cap_sanity -= amount
+
         return results
 
     def heal(self, amount):
@@ -55,6 +59,7 @@ class Fighter:
             results.append({'message': Message(f'{entity_name} hit {target.name} for {damage} hit points.',
                            tcod.white)})
             results.extend(target._Fighter.take_damage(damage))
+            results.extend(target._Fighter.take_damage(int(damage/randint(1,damage)),dmg_type='sanity'))
         else:
             results.append({'message': Message(f'{entity_name} hit {target.name} but does no damage.',tcod.white)})
         return results

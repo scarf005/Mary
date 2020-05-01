@@ -10,54 +10,73 @@ from renderer.render_functions import draw_animation
 def heal(*args, **kwargs):
     entity = args[0]
     amount = kwargs.get('amount')
+    which_heal = kwargs.get('which')
+    if not which_heal:
+        which_heal = 'hp'
 
     results = []
 
-    if entity._Fighter.hp == entity._Fighter.max_hp:
-        results.append({'consumed': False, 'message': Message('You are already at full health', tcod.yellow)})
-    else:
-        entity._Fighter.heal(amount)
-        results.append({'consumed': True, 'message': Message('Your feel better.', tcod.green)})
+    if which_heal == 'hp':
+        if entity._Fighter.hp == entity._Fighter.max_hp:
+            results.append({'consumed': False, 'message': Message('You are already at full health', tcod.yellow)})
+        else:
+            entity._Fighter.heal(amount)
+            results.append({'consumed': True, 'message': Message('Your feel better.', tcod.green)})
+
+    elif which_heal == 'sanity':
+        if entity._Fighter.sanity == entity._Fighter.cap_sanity:
+            results.append({'consumed': False, 'message': Message('You are cheerful enough, yet.', tcod.yellow)})
+        else:
+            entity._Fighter.heal_sanity(amount)
+            results.append({'consumed': True, 'message': Message('Your feel better.', tcod.green)})
 
     return results
 
 def read(*args, **kwargs):
     entity = args[0]
     about = kwargs.get('about')
-    #content = kwargs.get('content')
+    sanity = kwargs.get('sanity')
+    content = kwargs.get('content')
+
+    if content:
+        snippet = f" This part says:{content(randint(0,len(content)-1))}"
+    else:
+        snippet = ""
+
+    if sanity:
+        entity._Fighter.heal_sanity(sanity)
+        if sanity > 0:
+            feeling = "This feels better."
+        elif sanity == 0:
+            feeling = ""
+        elif sanity < 0:
+            feeling = "This makes you feel worse."
 
     results = []
 
     results.append({'used': True,
-                    'message': Message(F'You open the book and read... This is a book {about}.', tcod.white)})
+                    'message': Message(F'You open the book and read... This is a book {about}.{snippet}{feeling}',
+                                       tcod.white)})
 
     return results
 
 def talisman(*args, **kwargs):
     results = []
 
-    chance = randint(1,9)
-    if chance == 1:
-        talk = "askes you how are things going."
-    elif chance == 2:
-        talk = "tells you that she and Mary knew each other."
-    elif chance == 3:
-        talk = "says she think that you should hurry."
-    elif chance == 4:
-        talk = "tells you that death is nothing compared to the meaningless of life."
-    elif chance == 5:
-        talk = "smiles breifly."
-    elif chance == 6:
-        talk = "worries about Mary."
-    elif chance == 7:
-        talk = "assures you how time travel is completely possible even within the theory of relativity."
-    elif chance == 8:
-        talk = "laughs softly."
-    elif chance == 9:
-        talk = "tells you she could really have a walk, but is trapped in this talisman."
+    say = [
+    "askes you how are things going.",
+    "tells you that she and Mary knew each other.",
+    "says she think that you should hurry.",
+    "tells you that death is nothing compared to the meaningless of life.",
+    "smiles breifly.",
+    "worries about Mary.",
+    "assures you how time travel is completely possible even within the theory of relativity.",
+    "laughs softly.",
+    "tells you she could really have a walk, but is trapped in this talisman."
+    ]
 
     results.append({'used': True,
-                    'message': Message(F'You look at the talisman. The devil of the talisman {talk}', tcod.lighter_purple)})
+                    'message': Message(F'You look at the talisman. The devil of the talisman {say(randint(0,len(say)-1))}', tcod.lighter_purple)})
     return results
 
 def cast_spell(*args, **kwargs):

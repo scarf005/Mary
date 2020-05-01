@@ -4,7 +4,7 @@ import numpy as np
 from random import randint, shuffle
 
 from game_messages import Message
-from yaml_data.yaml_loader import open_yaml
+#from yaml_data.pgen_monster_creater import load_monster
 
 # 지도
 from map_objects.rectangle import Rect
@@ -14,6 +14,8 @@ from map_objects.map_generator.cellular_automata import make_cave, find_caverns,
 # 엔티티, 컴포넌트
 from entity import Entity
 from item_functions import heal, read, talisman, cast_spell, cast_fireball
+
+from random_utils import random_choice_from_dict
 
 from components.ai import BasicMonster
 from components.fighter import Fighter
@@ -32,11 +34,16 @@ class GameMap:
         self.tiles = self.initialize_tiles()
 
         self.depth = depth
+        self.monsters = 0
+
+    @property
+    def current_monsters_in_map(self):
+        return self.monsters
 
     def initialize_tiles(self):
         return np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
 
-    def create_map_cave(self, player, entities, min_nook, max_monsters, max_items):
+    def create_map_cave(self, player, entities, min_nook):
         """
         min_nook: 지도에서 구석진 곳의 최소 수 (아이템/몬스터 설치)
         max_monsters, max_items: 더 이상의 자세한 설명은 생략한다.
@@ -51,6 +58,8 @@ class GameMap:
                     self.tiles[y,x].blocked = False
                     self.tiles[y,x].block_sight = False
 
+        max_monsters = 6 + int(3* math.sqrt(self.depth))
+        max_items = 4 + int(2 * math.sqrt(self.depth))
         self.place_entities_at_nook(entities, min_nook, max_monsters, max_items)
 
     def next_depth(self, player, message_log):
@@ -98,8 +107,11 @@ class GameMap:
         monster_num = randint(min_monsters, max_monsters)
 
         # 몬스터 배치
-        Tm = 0
+        monster_chance = {'CI':80,'GS':20,"FA":10}
         for j in range(monster_num):
+            ai_comp = BasicMonster()
+            choice = random_choice_from_dict(monster_chance)
+
             if j < len(nooks):
                 mx = nooks[j][1]
                 my = nooks[j][0]
@@ -107,47 +119,43 @@ class GameMap:
                 # 구석진 곳이 모자르면 지도에서 무작위로 좌표를 뽑아옴
                 my, mx = self.np_find_empty_cell(entities, wall_map)
 
-            ai_comp = BasicMonster()
-            monster_chance = randint(0, 100)
-
-            if monster_chance < 60:
+            if choice == 'CI':
                 f_comp = Fighter(hp=10, defense=0, power=3)
-                monster = self.create_monster(mx,my, '~', tcod.flame, 'crawling intestine',
-                                            f_comp, ai_comp)
-            elif monster_chance < 90:
+                monster = self.create_monster(mx,my, '~', tcod.flame, 'crawling intestine',f_comp, ai_comp)
+            elif choice == 'GS':
                 f_comp = Fighter(hp=16, defense=1, power=4)
-                monster = self.create_monster(mx,my, 'S', tcod.dark_green, 'giant spider',
-                                            f_comp, ai_comp)
-            else:
+                monster = self.create_monster(mx,my, 'S', tcod.dark_green, 'giant spider',f_comp, ai_comp)
+            elif choice == 'FA':
                 f_comp = Fighter(hp=20, defense=0, power=7)
                 monster = self.create_monster(mx,my, '@', tcod.Color(128, 5, 5),
-                                              'flesh abomination',
-                                              f_comp, ai_comp)
+                                              'flesh abomination',f_comp, ai_comp)
             entities.append(monster)
-            Tm +=1
-        print(F"monsters {Tm}")
+            self.monsters += 1 #계산용
 
         # 아이템 배치, 아직 임시
-        i_nooks = nooks
-        shuffle(i_nooks)
-        if max_items > len(i_nooks):
-            max_items = len(i_nooks)
+        shuffle(nooks)
+        item_chance = {'BK': 20, 'FJ':60, 'REG':30,'SC':20,"FB":10}
 
-        for i in range(len(i_nooks)):
-            ix = i_nooks[i][1]
-            iy = i_nooks[i][0]
+        for i in range(len(nooks)):
+            kinds = random_choice_from_dict(item_chance)
 
-            kinds = randint(1,4)
-            if kinds == 1:
+            if j < len(nooks):
+                ix = nooks[i][1]
+                iy = nooks[i][0]
+            else:
+                # 구석진 곳이 모자르면 지도에서 무작위로 좌표를 뽑아옴
+                ix, iy = self.np_find_empty_cell(entities, wall_map)
+
+            if kinds == 'REG':
                 i_comp = Item(use_function=heal, amount=10)
                 item = self.create_item(ix, iy, '!', tcod.violet, 'Potion of Regeneration',item=i_comp)
-            elif kinds == 2:
-                i_comp = Item(use_function=heal, amount=2)
+            elif kinds == 'FJ':
+                i_comp = Item(use_function=heal, amount=7, which='sanity')
                 item = self.create_item(ix, iy, '!', tcod.orange, 'Fruit Juice',item=i_comp)
-            elif kinds == 3:
+            elif kinds == 'SC':
                 i_comp = Item(use_function=cast_spell, damage=(1,20), maximum_range=5)
-                item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Spell Card',item=i_comp)
-            elif kinds == 4:
+                item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Minor Spark',item=i_comp)
+            elif kinds == 'FB':
                 i_comp = Item(use_function=cast_fireball, targeting=True,
                               targeting_message=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
                               damage=(3,8,5), radius=3)

@@ -1,6 +1,7 @@
 import tcod
 import numpy as np
 import sys, warnings
+import math, random
 
 # 게임 지도
 from map_objects.game_map import GameMap
@@ -63,7 +64,7 @@ def main():
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
     game_map = GameMap(map_width,map_height)
-    game_map.create_map_cave(player, entities, 3, 10, 10)
+    game_map.create_map_cave(player, entities, 3)
     game_map.create_portal(entities, 10, player)
 
     # FOV
@@ -180,6 +181,8 @@ def main():
         toggle_wall  = action.get('toggle_wall')
         exit = action.get('exit')
 
+        player_turn_results = []
+
         if exit:
             if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
                 game_state = previous_game_state
@@ -196,8 +199,6 @@ def main():
         """
         플레이어 차례에 플레이어가 할 수 있는 행동들
         """
-        player_turn_results = []
-
         # move변수에 대입된 값이 있을 시 이동
         if move and game_state == GameStates.PLAYERS_TURN:
             dx, dy = action.get('move')
@@ -346,6 +347,24 @@ def main():
         적의 차례에 적이 할 수 있는 행동들
         """
         if game_state == GameStates.ENEMY_TURN:
+            #print(game_map.current_monsters_in_map)
+            # 정신력 고갈 기능. 따로 변수로 넣던가 Gamemap에 넣어야 하나.
+            if not game_map.current_monsters_in_map == 0:
+                clear_message_shown = False
+                sanity_damage = random.randint(-5, game_map.current_monsters_in_map)
+                if sanity_damage < 0:
+                    sanity_damage = 0
+                else:
+                    sanity_damage = int(math.sqrt(sanity_damage))
+                player._Fighter.heal_sanity(-sanity_damage)
+                if sanity_damage > 3:
+                    message_log.log(Message("You have a unpleasent feeling that you're not alone.",tcod.dark_chartreuse))
+            else:
+                if not clear_message_shown:
+                    clear_message_shown = True
+                    message_log.log(Message("Now you are more relieved that you are certain there's no more monsters here.",tcod.light_green))
+
+
             for entity in entities:
                 if entity.name == 'light source':
                     pass
@@ -366,6 +385,7 @@ def main():
                                 message, game_state = kill_player(dead_entity)
                             else:
                                 message = kill_monster(dead_entity)
+                                game_map.monsters -= 1
 
                             message_log.log(message)
 

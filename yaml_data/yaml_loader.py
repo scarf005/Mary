@@ -7,7 +7,7 @@ def open_yaml(file, print_info=False):
         FILE_PATH = os.path.dirname(os.path.abspath(__file__))
         return os.path.join(FILE_PATH, file)
 
-    with open(set_file_path(file), 'r') as file:
+    with open(set_file_path(file), 'r',  encoding='UTF8') as file:
         try:
             info = yaml.load(file, Loader=yaml.FullLoader)
             if print_info: pp(info)
