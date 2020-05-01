@@ -1,11 +1,11 @@
 import tcod
 
 #스크린 가로/세로 크기
-screen_width = 40
-screen_height = 30
+screen_width = 42
+screen_height = 35
 
 #지도
-map_width = 40
+map_width = 42
 map_height = 20
 
 """

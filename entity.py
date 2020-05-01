@@ -34,7 +34,7 @@ class Entity:
         """
         for key, value in entity_component_list.items():
             if getattr(self, key):
-                setattr(self, F'{key}.owner', self)
+                setattr(self, f'{key}.owner', self)
         """
 
         if self._Luminary:

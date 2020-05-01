@@ -1,4 +1,5 @@
 import tcod
+import math
 import numpy as np
 from random import randint, shuffle
 
@@ -17,29 +18,30 @@ from components.ai import BasicMonster
 from components.fighter import Fighter
 from components.item import Item
 from components.luminary import Luminary
+from components.portals import Portal
 
 # 렌더링
 from renderer.render_functions import RenderOrder
 
 class GameMap:
-    def __init__(self, width, height, depths=1):
+    def __init__(self, width, height, depth=1):
         # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
 
-        self.depths = 1
+        self.depth = depth
 
     def initialize_tiles(self):
         return np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
 
-    def create_map_cave(self, entities, min_nook, max_monsters, max_items):
+    def create_map_cave(self, player, entities, min_nook, max_monsters, max_items):
         """
         min_nook: 지도에서 구석진 곳의 최소 수 (아이템/몬스터 설치)
         max_monsters, max_items: 더 이상의 자세한 설명은 생략한다.
         """
         while True:
-            wall_map = make_cave(self.width, self.height, 2, 0.4)
+            wall_map = make_cave(player, self.width, self.height, 2, 0.4)
             if len(find_nook(wall_map)) >= min_nook and find_caverns(wall_map)[0] == 1: break
 
         for y in range(self.height):
@@ -47,7 +49,41 @@ class GameMap:
                 if not wall_map[y,x]:
                     self.tiles[y,x].blocked = False
                     self.tiles[y,x].block_sight = False
+
         self.place_entities_at_nook(entities, min_nook, max_monsters, max_items)
+
+    def next_depth(self, player, message_log):
+        self.depth += 1
+        entities = [player]
+
+        #placeholder vars
+        min_nook = 3
+        max_monster, max_items = 10, 10
+
+        self.tiles = self.initialize_tiles()
+        self.create_map_cave(player, entities, min_nook, max_monster, max_items)
+        player._Fighter.heal_sanity_capacity(player._Fighter.max_sanity // 2)
+        self.create_portal(entities, 10, player)
+
+        message_log.log(Message('You jump into the tear in the fabric of timespace.', tcod.light_violet))
+        return entities
+
+    def create_portal(self, entities, min_distance, player):
+        """
+        다음 층으로 가는 포탈 생성.
+        min_distance:플레이어로부터 떨어져야 하는 최소 거리
+        """
+        x, y, dist = 0, 0, 0
+        while dist < min_distance or self.tiles[y,x].blocked:
+            x = randint(0, self.width-1)
+            y = randint(0, self.height-1)
+            dist = math.sqrt((x - player.x)**2 + (y - player.y)**2)
+
+        portal_comp = Portal(self.depth + 1)
+        down_portal = Entity(x, y, 'O', tcod.light_purple, 'Gap',
+                             render_order=RenderOrder.PORTAL, blocks=True,
+                             _Portal=portal_comp, _Luminary=Luminary(luminosity=20))
+        entities.append(down_portal)
 
     def place_entities_at_nook(self, entities, min_monsters, max_monsters, max_items):
         # 벽 지도 생성
@@ -88,7 +124,7 @@ class GameMap:
                                               f_comp, ai_comp)
             entities.append(monster)
             Tm +=1
-        print(Tm)
+        print(F"monsters {Tm}")
 
         # 아이템 배치, 아직 임시
         i_nooks = nooks
@@ -140,8 +176,6 @@ class GameMap:
                         break
                 else:
                     return y,x
-
-
 
     def is_blocked(self, x, y):
         # 게임맵 객체의 tiles리스트에서 찾은 후 막혔는지 확인한다.

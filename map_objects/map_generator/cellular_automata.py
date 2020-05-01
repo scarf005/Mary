@@ -83,11 +83,11 @@ def cell_auto(width, height, generation, init_chance = 0.5, birth_limit = 4, dea
         old_map += new_map
     return old_map
 
-def make_cave(width, height, generation, init_chance, birth_limit = 4, death_limit = 3):
+def make_cave(player, width, height, generation, init_chance, birth_limit = 4, death_limit = 3):
         while True:
             cave_map = cell_auto(width,height, generation, init_chance, birth_limit, death_limit)
             # 플레이어가 있는 위치가 빈 공간일 때 까지 생성
-            if cave_map[int(height/2),int(width/2)] == 0:
+            if cave_map[player.y, player.x] == 0:
                 #가장자리 벽으로 둘러싸기
                 cave_map[0,:] = 1
                 cave_map[height-1,:] = 1

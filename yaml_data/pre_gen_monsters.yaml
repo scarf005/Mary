@@ -1,0 +1,10 @@
+crawling_intestine:
+  name: "crawling intestine"
+  color: "flame"
+  char: '~'
+  F_comp:
+    - hp: 10
+    - defense: 0
+    - power: 3
+  AI_comp: BasicMonster()
+

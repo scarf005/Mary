@@ -41,11 +41,13 @@ def main():
     객체 생성
     """
     # 플레이어 객체 생성. 위치는 맵 중앙.
+    playerX=int(map_width/2)
+    playerY=int(map_height/2)
 
-    fighter_component = Fighter(hp=30, defense=2, power=5)
+    fighter_component = Fighter(hp=30, sanity=100, defense=2, power=5)
     luminary_component = Luminary(luminosity=10)
     inventory_component = Inventory(26)
-    player = Entity(int(map_width/2),int(map_height/2),'@',tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
+    player = Entity(playerX , playerY, '@', tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
     entities = [player]
 
     i_comp = Item(use_function=read,about='about activities of you and your best friend, Mary')
@@ -61,7 +63,8 @@ def main():
 
     # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
     game_map = GameMap(map_width,map_height)
-    game_map.create_map_cave(entities, 3, 10, 10)
+    game_map.create_map_cave(player, entities, 3, 10, 10)
+    game_map.create_portal(entities, 10, player)
 
     # FOV
     fov_radius = max_fov_radius
@@ -157,6 +160,7 @@ def main():
         """
         입력에 대한 상호작용
         """
+
         # action 변수에 키보드 입력값을 사전 형태로 받아옴
         action = handle_keys(key, game_state)
         mouse_action = handle_mouse(mouse)
@@ -201,12 +205,29 @@ def main():
             destiy = player.y + dy
 
             if debug.passwall == False:
+                # 가려는 곳이 지형으로 안 막혀있으면
                 if not game_map.is_blocked(destix, destiy):
+                    # 거기에 이미 엔티티가 있나 확인
                     target = get_blocking_entities_at_location(entities, destix, destiy)
 
                     if target:
-                        attack_results = player._Fighter.attack(target)
-                        player_turn_results.extend(attack_results)
+                        battle = target._Fighter
+
+                        if battle:
+                            attack_results = player._Fighter.attack(target)
+                            player_turn_results.extend(attack_results)
+                        else:
+                            """
+                            다음 층으로
+                            """
+                            if target._Portal:
+                                entities = game_map.next_depth(player,message_log)
+                                fov_map = initialize_fov(game_map)
+                                fov_recompute = True
+                                light_recompute = True
+                                con.clear()
+                            else:
+                                print("This is the weirdest bug I've ever seen")
 
                     else:
                         player.move(dx, dy)
@@ -328,7 +349,7 @@ def main():
             for entity in entities:
                 if entity.name == 'light source':
                     pass
-                    #message_log.log(F"The {entity.name} is glowing")
+                    #message_log.log(f"The {entity.name} is glowing")
                 elif entity._Ai:
                     enemy_turn_results = entity._Ai.take_turn(player,
                                                               fov_map, game_map, entities)

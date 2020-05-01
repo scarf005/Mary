@@ -8,9 +8,10 @@ from menus import inventory_menu
 
 class RenderOrder(Enum):
     # 높을수록 위에 표시한다. 즉 높이
-    CORPSE = 1
-    ITEM = 2
-    ACTOR = 3
+    PORTAL = 1
+    CORPSE = 2
+    ITEM = 3
+    ACTOR = 4
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
     bar_width = int(float(value) / maximum * total_width)
@@ -24,7 +25,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
     tcod.console_set_default_foreground(panel, tcod.white)
     tcod.console_print_ex(panel, int(x + total_width / 2), y, tcod.BKGND_NONE, tcod.CENTER,
-                             '{0}: {1}/{2}'.format(name, value, maximum))
+                             f'{name}: {value}/{maximum}')
 
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
@@ -81,7 +82,11 @@ def render_all(game_state, con, panel, mouse, entities, player,
     entities_in_render_order = sorted(entities, key=lambda x: x.render_order.value)
 
     for entity in entities_in_render_order:
-        draw_entity(con, entity, fov_map, camera)
+        draw_entity(con, entity, fov_map, game_map, camera)
+
+    tcod.console_set_default_foreground(con, tcod.white)
+    tcod.console_print_ex(con, 0, 0, tcod.BKGND_NONE, tcod.LEFT,
+                             f'Depth {game_map.depth}')
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
@@ -97,6 +102,10 @@ def render_all(game_state, con, panel, mouse, entities, player,
 
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
                tcod.light_red, tcod.darker_red)
+
+    render_bar(panel, screen_width- (bar_width+1), 1, bar_width, 'SANITY', player._Fighter.sanity, player._Fighter.max_sanity,
+               tcod.light_blue, tcod.darker_blue)
+
 
     tcod.console_set_default_foreground(panel, tcod.light_gray)
     tcod.console_print_ex(panel, 1, 0, tcod.BKGND_NONE, tcod.LEFT,
@@ -118,9 +127,9 @@ def clear_all_entities(con, entities, camera):
     for entity in entities:
         clear_entity(con, entity, camera)
 
-def draw_entity(con, entity, fov_map, camera):
+def draw_entity(con, entity, fov_map, game_map, camera):
     #시야 안에 객체가 들어올 때만 객체를 그림
-    if fov_map.fov[entity.y, entity.x]:
+    if fov_map.fov[entity.y, entity.x] or (entity._Portal and game_map.tiles[entity.y,entity.x].explored):
         # 객체를 표시함. 앞줄은 글자색, 뒷줄은 글자 배치.
         tcod.console_set_default_foreground(con, entity.color)
         tcod.console_put_char(con, entity.x + camera.x, entity.y + camera.y, entity.char, tcod.BKGND_NONE)

@@ -1,3 +1,3 @@
-class Portals:
-    def __init__(self, depths):
-        self.depths = depths
+class Portal:
+    def __init__(self, depth):
+        self.depth = depth
