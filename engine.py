@@ -91,7 +91,6 @@ def init_message_and_states():
     previous_game_state = game_state
     targeting_item = None
 
-
     return message_log, game_state, previous_game_state, targeting_item
 
 def init_others(*args):
@@ -104,8 +103,9 @@ def init_console():
     context = tcod.context.new_window(WIDTH, HEIGHT,
                             renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
                             vsync=True, title="MARY")
-    console = tcod.Console(*context.recommended_console_size())
-    panel = tcod.Console(screen_width, panel_height)
+    console = tcod.Console(map_width, map_height)
+    #panel = tcod.Console(screen_width, panel_height)
+    panel = tcod.console_new(screen_width, panel_height)
 
     return console, panel, context
 
@@ -144,7 +144,7 @@ def main():
                    screen_width, screen_height,
                    bar_width, panel_height, panel_y, colors)
 
-        context.present(console, keep_aspect=True, integer_scaling=True)
+        context.present(console, keep_aspect=True, integer_scaling=True, align=(0.5,1))
         clear_all_entities(console, entities, camera)
 
         fov_recompute = False
@@ -188,7 +188,6 @@ def main():
                 player_turn_results.append({'targeting_cancelled': True})
             else:
                 pass
-                #return True
 
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if action.get('fullscreen'):

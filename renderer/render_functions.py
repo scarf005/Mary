@@ -89,15 +89,16 @@ def render_all(game_state, con, panel, entities, player, mouse,
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
-    tcod.console_set_default_background(panel, tcod.black)
+    tcod.console_set_default_background(panel, tcod.white)
 
-    #tcod.console_clear(panel)
+    tcod.console_clear(panel)
 
     # Print the game messages, one line at a time
     y = 2
     for message in message_log.messages:
         tcod.console_set_default_foreground(panel, message.color)
-        panel.print(message_log.x, y, message.text)
+        tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
+        #panel.print(message_log.x, y, message.text)
         y += 1
 
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
@@ -105,7 +106,6 @@ def render_all(game_state, con, panel, entities, player, mouse,
 
     render_bar(panel, screen_width- (bar_width+1), 1, bar_width, 'SANITY', player._Fighter.sanity, player._Fighter.cap_sanity,
                tcod.light_blue, tcod.darker_blue)
-
 
     tcod.console_set_default_foreground(panel, tcod.light_gray)
     panel.print(1, 0, get_names_under_mouse(mouse, camera, entities, fov_map))
