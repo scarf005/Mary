@@ -1,8 +1,9 @@
 import tcod
 import tcod.tileset
 import tcod.context
+import tcod.event
+
 import numpy as np
-import sys, warnings
 import math, random
 
 # 게임 지도
@@ -11,13 +12,12 @@ from map_objects.game_map import GameMap
 # 앤티티와 컴포넌트
 from entity import Entity, get_blocking_entities_at_location
 from death_functions import kill_monster, kill_player
+from item_functions import heal, read, talisman
 
 from components.fighter import Fighter
 from components.inventory import Inventory
 from components.luminary import Luminary
 from components.item import Item
-from item_functions import heal, read, talisman
-
 
 # 렌더링 기능
 from renderer.camera import Camera
@@ -28,147 +28,143 @@ from renderer.fov_functions import initialize_fov, recompute_fov
 # 조작 및 기타
 from game_messages import Message, MessageLog
 from game_states import GameStates
-from input_handlers import handle_keys, handle_mouse
+#from input_handlers import handle_keys, handle_mouse
+from input_functions import handle_input_per_state
 from debugs import Debug
-
 
 # 변수 정보
 from data import *
 
-if not sys.warnoptions:
-    warnings.simplefilter("ignore")
-
-def main():
-
+def init_player_and_entities():
     """
-    객체 생성
+    플레이어
     """
-    # 플레이어 객체 생성. 위치는 맵 중앙.
-    playerX=int(map_width/2)
-    playerY=int(map_height/2)
 
     fighter_component = Fighter(hp=30, sanity=100, defense=2, power=5)
     luminary_component = Luminary(luminosity=10)
     inventory_component = Inventory(26)
-    player = Entity(playerX , playerY, '@', tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
+
+    player = Entity(int(map_width/2) , int(map_height/2), '@', tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
     entities = [player]
 
     i_comp = Item(use_function=read,about='about activities of you and your best friend, Mary')
     Journal = Entity(player.x,player.y, ':', tcod.darkest_red,
-                     'Swallowstone Journal', render_order=RenderOrder.ITEM, _Item = i_comp)
+                    'Swallowstone Journal', render_order=RenderOrder.ITEM, _Item = i_comp)
 
     i_comp = Item(use_function=talisman)
     Talisman = Entity(player.x,player.y, '*', tcod.lighter_purple,
-                      'Passionflower Talisman', render_order=RenderOrder.ITEM, _Item = i_comp)
+                    'Passionflower Talisman', render_order=RenderOrder.ITEM, _Item = i_comp)
 
     player._Inventory.items.append(Journal)
     player._Inventory.items.append(Talisman)
 
-    # 지도 객체 생성: y,x 순서는 game_map 객체에서 알아서 처리
+    return player, entities
+
+def init_game_map(player, entities):
+    """
+    게임 지도
+    """
     game_map = GameMap(map_width,map_height)
     game_map.create_map_cave(player, entities, 3)
     game_map.create_portal(entities, 10, player)
 
-    # FOV
+    fov_recompute = True
     fov_radius = max_fov_radius
     fov_algorithm = fov_algorithm_lit
-    fov_recompute = True
     fov_map = initialize_fov(game_map)
 
-    # 광원, light_map은 numpy 리스트
-
     light_recompute = True
-
     light_map = initialize_light(game_map, fov_map, entities)
 
-    # 카메라 객체 생성
     camera = Camera(0,0, map_width, map_height, True)
     camera.update(player)
 
+    return game_map, fov_map, fov_radius, fov_algorithm, fov_recompute, light_recompute, camera
+
+def init_message_and_states():
     """
-    디버그 명령 목록
-    passwall: 벽 통과 가능
-    showpos: 플레이어 x,y좌표 표시. 다른 엔티티 좌표도 표시할 수 있게 고칠 것
+    메세지 출력
     """
-    # 메세지 출력용 객체 생성.
-    debug = Debug()
     message_log = MessageLog(message_x, message_width, message_height)
 
-    # 키보드, 마우스 입력 처리용 객체 생성
-    key = tcod.Key()
-    mouse = tcod.Mouse()
-
-    # 순서 결정용 객체 생성
     game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
     targeting_item = None
 
-    # 콘솔, 패널 생성
-    con = tcod.console.Console(screen_width, screen_height)
-    panel = tcod.console_new(screen_width, panel_height)
 
-    TILESET_TTF = tcod.tileset.load_truetype_font('NGCB.ttf', font_width, font_height)
-    #tcod.console_set_custom_font('terminal16x16.png', tcod.FONT_TYPE_GREYSCALE | tcod.FONT_LAYOUT_CP437)
+    return message_log, game_state, previous_game_state, targeting_item
 
-    # 스크린 생성: 스크린 가로/세로, 이름, 전체화면 여부
+def init_others(*args):
+    return (0,0), Debug(args)
+
+def init_console():
     """
-    tcod.console_init_root(screen_width, screen_height, 'Mary', False, vsync=True)
+    화면 출력
     """
-    context = tcod.context.new_window(screen_width*font_width, screen_height*font_height,
+    context = tcod.context.new_window(WIDTH, HEIGHT,
                             renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
                             vsync=True, title="MARY")
-    # TCOD 루프
-    #while not tcod.console_is_window_closed():
+    console = tcod.Console(*context.recommended_console_size())
+    panel = tcod.Console(screen_width, panel_height)
 
-    while True:
-        """
-        입력
-        """
-        # 사용자 입력을 받음: 키 누를 시, 키보드, 마우스
-        tcod.sys_check_for_event(tcod.EVENT_KEY_PRESS | tcod.EVENT_MOUSE, key, mouse)
+    return console, panel, context
 
+def main():
+    """
+    사전 준비 작업
+    """
+    player, entities = init_player_and_entities()
+
+    game_map, fov_map, fov_radius, \
+    fov_algorithm, fov_recompute, light_recompute, camera = init_game_map(player, entities)
+
+    message_log, game_state, previous_game_state, targeting_item = init_message_and_states()
+
+    console, panel, context = init_console()
+
+    mouse, debug = init_others()
+
+    quit = False
+
+    """
+    메인 루프
+    """
+    while not quit:
         """
         화면 표시
         """
-        # 플레이어 시야
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
 
-        """
-        화면 표시
-        """
-        # 화면 초기화
-        clear_all_entities(con, entities, camera)
-
-        # 표시할 모든 객체를 화면에 배치함
-        render_all(game_state, con, panel, mouse, entities, player,
+        render_all(game_state, console, panel, entities, player, mouse,
                    game_map, fov_map, light_map, camera, message_log, fov_recompute,
                    screen_width, screen_height,
                    bar_width, panel_height, panel_y, colors)
 
+        context.present(console, keep_aspect=True, integer_scaling=True)
+        clear_all_entities(console, entities, camera)
+
         fov_recompute = False
         light_recompute = False
-
-        # 화면 출력
-        #tcod.console_flush(keep_aspect=True) Deprecated
-        context.present(con, keep_aspect=True, integer_scaling=True)
-
-        # 화면 초기화
-        clear_all_entities(con, entities, camera)
 
         """
         입력에 대한 상호작용
         """
+        action = handle_input_per_state(context, game_state)
 
-        # action 변수에 키보드 입력값을 사전 형태로 받아옴
-        action = handle_keys(key, game_state)
-        mouse_action = handle_mouse(mouse)
+        try:
+            if action.get('mouse_pos'):
+                mouse = action.get('mouse_pos')
+            else:
+                pass
+        except:
+            pass
 
-        left_click = mouse_action.get('left_click')
-        right_click = mouse_action.get('right_click')
+        left_click = action.get('left_click')
+        right_click = action.get('right_click')
 
         move = action.get('move')
         rest = action.get('rest')
@@ -181,6 +177,7 @@ def main():
         create_luminary = action.get('create_light')
         toggle_wall  = action.get('toggle_wall')
         exit = action.get('exit')
+        quit = action.get('quit')
 
         player_turn_results = []
 
@@ -227,7 +224,7 @@ def main():
                                 fov_map = initialize_fov(game_map)
                                 fov_recompute = True
                                 light_recompute = True
-                                con.clear()
+                                console.clear()
                             else:
                                 print("This is the weirdest bug I've ever seen")
 
@@ -397,7 +394,6 @@ def main():
 
             else:
                 game_state = GameStates.PLAYERS_TURN
-
 
         """
         디버그 기능들

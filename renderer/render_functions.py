@@ -14,6 +14,7 @@ class RenderOrder(Enum):
     ACTOR = 4
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
+    #print(panel)
     bar_width = int(float(value) / maximum * total_width)
 
     tcod.console_set_default_background(panel, back_color)
@@ -24,12 +25,11 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
         tcod.console_rect(panel, x, y, bar_width, 1, False, tcod.BKGND_SCREEN)
 
     tcod.console_set_default_foreground(panel, tcod.white)
-    #tcod.console_print_ex(panel, int(x + total_width / 2), y, tcod.BKGND_NONE, tcod.CENTER,
-    #                         f'{name}: {value}/{maximum}')
+    panel.print(int(x + total_width / 2), y, f'{name}: {value}/{maximum}')
 
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
-    (x, y) = (mouse.cx - camera.x, mouse.cy - camera.y)
+    (x, y) = (mouse[0] - camera.x, mouse[1] - camera.y)
 
     names = [entity.name for entity in entities
              if entity.x == x and entity.y == y and fov_map.fov[entity.y, entity.x]]
@@ -42,7 +42,7 @@ def draw_animation(con, camera, screen_width, screen_height, x, y, color):
     MapY = y + camera.y
     draw_background(con, MapX, MapY, color, 30)
 
-def render_all(game_state, con, panel, mouse, entities, player,
+def render_all(game_state, con, panel, entities, player, mouse,
                game_map, fov_map, light_map,camera, message_log, fov_recompute,
                screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     if fov_recompute:
@@ -85,19 +85,19 @@ def render_all(game_state, con, panel, mouse, entities, player,
         draw_entity(con, entity, fov_map, game_map, camera)
 
     tcod.console_set_default_foreground(con, tcod.white)
-    #tcod.console_print_ex(con, 0, 0, tcod.BKGND_NONE, tcod.LEFT,
-    #                         f'Depth {game_map.depth}')
+    con.print(0, 0, f'Depth {game_map.depth}')
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
     tcod.console_set_default_background(panel, tcod.black)
-    tcod.console_clear(panel)
+
+    #tcod.console_clear(panel)
 
     # Print the game messages, one line at a time
     y = 2
     for message in message_log.messages:
         tcod.console_set_default_foreground(panel, message.color)
-        #tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
+        panel.print(message_log.x, y, message.text)
         y += 1
 
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
@@ -108,8 +108,7 @@ def render_all(game_state, con, panel, mouse, entities, player,
 
 
     tcod.console_set_default_foreground(panel, tcod.light_gray)
-    #tcod.console_print_ex(panel, 1, 0, tcod.BKGND_NONE, tcod.LEFT,
-    #                        get_names_under_mouse(mouse, camera, entities, fov_map))
+    panel.print(1, 0, get_names_under_mouse(mouse, camera, entities, fov_map))
 
     tcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 

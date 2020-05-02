@@ -1,16 +1,22 @@
 import tcod
 
+#폰트
+font_width = 24
+font_height = 24
+
+TILESET_TTF = tcod.tileset.load_truetype_font('NGCB.ttf', font_width, font_height)
+
 #스크린 가로/세로 크기
 screen_width = 42
 screen_height = 35
+
+WIDTH = int(screen_width * font_width,)
+HEIGHT = int(screen_height * font_height)
 
 #지도
 map_width = 42
 map_height = 20
 
-#폰트
-font_width = 24
-font_height = 24
 
 """
 인터페이스
