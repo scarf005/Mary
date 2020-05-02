@@ -5,7 +5,7 @@ import tcod.event
 
 import numpy as np
 import math, random
-
+import time
 # 게임 지도
 from map_objects.game_map import GameMap
 
@@ -104,8 +104,8 @@ def init_console():
                             renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
                             vsync=True, title="MARY")
     console = tcod.Console(map_width, map_height)
-    #panel = tcod.Console(screen_width, panel_height)
-    panel = tcod.console_new(screen_width, panel_height)
+    panel = tcod.Console(screen_width, panel_height)
+    #panel = tcod.console_new(screen_width, panel_height)
 
     return console, panel, context
 
@@ -138,13 +138,13 @@ def main():
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
-
         render_all(game_state, console, panel, entities, player, mouse,
                    game_map, fov_map, light_map, camera, message_log, fov_recompute,
                    screen_width, screen_height,
                    bar_width, panel_height, panel_y, colors)
-
         context.present(console, keep_aspect=True, integer_scaling=True, align=(0.5,1))
+        context.present(panel, keep_aspect=True, integer_scaling=True, align=(0.5,-1))
+
         clear_all_entities(console, entities, camera)
 
         fov_recompute = False

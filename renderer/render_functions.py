@@ -1,4 +1,5 @@
 import tcod
+
 from enum import Enum
 
 from renderer.lighting_functions import mix_rgb
@@ -85,11 +86,11 @@ def render_all(game_state, con, panel, entities, player, mouse,
         draw_entity(con, entity, fov_map, game_map, camera)
 
     tcod.console_set_default_foreground(con, tcod.white)
-    con.print(0, 0, f'Depth {game_map.depth}')
+    con.print(0, 0, f'현재 층: {game_map.depth}')
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
 
-    tcod.console_set_default_background(panel, tcod.white)
+    tcod.console_set_default_background(panel, tcod.black)
 
     tcod.console_clear(panel)
 
