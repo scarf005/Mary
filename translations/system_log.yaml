@@ -1,0 +1,14 @@
+# 게임 콘솔 관련된 로그
+
+hp: "hp"
+sanity: "sanity"
+
+# Inventory
+get_item: 
+    log_format: "You pick up {0}."
+
+inventory_log: "use which? (ESC to cancel)\n"
+inventory_full: 'You cannot carry any more, your inventory is full'
+
+drop_log: "drop which? (ESC to cancel)\n"
+book_log: "You open the book and read... This is a book "

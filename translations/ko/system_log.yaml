@@ -1,0 +1,21 @@
+# 게임 콘솔 관련된 로그
+
+hp: "체력"
+sanity: "정신력"
+
+# 인벤토리
+get_item: 
+    log_format: "당신은 {0}을 주웠다."
+
+inventory_log: "무엇을 쓸까?\n"
+inventory_full: '가방이 가득 차서 더 주울 수가 없다.'
+
+drop_log: "무엇들 떨어뜨릴까?\n"
+
+book_log: "당신을 책을 훝어보았다... 이 책은 "
+
+death_log:
+    log_format: "{0}이 죽었다!"
+    
+dead_entity:
+    log_format: "{0}었던 것) " #었던/이었던 구분

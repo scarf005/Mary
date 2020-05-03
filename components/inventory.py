@@ -1,5 +1,8 @@
 import tcod
 from game_messages import Message
+from yaml_functions import read_yaml, cout
+
+SYS_LOG = read_yaml("system_log.yaml")
 
 class Inventory:
     def __init__(self, capacity):
@@ -12,12 +15,12 @@ class Inventory:
         if len(self.items) >= self.capacity:
             results.append({
                 'item_added': None,
-                'message': Message('You cannot carry any more, your inventory is full', tcod.yellow)
+                'message': Message(SYS_LOG["inventory_full"], tcod.yellow)
             })
         else:
             results.append({
                 'item_added': item,
-                'message': Message(F'You pick up {item.name}.', tcod.light_green)
+                'message': Message(cout(SYS_LOG["get_item"],item.name), tcod.light_green)
             })
 
             item_names = []

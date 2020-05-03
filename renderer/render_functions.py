@@ -1,13 +1,15 @@
-#-*- coding:utf-8 -*-
-
 import tcod
 
 from enum import Enum
+
+from yaml_functions import read_yaml
 
 from renderer.lighting_functions import mix_rgb
 from data import colors
 from game_states import GameStates
 from menus import inventory_menu
+
+SYS_LOG = read_yaml("system_log.yaml")
 
 class RenderOrder(Enum):
     # 높을수록 위에 표시한다. 즉 높이
@@ -100,8 +102,8 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
     y = 2
     for message in message_log.messages:
         tcod.console_set_default_foreground(panel, message.color)
-        tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
-        #panel.print(message_log.x, y, message.text)
+        #tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
+        panel.print(message_log.x, y, message.text)
         y += 1
 
     render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
@@ -118,9 +120,9 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
     # 인벤토리
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         if game_state == GameStates.SHOW_INVENTORY:
-            inventory_title = 'Use which? (Esc to exit)\n'
+            inventory_title = SYS_LOG["inventory_log"]
         else:
-            inventory_title = 'Drop which? , or Esc to cancel.\n'
+            inventory_title = SYS_LOG["drop_log"]
         inventory_menu(root, con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height)
 
 

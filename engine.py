@@ -1,13 +1,12 @@
-#-*- coding:utf-8 -*-
-
 import tcod
-import tcod.tileset
-import tcod.context
 import tcod.event
 
 import numpy as np
-import math, random
-import time
+import math, random, time
+
+from yaml_functions import read_yaml
+
+
 # 게임 지도
 from map_objects.game_map import GameMap
 
@@ -30,7 +29,6 @@ from renderer.fov_functions import initialize_fov, recompute_fov
 # 조작 및 기타
 from game_messages import Message, MessageLog
 from game_states import GameStates
-#from input_handlers import handle_keys, handle_mouse
 from input_functions import handle_input_per_state
 from debugs import Debug
 

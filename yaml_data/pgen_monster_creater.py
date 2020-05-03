@@ -4,7 +4,7 @@
 
 
 import tcod
-from yaml_data.yaml_loader import open_yaml
+from yaml_functions import read_yaml
 from renderer.render_functions import RenderOrder
 
 # 엔티티
@@ -14,7 +14,7 @@ from components.ai import BasicMonster
 from components.fighter import Fighter
 
 # 미리 생성된 몬스터들
-monster_list = open_yaml('pgen_monsters.yaml')
+monster_list = read_yaml('pgen_monsters.yaml')
 
 def load_and_create_monster(monster_name, x=None,y=None):
     Minfo = monster_list.get(monster_name)

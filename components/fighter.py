@@ -3,6 +3,10 @@ import tcod
 from game_messages import Message
 from random import randint
 
+from yaml_functions import read_yaml, cout
+
+SYS_LOG = read_yaml("system_log.yaml")
+
 class Fighter:
     def __init__(self, hp, defense, power, sanity=0):
         """

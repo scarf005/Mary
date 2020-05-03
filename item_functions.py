@@ -2,10 +2,13 @@ import tcod
 import math, time
 from dice import roll_dice
 
+from yaml_functions import read_yaml, cout
+
 from random import randint
 from game_messages import Message
 from renderer.render_functions import draw_animation
 
+SYS_LOG = read_yaml("system_log.yaml")
 
 def heal(*args, **kwargs):
     entity = args[0]
@@ -56,28 +59,18 @@ def read(*args, **kwargs):
     results = []
 
     results.append({'used': True,
-                    'message': Message(F'당신은 책을 펼치고 읽는다... 이 책은 {about}.{snippet}{feeling}',
-                                       tcod.white)}) #You open the book and read... This is a book
+                    'message': Message(F' {about}.{snippet}{feeling}',
+                                       tcod.white)})
 
     return results
 
 def talisman(*args, **kwargs):
     results = []
-
-    say = [
-    "askes you how are things going.",
-    "tells you that she and Mary knew each other.",
-    "says she think that you should hurry.",
-    "tells you that death is nothing compared to the meaningless of life.",
-    "smiles breifly.",
-    "worries about Mary.",
-    "assures you how time travel is completely possible even within the theory of relativity.",
-    "laughs softly.",
-    "tells you she could really have a walk, but is trapped in this talisman."
-    ]
+    talisman = read_yaml("artifacts.yaml")['talisman']
+    log = talisman['quotes'][randint(0,len(talisman)-1)]
 
     results.append({'used': True,
-                    'message': Message(F'You look at the talisman. The devil of the talisman {say(randint(0,len(say)-1))}', tcod.lighter_purple)})
+                    'message': Message(cout(talisman,log),tcod.lighter_purple)})
     return results
 
 def cast_spell(*args, **kwargs):
@@ -106,7 +99,6 @@ def cast_spell(*args, **kwargs):
     if target:
         draw_animation(0, camera, screen_width, screen_height, target.x, target.y, 'flash')
         tcod.console_blit(0, 0, 0, screen_width, screen_height, 0, 0, 0)
-        tcod.console_flush(keep_aspect=True)
 
         results.append({'consumed': True, 'target': target,
                         'message': Message(F'A crackling stream of energy hits {target.name} for {damage} hit points.')})
@@ -141,7 +133,6 @@ def cast_fireball(*args, **kwargs):
             draw_animation(0, camera, screen_width, screen_height, x,y, 'explosion')
 
     tcod.console_blit(0, 0, 0, screen_width, screen_height, 0, 0, 0)
-    tcod.console_flush(keep_aspect=True)
     results.append({'consumed': True,
                     'message': Message(F'The flaming sphere explodes!', tcod.orange)})
     time.sleep(0.1)

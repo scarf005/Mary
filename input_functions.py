@@ -2,6 +2,8 @@ import tcod
 import tcod.event
 from game_states import GameStates
 
+from yaml_functions import read_yaml
+
 LOG = False
 LOG2 = False
 
@@ -72,16 +74,15 @@ class State(tcod.event.EventDispatch[None]):
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if LOG2: print("A key was pressed.")
         if LOG: print(event)
-        if event.sym in MOVE_KEYS:
-            # Send movement keys to the cmd_move method with parameters.
-            self.cmd_move(*MOVE_KEYS[event.sym])
-        elif event.sym == tcod.event.K_ESCAPE:
+        if event.sym == tcod.event.K_ESCAPE:
             self.cmd_escape()
         elif self.key_list == "INVENTORY":
             index = event.sym - ord('a')
             if index >= 0:
                 self.result.update({'inventory_index': index})
-
+        elif event.sym in MOVE_KEYS:
+            # Send movement keys to the cmd_move method with parameters.
+            self.cmd_move(*MOVE_KEYS[event.sym])
 
     def ev_textinput(self, event: tcod.event.TextInput) -> None:
         if event.text in self.key_list:
@@ -121,9 +122,9 @@ def handle_input_per_state(context, game_state):
     if game_state == GameStates.PLAYERS_TURN:
         return handle_input(context, PLAYER_INPUT)
     elif game_state == GameStates.PLAYER_DEAD:
-        return #handle_player_dead_keys(key)
+        return handle_input(context, INVENTORY_INPUT)
     elif game_state == GameStates.TARGETING:
-        return #handle_targeting_keys(key)
+        return handle_input(context, {})
     elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         return handle_input(context, INVENTORY_INPUT)
 
@@ -134,13 +135,10 @@ def handle_input(context, available_key_list):
     for event in tcod.event.wait():
         context.convert_event(event)
         state.dispatch(event)
-        print(state.result)
+        #print(state.result)
 
         if not state.result == None:
             return state.result
-
-        if event.type == "QUIT":
-            raise SystemExit()
         if event.type == "WINDOWRESIZED":
                 console = tcod.Console(*context.recommended_console_size())
 

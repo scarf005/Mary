@@ -121,14 +121,14 @@ class GameMap:
 
             if choice == 'CI':
                 f_comp = Fighter(hp=10, defense=0, power=3)
-                monster = self.create_monster(mx,my, '~', tcod.flame, 'crawling intestine',f_comp, ai_comp)
+                monster = self.create_monster(mx,my, '~', tcod.flame, '기어다니는 내장',f_comp, ai_comp)
             elif choice == 'GS':
                 f_comp = Fighter(hp=16, defense=1, power=4)
-                monster = self.create_monster(mx,my, 'S', tcod.dark_green, 'giant spider',f_comp, ai_comp)
+                monster = self.create_monster(mx,my, 'S', tcod.dark_green, '거대 거미',f_comp, ai_comp)
             elif choice == 'FA':
                 f_comp = Fighter(hp=20, defense=0, power=7)
                 monster = self.create_monster(mx,my, '@', tcod.Color(128, 5, 5),
-                                              'flesh abomination',f_comp, ai_comp)
+                                              '사람을 닮은 무언가',f_comp, ai_comp)
             entities.append(monster)
             self.monsters += 1 #계산용
 
