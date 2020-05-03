@@ -43,6 +43,7 @@ def read(*args, **kwargs):
     else:
         snippet = ""
 
+    feeling = ""
     if sanity:
         entity._Fighter.heal_sanity(sanity)
         if sanity > 0:
@@ -55,8 +56,8 @@ def read(*args, **kwargs):
     results = []
 
     results.append({'used': True,
-                    'message': Message(F'You open the book and read... This is a book {about}.{snippet}{feeling}',
-                                       tcod.white)})
+                    'message': Message(F'당신은 책을 펼치고 읽는다... 이 책은 {about}.{snippet}{feeling}',
+                                       tcod.white)}) #You open the book and read... This is a book
 
     return results
 

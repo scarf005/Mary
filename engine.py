@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import tcod
 import tcod.tileset
 import tcod.context
@@ -47,7 +49,8 @@ def init_player_and_entities():
     player = Entity(int(map_width/2) , int(map_height/2), '@', tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
     entities = [player]
 
-    i_comp = Item(use_function=read,about='about activities of you and your best friend, Mary')
+    i_comp = Item(use_function=read,
+                  about='당신과 당신의 절친, 메리가 같이 한 일들이 적혀 있다') #about activities of you and your best friend, Mary
     Journal = Entity(player.x,player.y, ':', tcod.darkest_red,
                     'Swallowstone Journal', render_order=RenderOrder.ITEM, _Item = i_comp)
 
@@ -64,7 +67,7 @@ def init_game_map(player, entities):
     """
     게임 지도
     """
-    game_map = GameMap(map_width,map_height)
+    game_map = GameMap(map_width, map_height)
     game_map.create_map_cave(player, entities, 3)
     game_map.create_portal(entities, 10, player)
 
@@ -105,9 +108,10 @@ def init_console():
                             vsync=True, title="MARY")
     console = tcod.Console(map_width, map_height)
     panel = tcod.Console(screen_width, panel_height)
+    root = tcod.Console(screen_width, screen_height)
     #panel = tcod.console_new(screen_width, panel_height)
 
-    return console, panel, context
+    return root, console, panel, context
 
 def main():
     """
@@ -120,7 +124,7 @@ def main():
 
     message_log, game_state, previous_game_state, targeting_item = init_message_and_states()
 
-    console, panel, context = init_console()
+    root, console, panel, context = init_console()
 
     mouse, debug = init_others()
 
@@ -138,12 +142,12 @@ def main():
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
-        render_all(game_state, console, panel, entities, player, mouse,
+        render_all(game_state, root, console, panel, entities, player, mouse,
                    game_map, fov_map, light_map, camera, message_log, fov_recompute,
                    screen_width, screen_height,
                    bar_width, panel_height, panel_y, colors)
-        context.present(console, keep_aspect=True, integer_scaling=True, align=(0.5,1))
-        context.present(panel, keep_aspect=True, integer_scaling=True, align=(0.5,-1))
+        context.present(root, keep_aspect=True, integer_scaling=True) # align=(0.5,1))
+        #context.present(panel, keep_aspect=True, integer_scaling=True, align=(0.5,-1))
 
         clear_all_entities(console, entities, camera)
 
@@ -160,11 +164,14 @@ def main():
                 mouse = action.get('mouse_pos')
             else:
                 pass
+            left_click = action.get('left_click')
+            right_click = action.get('right_click')
         except:
             pass
 
-        left_click = action.get('left_click')
-        right_click = action.get('right_click')
+        #Ridiculous failsafe
+        if action == None:
+            action = {}
 
         move = action.get('move')
         rest = action.get('rest')

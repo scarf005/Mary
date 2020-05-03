@@ -42,11 +42,13 @@ PLAYER_INPUT = {
     'q':'toggle_light',
     ',':'pickup',
     '.':'rest',
-    'i,':'show_inventory',
+    'i':'show_inventory',
     'd':'drop_inventory',
     #'1':'toggle_wall',
     #'2':'create_luminary'
 }
+
+INVENTORY_INPUT = 'INVENTORY'
 
 class State(tcod.event.EventDispatch[None]):
     """A state-based superclass that converts `events` into `commands`.
@@ -58,8 +60,9 @@ class State(tcod.event.EventDispatch[None]):
     functionality.  There could be a subclass for every individual state
     of your game.
     """
-    def __init__(self):
+    def __init__(self, available):
         self.result = {}
+        self.key_list = available
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         """The window close button was clicked or Alt+F$ was pressed."""
@@ -74,35 +77,44 @@ class State(tcod.event.EventDispatch[None]):
             self.cmd_move(*MOVE_KEYS[event.sym])
         elif event.sym == tcod.event.K_ESCAPE:
             self.cmd_escape()
+        elif self.key_list == "INVENTORY":
+            index = event.sym - ord('a')
+            if index >= 0:
+                self.result.update({'inventory_index': index})
+
+
+    def ev_textinput(self, event: tcod.event.TextInput) -> None:
+        if event.text in self.key_list:
+            self.result.update({self.key_list.get(event.text): True})
 
     def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
         if LOG2: print("The window was clicked.")
         if LOG: print(event)
         x,y = (event.tile.x, event.tile.y)
         if event.button == 1:
-            self.result = {'left_click': (x, y)}
+            self.result.update({'left_click': (x, y)})
         elif event.button == 3:
-            self.result = {'right_click': (x, y)}
+            self.result.update({'right_click': (x, y)})
 
     def ev_mousemotion(self, event: tcod.event.MouseMotion) -> None:
         if LOG2: print("The mouse has moved within the window.")
         if LOG: print(event)
         (x,y) = (event.tile.x, event.tile.y)
-        self.result = {'mouse_pos': (x,y)}
+        self.result.update( {'mouse_pos': (x,y)})
 
     def cmd_move(self, x: int, y: int) -> None:
         if LOG2: print("Intent to move: `x` and `y` is the direction, both may be 0.")
-        self.result = {'move': (x, y)}
+        self.result.update( {'move': (x, y)})
 
     def cmd_escape(self) -> None:
         if LOG2: print("Intent to exit this state.")
         if LOG: print("Command escape.")
-        self.result = {'exit': True}
+        self.result.update( {'exit': True})
 
     def cmd_quit(self) -> None:
         if LOG2: print("Intent to exit the game.")
         if LOG: print("Command quit.")
-        self.result = {'quit': True}
+        self.result.update( {'quit': True})
 
 
 def handle_input_per_state(context, game_state):
@@ -113,36 +125,24 @@ def handle_input_per_state(context, game_state):
     elif game_state == GameStates.TARGETING:
         return #handle_targeting_keys(key)
     elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
-        return #handle_inventory_keys(key)
+        return handle_input(context, INVENTORY_INPUT)
 
     return {}
 
 def handle_input(context, available_key_list):
-    state = State()
+    state = State(available_key_list)
     for event in tcod.event.wait():
-        def check_key(key, returning):
-            if event.text == key: return {returning: True}
-
         context.convert_event(event)
         state.dispatch(event)
+        print(state.result)
 
-        if state.result: return state.result
+        if not state.result == None:
+            return state.result
 
         if event.type == "QUIT":
             raise SystemExit()
-
         if event.type == "WINDOWRESIZED":
                 console = tcod.Console(*context.recommended_console_size())
-
-        if event.type == "TEXTINPUT":
-            this_key = {}
-            for key in available_key_list.keys():
-                key_candiate = check_key(key, available_key_list.get(key))
-                if key_candiate:
-                    this_key = key_candiate
-            return this_key if this_key else {}
-
-
 
     return {}
 

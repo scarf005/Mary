@@ -1,3 +1,5 @@
+#-*- coding:utf-8 -*-
+
 import tcod
 
 from enum import Enum
@@ -43,7 +45,7 @@ def draw_animation(con, camera, screen_width, screen_height, x, y, color):
     MapY = y + camera.y
     draw_background(con, MapX, MapY, color, 30)
 
-def render_all(game_state, con, panel, entities, player, mouse,
+def render_all(game_state, root, con, panel, entities, player, mouse,
                game_map, fov_map, light_map,camera, message_log, fov_recompute,
                screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     if fov_recompute:
@@ -88,7 +90,7 @@ def render_all(game_state, con, panel, entities, player, mouse,
     tcod.console_set_default_foreground(con, tcod.white)
     con.print(0, 0, f'현재 층: {game_map.depth}')
 
-    tcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0, 0)
+    tcod.console_blit(con, 0, 0, screen_width, screen_height, root, 0, 0)
 
     tcod.console_set_default_background(panel, tcod.black)
 
@@ -111,7 +113,7 @@ def render_all(game_state, con, panel, entities, player, mouse,
     tcod.console_set_default_foreground(panel, tcod.light_gray)
     panel.print(1, 0, get_names_under_mouse(mouse, camera, entities, fov_map))
 
-    tcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
+    tcod.console_blit(panel, 0, 0, screen_width, panel_height, root, 0, panel_y)
 
     # 인벤토리
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
@@ -119,7 +121,7 @@ def render_all(game_state, con, panel, entities, player, mouse,
             inventory_title = 'Use which? (Esc to exit)\n'
         else:
             inventory_title = 'Drop which? , or Esc to cancel.\n'
-        inventory_menu(con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height)
+        inventory_menu(root, con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height)
 
 
 def clear_all_entities(con, entities, camera):

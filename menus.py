@@ -1,10 +1,10 @@
 import tcod
 
 
-def menu(con, header, options, width, screen_width, screen_height):
+def menu(root, con, header, options, width, screen_width, screen_height):
     if len(options) > 26: raise ValueError('Cannot have a menu with more than 26 options.')
 
-    # calculate total height for the header (after auto-wrap) and one line per option
+    # calculate root height for the header (after auto-wrap) and one line per option
     header_height = tcod.console_get_height_rect(con, 0, 0, width, screen_height, header)
     height = len(options) + header_height
 
@@ -27,9 +27,9 @@ def menu(con, header, options, width, screen_width, screen_height):
     # blit the contents of "window" to the root console
     x = int(screen_width / 2 - width / 2)
     y = int(screen_height / 2 - height / 2)
-    tcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
+    tcod.console_blit(window, 0, 0, width, height, root, x, y, 1.0, 0.7)
 
-def inventory_menu(con, header, inventory, inventory_width, screen_width, screen_height):
+def inventory_menu(root, con, header, inventory, inventory_width, screen_width, screen_height):
     # show a menu with each item of the inventory as an option
     if len(inventory.items) == 0:
         options = ['Inventory is empty.']
@@ -38,4 +38,4 @@ def inventory_menu(con, header, inventory, inventory_width, screen_width, screen
         for item in inventory.items:
             options.append(item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}")
 
-    menu(con, header, options, inventory_width, screen_width, screen_height)
+    menu(root, con, header, options, inventory_width, screen_width, screen_height)
