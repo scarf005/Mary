@@ -22,7 +22,7 @@ class Inventory:
         else:
             results.append({
                 'item_added': item,
-                'message': Message(cout(SYS_LOG["get_item"],item.name), tcod.light_green)
+                'message': Message(cout(SYS_LOG["get_item"],Batchim(item.name,1)), tcod.light_green)
             })
 
             item_names = []

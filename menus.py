@@ -20,7 +20,7 @@ def menu(root, con, header, options, width, screen_width, screen_height):
     letter_index = ord('a')
     for option_text in options:
         text = F"({chr(letter_index)}) {option_text}"
-        tcod.console_print_ex(window, 0, y, tcod.BKGND_NONE, tcod.LEFT, text)
+        window.print(0, y, text, alignment=tcod.LEFT )
         y += 1
         letter_index += 1
 

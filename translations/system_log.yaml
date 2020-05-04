@@ -3,6 +3,7 @@
 depth: "Current Depth:"
 hp: "HP"
 sanity: "SANITY"
+player_name: "You"
 
 # 레벨
 enemies_exist: 
@@ -11,9 +12,10 @@ enemies_exist:
     - "You feel queasy."
     
 enemies_nonexistant: "Now you are more relieved that you are certain there's no more monsters here."
+next_depth: 'You jump into the tear in the fabric of timespace.'
 
 # Inventory
-cannot_get_item: "바닥에 주울 만한 것이 없다."
+cannot_get_item: "There's notthing to pick up."
 get_item: 
     log_format: "You pick up {0}."
 
@@ -52,5 +54,6 @@ dead_entity:
 dead_player: "You have died."
 
 # Targetting
+target_message: 'Left-click a tile to target, or right-click to cancel.'
 no_close_enemy: 'No enemy is close enough to strike.'
 outside_fov: 'You cannot target a tile outside your field of view.'

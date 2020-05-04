@@ -101,9 +101,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
     # Print the game messages, one line at a time
     y = 2
     for message in message_log.messages:
-        tcod.console_set_default_foreground(panel, message.color)
-        #tcod.console_print_ex(panel, message_log.x, y, tcod.BKGND_NONE, tcod.LEFT, message.text)
-        panel.print(message_log.x, y, message.text)
+        panel.print(message_log.x, y, message.text, fg=message.color)
         y += 1
 
     render_bar(panel, 1, 1, bar_width, SYS_LOG['hp'], player._Fighter.hp, player._Fighter.max_hp,

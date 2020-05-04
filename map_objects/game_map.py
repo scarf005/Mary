@@ -4,7 +4,8 @@ import numpy as np
 from random import randint, shuffle
 
 from game_messages import Message
-#from yaml_data.pgen_monster_creater import load_monster
+from yaml_functions import read_yaml, cout
+from batchim import Batchim
 
 # 지도
 from map_objects.rectangle import Rect
@@ -26,6 +27,8 @@ from components.portals import Portal
 # 렌더링
 from renderer.render_functions import RenderOrder
 
+SYS_LOG = read_yaml("system_log.yaml")
+
 class GameMap:
     def __init__(self, width, height, depth=1):
         # 맵 크기 인자를 받아 객체의 높이와 너비 변수에 저장한다.
@@ -35,10 +38,6 @@ class GameMap:
 
         self.depth = depth
         self.monsters = 0
-
-    @property
-    def current_monsters_in_map(self):
-        return self.monsters
 
     def initialize_tiles(self):
         return np.array([[Tile(True) for x in range(self.width)] for y in range(self.height)])
@@ -75,7 +74,7 @@ class GameMap:
         player._Fighter.heal_sanity_capacity(player._Fighter.max_sanity // 2)
         self.create_portal(entities, 10, player)
 
-        message_log.log(Message('You jump into the tear in the fabric of timespace.', tcod.light_violet))
+        message_log.log(Message(SYS_LOG['next_depth'], tcod.light_violet))
         return entities
 
     def create_portal(self, entities, min_distance, player):
@@ -134,7 +133,7 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        item_chance = {'FJ':60, 'REG':30,'SC':20,"FB":10} #'BK': 20
+        item_chance = {'SC':20,"FB":10} #'BK': 20 #'FJ':60, 'REG':30,
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)
@@ -148,18 +147,18 @@ class GameMap:
 
             if kinds == 'REG':
                 i_comp = Item(use_function=heal, amount=10)
-                item = self.create_item(ix, iy, '!', tcod.violet, 'Potion of Regeneration',item=i_comp)
+                item = self.create_item(ix, iy, '!', tcod.violet, '재생 물약',item=i_comp)
             elif kinds == 'FJ':
                 i_comp = Item(use_function=heal, amount=7, which='sanity')
-                item = self.create_item(ix, iy, '!', tcod.orange, 'Fruit Juice',item=i_comp)
+                item = self.create_item(ix, iy, '!', tcod.orange, '과일 주스',item=i_comp)
             elif kinds == 'SC':
-                i_comp = Item(use_function=cast_spell, damage=(1,20), maximum_range=5)
-                item = self.create_item(ix, iy, '?', tcod.green, 'Manuscript of Minor Spark',item=i_comp)
+                i_comp = Item(use_function=cast_spell, damage=(1,30), maximum_range=5)
+                item = self.create_item(ix, iy, '?', tcod.green, '마법 불꽃의 주문서',item=i_comp)
             elif kinds == 'FB':
                 i_comp = Item(use_function=cast_fireball, targeting=True,
-                              targeting_message=Message('Left-click a target tile for the fireball, or right-click to cancel.', tcod.light_cyan),
+                              targeting_message=Message(SYS_LOG['target_message'], tcod.light_cyan),
                               damage=(3,8,5), radius=3)
-                item = self.create_item(ix, iy, '?', tcod.red, 'Manuscript of Hurl Fireball',item=i_comp)
+                item = self.create_item(ix, iy, '?', tcod.red, '화염 폭발의 주문서',item=i_comp)
             entities.append(item)
 
         """
@@ -207,5 +206,5 @@ class GameMap:
 
     def create_luminary(self, entities, x ,y, brightness=5):
         luminary_component = Luminary(luminosity=brightness)
-        light = Entity(x, y, '&', tcod.yellow, 'light source',_Luminary=luminary_component)
+        light = Entity(x, y, '&', tcod.yellow, '광원',_Luminary=luminary_component)
         entities.append(light)

@@ -1,5 +1,7 @@
 import tcod
 import tcod.event
+import time
+
 from game_states import GameStates
 
 from yaml_functions import read_yaml
@@ -65,6 +67,7 @@ class State(tcod.event.EventDispatch[None]):
     def __init__(self, available):
         self.result = {}
         self.key_list = available
+        self.lastkey = None
 
     def ev_quit(self, event: tcod.event.Quit) -> None:
         """The window close button was clicked or Alt+F$ was pressed."""
@@ -87,6 +90,7 @@ class State(tcod.event.EventDispatch[None]):
     def ev_textinput(self, event: tcod.event.TextInput) -> None:
         if event.text in self.key_list:
             self.result.update({self.key_list.get(event.text): True})
+
 
     def ev_mousebuttondown(self, event: tcod.event.MouseButtonDown) -> None:
         if LOG2: print("The window was clicked.")
@@ -135,7 +139,6 @@ def handle_input(context, available_key_list):
     for event in tcod.event.wait():
         context.convert_event(event)
         state.dispatch(event)
-        #print(state.result)
 
         if not state.result == None:
             return state.result

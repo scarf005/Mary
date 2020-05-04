@@ -36,7 +36,7 @@ from debugs import Debug
 # 변수 정보
 from data import *
 
-def init_player_and_entities():
+def init_player_and_entities(player_name):
     """
     플레이어
     """
@@ -45,17 +45,17 @@ def init_player_and_entities():
     luminary_component = Luminary(luminosity=10)
     inventory_component = Inventory(26)
 
-    player = Entity(int(map_width/2) , int(map_height/2), '@', tcod.white, 'You', blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
+    player = Entity(int(map_width/2) , int(map_height/2), '@', tcod.white, player_name , blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
     entities = [player]
 
     i_comp = Item(use_function=read,
                   about='당신과 당신의 절친, 메리가 같이 한 일들이 적혀 있다') #about activities of you and your best friend, Mary
     Journal = Entity(player.x,player.y, ':', tcod.darkest_red,
-                    'Swallowstone Journal', render_order=RenderOrder.ITEM, _Item = i_comp)
+                    '연석박물지', render_order=RenderOrder.ITEM, _Item = i_comp)
 
     i_comp = Item(use_function=talisman)
     Talisman = Entity(player.x,player.y, '*', tcod.lighter_purple,
-                    'Passionflower Talisman', render_order=RenderOrder.ITEM, _Item = i_comp)
+                    '시계꽃 부적', render_order=RenderOrder.ITEM, _Item = i_comp)
 
     player._Inventory.items.append(Journal)
     player._Inventory.items.append(Talisman)
@@ -120,7 +120,9 @@ def main():
     """
     사전 준비 작업
     """
-    player, entities = init_player_and_entities()
+    SYS_LOG = init_log()
+
+    player, entities = init_player_and_entities(SYS_LOG['player_name'])
 
     game_map, fov_map, fov_radius, \
     fov_algorithm, fov_recompute, light_recompute, camera = init_game_map(player, entities)
@@ -130,8 +132,6 @@ def main():
     root, console, panel, context = init_console()
 
     mouse, debug = init_others()
-
-    SYS_LOG = init_log()
 
     quit = False
 
@@ -331,7 +331,7 @@ def main():
                 if dead_entity == player:
                     message, game_state = kill_player(dead_entity)
                 else:
-                    message = kill_monster(dead_entity)
+                    message = kill_monster(dead_entity, game_map)
 
                 message_log.log(message)
 
@@ -356,11 +356,11 @@ def main():
         적의 차례에 적이 할 수 있는 행동들
         """
         if game_state == GameStates.ENEMY_TURN:
-            #print(game_map.current_monsters_in_map)
             # 정신력 고갈 기능. 따로 변수로 넣던가 Gamemap에 넣어야 하나.
-            if not game_map.current_monsters_in_map == 0:
+            if not game_map.monsters == 0:
                 clear_message_shown = False
-                sanity_damage = random.randint(-5, game_map.current_monsters_in_map)
+
+                sanity_damage = random.randint(int(-30/math.sqrt(game_map.depth)), game_map.monsters)
                 if sanity_damage < 0:
                     sanity_damage = 0
                 else:
@@ -372,7 +372,7 @@ def main():
             else:
                 if not clear_message_shown:
                     clear_message_shown = True
-                    message_log.log(Message(SYS_LOG['enemies_nonexsistant'],tcod.light_green))
+                    message_log.log(Message(SYS_LOG['enemies_nonexistant'],tcod.light_green))
 
 
             for entity in entities:

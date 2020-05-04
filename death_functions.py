@@ -1,5 +1,7 @@
 import tcod
 
+from map_objects.game_map import GameMap
+
 from game_states import GameStates
 from renderer.render_functions import RenderOrder
 from game_messages import Message
@@ -16,7 +18,8 @@ def kill_player(player):
     return Message(SYS_LOG['dead_player'], tcod.red), GameStates.PLAYER_DEAD
 
 
-def kill_monster(monster):
+def kill_monster(monster, game_map):
+    game_map.monsters -= 1
     capped = monster.name.capitalize()
     death_message = Message(cout(SYS_LOG['death_log'],Batchim(capped)), tcod.orange)
     monster.name = cout(SYS_LOG['dead_entity'],Batchim(capped,'(이었','(였'))
