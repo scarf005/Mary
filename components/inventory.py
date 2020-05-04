@@ -1,6 +1,8 @@
 import tcod
 from game_messages import Message
+
 from yaml_functions import read_yaml, cout
+from batchim import Batchim
 
 SYS_LOG = read_yaml("system_log.yaml")
 
@@ -43,7 +45,7 @@ class Inventory:
         item_component = item_entity._Item
 
         if item_component.use_function is None:
-            results.append({'message': Message(F'The {item_entity.name} cannot be used', tcod.light_crimson)})
+            results.append({'message': Message(cout(SYS_LOG['item_unusable_log'],Batchim(item_entity.name,3)), tcod.light_crimson)})
         else:
             # 타게팅 중
             if item_component.targeting and not (kwargs.get('target_x') or kwargs.get('target_y')):
@@ -72,7 +74,7 @@ class Inventory:
         item.y = self.owner.y
 
         self.remove_item(item)
-        results.append({'item_dropped': item, 'message': Message(F'You drop {item.name}',
+        results.append({'item_dropped': item, 'message': Message(cout(SYS_LOG['item_drop_log'],Batchim(item.name,1)),
                                                                  tcod.yellow)})
 
         return results

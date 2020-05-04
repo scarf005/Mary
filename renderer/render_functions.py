@@ -90,7 +90,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
         draw_entity(con, entity, fov_map, game_map, camera)
 
     tcod.console_set_default_foreground(con, tcod.white)
-    con.print(0, 0, f'현재 층: {game_map.depth}')
+    con.print(0, 0, f"{SYS_LOG['depth']} {game_map.depth}")
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, root, 0, 0)
 
@@ -106,10 +106,10 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
         panel.print(message_log.x, y, message.text)
         y += 1
 
-    render_bar(panel, 1, 1, bar_width, 'HP', player._Fighter.hp, player._Fighter.max_hp,
+    render_bar(panel, 1, 1, bar_width, SYS_LOG['hp'], player._Fighter.hp, player._Fighter.max_hp,
                tcod.light_red, tcod.darker_red)
 
-    render_bar(panel, screen_width- (bar_width+1), 1, bar_width, 'SANITY', player._Fighter.sanity, player._Fighter.cap_sanity,
+    render_bar(panel, screen_width- (bar_width + 1), 1, bar_width, SYS_LOG['sanity'], player._Fighter.sanity, player._Fighter.cap_sanity,
                tcod.light_blue, tcod.darker_blue)
 
     tcod.console_set_default_foreground(panel, tcod.light_gray)

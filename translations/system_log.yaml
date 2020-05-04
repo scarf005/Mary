@@ -1,9 +1,19 @@
 # 게임 콘솔 관련된 로그
 
-hp: "hp"
-sanity: "sanity"
+depth: "Current Depth:"
+hp: "HP"
+sanity: "SANITY"
+
+# 레벨
+enemies_exist: 
+    - "You have a unpleasent feeling that you're not alone."
+    - "You feel something is watching you."
+    - "You feel queasy."
+    
+enemies_nonexistant: "Now you are more relieved that you are certain there's no more monsters here."
 
 # Inventory
+cannot_get_item: "바닥에 주울 만한 것이 없다."
 get_item: 
     log_format: "You pick up {0}."
 
@@ -12,3 +22,35 @@ inventory_full: 'You cannot carry any more, your inventory is full'
 
 drop_log: "drop which? (ESC to cancel)\n"
 book_log: "You open the book and read... This is a book "
+item_unusable_log: 
+    log_format: "The {item_entity.name} cannot be used" #item_entity.name
+item_drop_log:
+    log_format: "You drop {0}." #item.name
+
+# Health
+full_health: 'You are already at full health.'
+heal_health: 'Your wounds vanishes.'
+
+# Sanity
+full_sanity: 'You still feel okay.'
+heal_sanity: 'You feel better.'
+
+
+# Fighting
+fight_log:
+    log_format: '{0} hit {1} for {2} hit points.' # entity_name,target.name,damage
+    
+fight_no_dmg_log:
+    log_format: '{0} hit {1} but does no damage.' # entity_name, target.name
+    
+death_log:
+    log_format: "{0} is dead!"
+    
+dead_entity:
+    log_format: "What is left of {0})"
+    
+dead_player: "You have died."
+
+# Targetting
+no_close_enemy: 'No enemy is close enough to strike.'
+outside_fov: 'You cannot target a tile outside your field of view.'

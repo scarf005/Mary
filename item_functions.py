@@ -2,13 +2,15 @@ import tcod
 import math, time
 from dice import roll_dice
 
-from yaml_functions import read_yaml, cout
-
 from random import randint
 from game_messages import Message
 from renderer.render_functions import draw_animation
 
+from yaml_functions import read_yaml, cout
+from batchim import Batchim
+
 SYS_LOG = read_yaml("system_log.yaml")
+ITEM_LOG = read_yaml("item_log.yaml")
 
 def heal(*args, **kwargs):
     entity = args[0]
@@ -21,17 +23,17 @@ def heal(*args, **kwargs):
 
     if which_heal == 'hp':
         if entity._Fighter.hp == entity._Fighter.max_hp:
-            results.append({'consumed': False, 'message': Message('You are already at full health', tcod.yellow)})
+            results.append({'consumed': False, 'message': Message(SYS_LOG['full_health'], tcod.yellow)})
         else:
             entity._Fighter.heal(amount)
-            results.append({'consumed': True, 'message': Message('Your feel better.', tcod.green)})
+            results.append({'consumed': True, 'message': Message(SYS_LOG['heal_health'], tcod.green)})
 
     elif which_heal == 'sanity':
         if entity._Fighter.sanity == entity._Fighter.cap_sanity:
-            results.append({'consumed': False, 'message': Message('You are cheerful enough, yet.', tcod.yellow)})
+            results.append({'consumed': False, 'message': Message(SYS_LOG['full_sanity'], tcod.yellow)})
         else:
             entity._Fighter.heal_sanity(amount)
-            results.append({'consumed': True, 'message': Message('Your feel better.', tcod.green)})
+            results.append({'consumed': True, 'message': Message(SYS_LOG['heal_sanity'], tcod.green)})
 
     return results
 
@@ -105,7 +107,7 @@ def cast_spell(*args, **kwargs):
         results.extend(target._Fighter.take_damage(damage))
         time.sleep(0.1)
     else:
-        results.append({'consumed': False, 'target': None, 'message': Message('No enemy is close enough to strike.', tcod.red)})
+        results.append({'consumed': False, 'target': None, 'message': Message(SYS_LOG['no_close_enemy'], tcod.red)})
 
     return results
 
@@ -125,7 +127,7 @@ def cast_fireball(*args, **kwargs):
 
     if not fov_map.fov[target_y, target_x]:
         results.append({'consumed': False,
-                        'message': Message('You cannot target a tile outside your field of view.', tcod.yellow)})
+                        'message': Message(SYS_LOG['outside_fov'], tcod.yellow)})
         return results
 
     for x in range(target_x - r, target_x + r + 1):

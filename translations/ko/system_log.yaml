@@ -1,11 +1,17 @@
 # 게임 콘솔 관련된 로그
 
+depth: "현재 층:"
 hp: "체력"
 sanity: "정신력"
 
+# 레벨
+enemies_exist: "혼자가 아니라는 기분이 든다."
+enemies_nonexistant: "당신은 여기에 더 이상 적이 없다는 확신이 든다. 이제 안심이 된다."
+
 # 인벤토리
+cannot_get_item: "바닥에 주울 만한 것이 없다."
 get_item: 
-    log_format: "당신은 {0}을 주웠다."
+    log_format: "당신은 {0} 주웠다."
 
 inventory_log: "무엇을 쓸까?\n"
 inventory_full: '가방이 가득 차서 더 주울 수가 없다.'
@@ -13,9 +19,36 @@ inventory_full: '가방이 가득 차서 더 주울 수가 없다.'
 drop_log: "무엇들 떨어뜨릴까?\n"
 
 book_log: "당신을 책을 훝어보았다... 이 책은 "
+item_unusable_log: 
+    log_format: "고민해 보았지만 {0} 마땅히 할 만한 일이 생각이 나지 않는다." #item_entity.name
+item_drop_log:
+    log_format: "당신은 {0} 바닥에 떨어뜨렸다." #item.name
 
+# 체력
+full_health: '몸에 난 상처가 없다.'
+heal_health: '상처가 믿기 어려운 속도로 사라진다.'
+
+# 정신력
+full_sanity: '아직은 기분이 그런대로 괜찮다."
+heal_sanity: '기분이 나아졌다.'
+
+# 전투
+damage_log:
+    log_format: '{0} {1}만큼 피해를 입었다.' # target.name,[은/는],damage
+fight_log:
+    log_format: '{0} {1} {2}만큼 공격했다.' # entity_name,[이/가],target.name,[을/를],damage
+    
+fight_no_dmg_log:
+    log_format: '{0} {1}공격했지만 피해를 입지 않았다.' # entity_name, [이/가] target.name [을/를]
+    
 death_log:
-    log_format: "{0}이 죽었다!"
+    log_format: "{0} 죽었다!" #[이/가]
     
 dead_entity:
-    log_format: "{0}었던 것) " #었던/이었던 구분
+    log_format: "{0}던 것)" # [였/이었]
+    
+dead_player: "당신은 죽었다."
+
+# 타게팅
+no_close_enemy: '근처에 공격할 만한 적이 없다.'
+outside_fov: '시야 밖은 조준할 수가 없다.'

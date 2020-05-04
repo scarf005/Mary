@@ -5,6 +5,7 @@ import numpy as np
 import math, random, time
 
 from yaml_functions import read_yaml
+from batchim import Batchim
 
 
 # 게임 지도
@@ -111,6 +112,10 @@ def init_console():
 
     return root, console, panel, context
 
+def init_log():
+    SYS_LOG = read_yaml("system_log.yaml")
+    return SYS_LOG
+
 def main():
     """
     사전 준비 작업
@@ -125,6 +130,8 @@ def main():
     root, console, panel, context = init_console()
 
     mouse, debug = init_others()
+
+    SYS_LOG = init_log()
 
     quit = False
 
@@ -252,7 +259,7 @@ def main():
                     player_turn_results.extend(pickup_results)
                     break
             else:
-                message_log.log(Message('There is nothing here to pick up.', tcod.yellow))
+                message_log.log(Message(SYS_LOG['cannot_get_item'], tcod.yellow))
 
         if toggle_light:
             if player._Luminary.luminosity:
@@ -360,11 +367,12 @@ def main():
                     sanity_damage = int(math.sqrt(sanity_damage))
                 player._Fighter.heal_sanity(-sanity_damage)
                 if sanity_damage > 3:
-                    message_log.log(Message("You have a unpleasent feeling that you're not alone.",tcod.dark_chartreuse))
+                    log = SYS_LOG['enemies_exist']
+                    message_log.log(Message(log[random.randint(0,len(log)-1)],tcod.dark_chartreuse))
             else:
                 if not clear_message_shown:
                     clear_message_shown = True
-                    message_log.log(Message("Now you are more relieved that you are certain there's no more monsters here.",tcod.light_green))
+                    message_log.log(Message(SYS_LOG['enemies_nonexsistant'],tcod.light_green))
 
 
             for entity in entities:
