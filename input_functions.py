@@ -76,6 +76,7 @@ class Keyboard(tcod.event.EventDispatch[None]):
     def __init__(self):
         self.result = {}
 
+
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         if event.sym == tcod.event.K_ESCAPE:
             self.result = {'exit': True}

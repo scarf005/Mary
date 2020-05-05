@@ -173,6 +173,7 @@ def main():
         move = action.get('move')
         rest = action.get('rest')
         pickup = action.get('pickup')
+
         show_inventory = action.get('show_inventory')
         inventory_index = action.get('inventory_index')
         drop_inventory = action.get('drop_inventory')
