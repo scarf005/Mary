@@ -30,7 +30,7 @@ from renderer.fov_functions import initialize_fov, recompute_fov
 # 조작 및 기타
 from game_messages import Message, MessageLog
 from game_states import GameStates
-from input_functions import handle_input_per_state
+from input_functions import Mouse, Keyboard, handle_input_per_state
 from debugs import Debug
 
 # 변수 정보
@@ -51,7 +51,7 @@ def init_player_and_entities(player_name):
     i_comp = Item(use_function=read,
                   about='당신과 당신의 절친, 메리가 같이 한 일들이 적혀 있다') #about activities of you and your best friend, Mary
     Journal = Entity(player.x,player.y, ':', tcod.darkest_red,
-                    '연석박물지', render_order=RenderOrder.ITEM, _Item = i_comp)
+                    '수첩', render_order=RenderOrder.ITEM, _Item = i_comp)
 
     i_comp = Item(use_function=talisman)
     Talisman = Entity(player.x,player.y, '*', tcod.lighter_purple,
@@ -96,7 +96,7 @@ def init_message_and_states():
     return message_log, game_state, previous_game_state, targeting_item
 
 def init_others(*args):
-    return (0,0), Debug(args)
+    return Debug(args), Mouse(), Keyboard()
 
 def init_console():
     """
@@ -106,9 +106,9 @@ def init_console():
                             renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
                             vsync=True, title="MARY")
     console = tcod.Console(map_width, map_height)
+    animation = tcod.Console(map_width, map_height)
     panel = tcod.Console(screen_width, panel_height)
     root = tcod.Console(screen_width, screen_height)
-    #panel = tcod.console_new(screen_width, panel_height)
 
     return root, console, panel, context
 
@@ -131,7 +131,7 @@ def main():
 
     root, console, panel, context = init_console()
 
-    mouse, debug = init_others()
+    debug, mouse, keyboard = init_others()
 
     quit = False
 
@@ -150,7 +150,7 @@ def main():
         render_all(game_state, root, console, panel, entities, player, mouse,
                    game_map, fov_map, light_map, camera, message_log, fov_recompute,
                    screen_width, screen_height,
-                   bar_width, panel_height, panel_y, colors)
+                   bar_width, panel_height, panel_y, map_height, colors)
         context.present(root, keep_aspect=True, integer_scaling=True) # align=(0.5,1))
         #context.present(panel, keep_aspect=True, integer_scaling=True, align=(0.5,-1))
 
@@ -162,17 +162,9 @@ def main():
         """
         입력에 대한 상호작용
         """
-        action = handle_input_per_state(context, game_state)
 
-        try:
-            if action.get('mouse_pos'):
-                mouse = action.get('mouse_pos')
-            else:
-                pass
-            left_click = action.get('left_click')
-            right_click = action.get('right_click')
-        except:
-            pass
+        action = handle_input_per_state(keyboard, mouse, context, game_state)
+        #print(f'Mx:{mouse.x} My:{mouse.y} Clk:{mouse.click}')
 
         #Ridiculous failsafe
         if action == None:
@@ -188,9 +180,11 @@ def main():
         toggle_light  = action.get('toggle_light')
         create_luminary = action.get('create_light')
         toggle_wall  = action.get('toggle_wall')
+
         exit = action.get('exit')
         quit = action.get('quit')
 
+        #print(action)
         player_turn_results = []
 
         if exit:
@@ -372,7 +366,7 @@ def main():
             else:
                 if not clear_message_shown:
                     clear_message_shown = True
-                    message_log.log(Message(SYS_LOG['enemies_nonexistant'],tcod.light_green))
+                    message_log.log(Message(SYS_LOG['enemies_nonexistant'],tcod.green))
 
 
             for entity in entities:

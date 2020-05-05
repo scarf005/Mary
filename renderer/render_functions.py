@@ -34,7 +34,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
-    (x, y) = (mouse[0] - camera.x, mouse[1] - camera.y)
+    (x, y) = (mouse.x - camera.x, mouse.y - camera.y)
 
     names = [entity.name for entity in entities
              if entity.x == x and entity.y == y and fov_map.fov[entity.y, entity.x]]
@@ -49,7 +49,7 @@ def draw_animation(con, camera, screen_width, screen_height, x, y, color):
 
 def render_all(game_state, root, con, panel, entities, player, mouse,
                game_map, fov_map, light_map,camera, message_log, fov_recompute,
-               screen_width, screen_height, bar_width, panel_height, panel_y, colors):
+               screen_width, screen_height, bar_width, panel_height, panel_y, map_height, colors):
     if fov_recompute:
         con.clear()
         for y in range(game_map.height):
@@ -89,8 +89,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
     for entity in entities_in_render_order:
         draw_entity(con, entity, fov_map, game_map, camera)
 
-    tcod.console_set_default_foreground(con, tcod.white)
-    con.print(0, 0, f"{SYS_LOG['depth']} {game_map.depth}")
+    con.print(0, 0, f"{SYS_LOG['depth']} {game_map.depth}", fg=tcod.white)
 
     tcod.console_blit(con, 0, 0, screen_width, screen_height, root, 0, 0)
 
@@ -110,8 +109,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
     render_bar(panel, screen_width- (bar_width + 1), 1, bar_width, SYS_LOG['sanity'], player._Fighter.sanity, player._Fighter.cap_sanity,
                tcod.light_blue, tcod.darker_blue)
 
-    tcod.console_set_default_foreground(panel, tcod.light_gray)
-    panel.print(1, 0, get_names_under_mouse(mouse, camera, entities, fov_map))
+    panel.print(1, 0, get_names_under_mouse(mouse, camera, entities, fov_map), fg=tcod.light_gray)
 
     tcod.console_blit(panel, 0, 0, screen_width, panel_height, root, 0, panel_y)
 
@@ -121,7 +119,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
             inventory_title = SYS_LOG["inventory_log"]
         else:
             inventory_title = SYS_LOG["drop_log"]
-        inventory_menu(root, con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height)
+        inventory_menu(root, con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height, map_height)
 
 
 def clear_all_entities(con, entities, camera):

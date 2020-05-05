@@ -133,7 +133,7 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        item_chance = {'SC':20,"FB":10} #'BK': 20 #'FJ':60, 'REG':30,
+        item_chance = {'FJ':60, 'REG':30,'SC':20,"FB":10} #'BK': 20 #
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)

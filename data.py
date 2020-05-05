@@ -15,7 +15,7 @@ HEIGHT = int(screen_height * font_height)
 
 #지도
 map_width = 42
-map_height = 20
+map_height = 25
 
 
 """
@@ -23,7 +23,7 @@ map_height = 20
 """
 # 체력 바
 bar_width = 20
-panel_height = 7
+panel_height = screen_height - map_height
 panel_y = screen_height - panel_height
 
 message_x = 1
