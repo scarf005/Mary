@@ -18,42 +18,20 @@ class Entity:
         # 기타 속성들
         args_list = {'blocks':False, 'render_order':RenderOrder.CORPSE}
         entity_component_list = {'_Luminary':None, '_Fighter':None, '_Ai':None,
-                          '_Item':None, '_Inventory':None, '_Portal':None}
+                          '_Item':None, '_Inventory':None, '_Equippable':None,
+                          '_Portal':None}
         total_list = {**args_list, **entity_component_list}
-        #print(total_list)
+
         for key,value in total_list.items():
-            #print("kwargs")
-            #print (kwargs)
             if key in kwargs.keys():
                 setattr(self, key, kwargs[key])
             else:
                 setattr(self, key, value)
 
-
         # 컴포넌트 소유주 추가
-        """
         for key, value in entity_component_list.items():
-            if getattr(self, key):
-                setattr(self, f'{key}.owner', self)
-        """
-
-        if self._Luminary:
-            self._Luminary.owner = self
-
-        if self._Fighter:
-            self._Fighter.owner = self
-
-        if self._Ai:
-            self._Ai.owner = self
-
-        if self._Item:
-            self._Item.owner = self
-
-        if self._Inventory:
-            self._Inventory.owner = self
-
-        if self._Portal:
-            self._Portal.owner = self
+            if getattr(self, key , None):
+                setattr(getattr(self, key), 'owner', self)
 
     def distance_to(self, other):
             dx = other.x - self.x

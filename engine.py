@@ -157,7 +157,7 @@ def main():
 
         context.present(root, keep_aspect=True, align=(0.5,0.5)) # integer_scaling=True align=(0.5,1))
 
-        print(*context.recommended_console_size())
+        #print(*context.recommended_console_size())
         clear_all_entities(console, entities, camera)
 
         fov_recompute = False

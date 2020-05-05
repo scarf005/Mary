@@ -9,6 +9,8 @@ from init_constants import colors
 from game_states import GameStates
 from menus import inventory_menu
 
+from init_constants import *
+
 SYS_LOG = read_yaml("system_log.yaml")
 
 class RenderOrder(Enum):
@@ -55,8 +57,8 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
         for y in range(game_map.height):
             for x in range(game_map.width):
                 # 지도 위치
-                Mapx = x + camera.x
-                Mapy = y + camera.y
+                Mapx = x + camera.x + CENTER_X
+                Mapy = y + camera.y + CENTER_Y
 
                 #print(F"{camera.x},{camera.y}")
 
@@ -132,11 +134,11 @@ def draw_entity(con, entity, fov_map, game_map, camera):
     if fov_map.fov[entity.y, entity.x] or (entity._Portal and game_map.tiles[entity.y,entity.x].explored):
         # 객체를 표시함. 앞줄은 글자색, 뒷줄은 글자 배치.
         tcod.console_set_default_foreground(con, entity.color)
-        tcod.console_put_char(con, entity.x + camera.x, entity.y + camera.y, entity.char, tcod.BKGND_NONE)
+        tcod.console_put_char(con, entity.x + camera.x + CENTER_X, entity.y + camera.y + CENTER_Y, entity.char, tcod.BKGND_NONE)
 
 def clear_entity(con, entity, camera):
     # 객체를 화면에서 지운다
-    tcod.console_put_char(con, entity.x + camera.x, entity.y + camera.y, ' ', tcod.BKGND_NONE)
+    tcod.console_put_char(con, entity.x + camera.x + CENTER_X, entity.y + camera.y + CENTER_Y, ' ', tcod.BKGND_NONE)
 
 def draw_background(con,x,y,color,brightness=0,flag=None):
     # 나중에 tcod.BKGND_SET이 대체 뭐하는 건지 찾아볼 것

@@ -7,12 +7,9 @@ FONT_WIDTH: 16
 FONT_HEIGHT: 16
 
 # 언어
-LANGUAGE: "KO"
+LANGUAGE: "ko"
 
-# 화면 크기
-SCREEN_WIDTH: 42
-SCREEN_HEIGHT: 35
-
+# 색상 팔레트
 COLORS:
   dark_wall: [0, 0, 100]
   dark_ground: [50, 50, 150]
@@ -23,11 +20,15 @@ COLORS:
   explosion: [255, 52, 20]
   flash : [74, 177, 255]
 
+# 화면 크기
+SCREEN_WIDTH: 42
+SCREEN_HEIGHT: 35
+
 ### 게임 기본 설정 ###
 ### GAME SETTINGS ###
 
 # 지도
-MAP_WIDTH: 42
+MAP_WIDTH: 35
 MAP_HEIGHT: 25
 
 # 인터페이스
