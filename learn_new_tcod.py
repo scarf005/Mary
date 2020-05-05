@@ -109,10 +109,9 @@ with tcod.context.new_window(
             if event.type == "QUIT":
                 raise SystemExit()
             elif event.type == "KEYDOWN":
-                print(event.)
+                print(event)
             elif event.type == "TEXTINPUT":
                 print(event.text)
-            """
             elif event.type == "WINDOWRESIZED":
                 console = tcod.Console(*context.recommended_console_size())
             elif event.type == "MOUSEBUTTONDOWN":
@@ -120,4 +119,3 @@ with tcod.context.new_window(
                 print(event.tile.x)
             elif event.type == "MOUSEMOTION":
                 print('HMM')
-            """

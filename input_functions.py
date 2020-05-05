@@ -75,28 +75,34 @@ class Mouse(tcod.event.EventDispatch[None]):
 class Keyboard(tcod.event.EventDispatch[None]):
     def __init__(self):
         self.result = {}
-
+        self.key_up = False
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        if event.sym == tcod.event.K_ESCAPE:
-            self.result = {'exit': True}
-            self.get_out = True
+        try:
+            if event.sym == tcod.event.K_ESCAPE:
+                self.result = {'exit': True}
+                self.get_out = True
 
-        elif event.sym in MOVE_KEYS:
-            self.cmd_move(*MOVE_KEYS[event.sym])
+            elif event.sym in MOVE_KEYS:
+                self.cmd_move(*MOVE_KEYS[event.sym])
 
-        elif self.key_list == "INVENTORY":
-            if not event.repeat:
-                index = event.sym - ord('a')
-                print(f'index:{index}')
-                if index >= 0:
-                    self.result = {'inventory_index': index}
+            elif self.key_list == "INVENTORY":
+                if not event.repeat:
+                    index = event.sym - ord('a')
+                    print(f'index:{index}')
+                    if index >= 0:
+                        self.result = {'inventory_index': index}
+                        self.get_out = True
+            elif chr(event.sym) in self.key_list:
+                if self.key_up:
+                    self.result = {self.key_list.get(chr(event.sym)): True}
+                    self.key_up = False
                     self.get_out = True
+        except:
+            print("Fatal error")
 
-        elif chr(event.sym) in self.key_list:
-            self.result = {self.key_list.get(chr(event.sym)): True}
-            print(f'text input:{self.result}')
-            self.get_out = True
+    def ev_keyup(self, event: tcod.event.KeyUp) -> None:
+        self.key_up = True
 
     def cmd_move(self, x: int, y: int) -> None:
         self.result = {'move': (x, y)}
@@ -132,12 +138,12 @@ def handle_input(state, mouse, context, available_key_list):
         state.dispatch(event)
         mouse.dispatch(event)
 
-        if state.get_out:
-            print(f'done,{state.result}')
-            return state.result
-
         if event.type == "WINDOWRESIZED":
-                console = tcod.Console(*context.recommended_console_size())
+            return {"window_resized": True}
+
+        if state.get_out:
+            #print(f'done,{state.result}')
+            return state.result
     return {}
 
 

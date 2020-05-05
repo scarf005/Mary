@@ -34,7 +34,7 @@ from input_functions import Mouse, Keyboard, handle_input_per_state
 from debugs import Debug
 
 # 변수 정보
-from data import *
+from init_constants import *
 
 def init_player_and_entities(player_name):
     """
@@ -45,7 +45,7 @@ def init_player_and_entities(player_name):
     luminary_component = Luminary(luminosity=10)
     inventory_component = Inventory(26)
 
-    player = Entity(int(map_width/2) , int(map_height/2), '@', tcod.white, player_name , blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
+    player = Entity(int(MAP_WIDTH/2) , int(MAP_HEIGHT/2), '@', tcod.white, player_name , blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
     entities = [player]
 
     i_comp = Item(use_function=read,
@@ -66,7 +66,7 @@ def init_game_map(player, entities):
     """
     게임 지도
     """
-    game_map = GameMap(map_width, map_height)
+    game_map = GameMap(MAP_WIDTH, MAP_HEIGHT)
     game_map.create_map_cave(player, entities, 3)
     game_map.create_portal(entities, 10, player)
 
@@ -78,7 +78,7 @@ def init_game_map(player, entities):
     light_recompute = True
     light_map = initialize_light(game_map, fov_map, entities)
 
-    camera = Camera(0,0, map_width, map_height, True)
+    camera = Camera(0,0, MAP_WIDTH, MAP_HEIGHT, True)
     camera.update(player)
 
     return game_map, fov_map, fov_radius, fov_algorithm, fov_recompute, light_recompute, camera
@@ -87,7 +87,7 @@ def init_message_and_states():
     """
     메세지 출력
     """
-    message_log = MessageLog(message_x, message_width, message_height)
+    message_log = MessageLog(MESSAGE_X, MESSAGE_WIDTH, MESSAGE_HEIGHT)
 
     game_state = GameStates.PLAYERS_TURN
     previous_game_state = game_state
@@ -104,15 +104,16 @@ def init_console():
     """
     context = tcod.context.new_window(WIDTH, HEIGHT,
                             renderer=tcod.context.RENDERER_OPENGL2, tileset=TILESET_TTF,
-                            vsync=True, title="MARY")
-    console = tcod.Console(map_width, map_height)
-    animation = tcod.Console(map_width, map_height)
-    panel = tcod.Console(screen_width, panel_height)
-    root = tcod.Console(screen_width, screen_height)
+                            sdl_window_flags=FLAGS, title="MARY")
+
+    console = tcod.Console(MAP_WIDTH, MAP_HEIGHT)
+    animation = tcod.Console(MAP_WIDTH, MAP_HEIGHT)
+    panel = tcod.Console(SCREEN_WIDTH, PANEL_HEIGHT)
+    root = tcod.Console(*context.recommended_console_size())
 
     return root, console, panel, context
 
-def init_log():
+def init_data():
     SYS_LOG = read_yaml("system_log.yaml")
     return SYS_LOG
 
@@ -120,7 +121,7 @@ def main():
     """
     사전 준비 작업
     """
-    SYS_LOG = init_log()
+    SYS_LOG = init_data()
 
     player, entities = init_player_and_entities(SYS_LOG['player_name'])
 
@@ -139,6 +140,8 @@ def main():
     메인 루프
     """
     while not quit:
+        root = tcod.Console(*context.recommended_console_size())
+
         """
         화면 표시
         """
@@ -149,11 +152,12 @@ def main():
             light_map = initialize_light(game_map, fov_map, entities)
         render_all(game_state, root, console, panel, entities, player, mouse,
                    game_map, fov_map, light_map, camera, message_log, fov_recompute,
-                   screen_width, screen_height,
-                   bar_width, panel_height, panel_y, map_height, colors)
-        context.present(root, keep_aspect=True, integer_scaling=True) # align=(0.5,1))
-        #context.present(panel, keep_aspect=True, integer_scaling=True, align=(0.5,-1))
+                   SCREEN_WIDTH, SCREEN_HEIGHT,
+                   BAR_WIDTH, PANEL_HEIGHT, PANEL_Y, MAP_HEIGHT, colors)
 
+        context.present(root, keep_aspect=True, align=(0.5,0.5)) # integer_scaling=True align=(0.5,1))
+
+        print(*context.recommended_console_size())
         clear_all_entities(console, entities, camera)
 
         fov_recompute = False
@@ -286,20 +290,20 @@ def main():
             if game_state == GameStates.SHOW_INVENTORY:
                 player_turn_results.extend(player._Inventory.use(item, camera=camera,
                                                                  entities=entities, fov_map=fov_map,
-                                                                 screen_width = screen_width,
-                                                                 screen_height = screen_height))
+                                                                 screen_width = SCREEN_WIDTH,
+                                                                 screen_height = SCREEN_HEIGHT))
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player._Inventory.drop_item(item))
 
         if game_state == GameStates.TARGETING:
-            if left_click:
-                target_x, target_y = left_click
+            if mouse.click == "L":
+                target_x, target_y = mouse.x, mouse.y
 
                 item_use_results = player._Inventory.use(targeting_item, entities=entities, fov_map=fov_map,
-                                                        camera=camera, screen_width = screen_width, screen_height = screen_height,
+                                                        camera=camera, screen_width = SCREEN_WIDTH, screen_height = SCREEN_HEIGHT,
                                                         target_x=target_x, target_y=target_y)
                 player_turn_results.extend(item_use_results)
-            elif right_click:
+            elif mouse.click == "R":
                 player_turn_results.append({'targeting_cancelled': True})
 
         if rest:

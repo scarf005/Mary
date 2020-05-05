@@ -5,7 +5,7 @@ from enum import Enum
 from yaml_functions import read_yaml
 
 from renderer.lighting_functions import mix_rgb
-from data import colors
+from init_constants import colors
 from game_states import GameStates
 from menus import inventory_menu
 
@@ -30,7 +30,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
         tcod.console_rect(panel, x, y, bar_width, 1, False, tcod.BKGND_SCREEN)
 
     tcod.console_set_default_foreground(panel, tcod.white)
-    panel.print(int(x + total_width / 2), y, f'{name}: {value}/{maximum}')
+    panel.print(x, y, f'{name}: {value}/{maximum}') #total_width / 2
 
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
@@ -140,5 +140,7 @@ def clear_entity(con, entity, camera):
 
 def draw_background(con,x,y,color,brightness=0,flag=None):
     # 나중에 tcod.BKGND_SET이 대체 뭐하는 건지 찾아볼 것
-    total_color = mix_rgb(colors.get(color),brightness)
+    rgbs = colors.get(color)
+    basic_color = tcod.Color(rgbs[0],rgbs[1],rgbs[2])
+    total_color = mix_rgb(basic_color,brightness)
     tcod.console_set_char_background(con, x, y, total_color, tcod.BKGND_SET)
