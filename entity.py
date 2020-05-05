@@ -3,6 +3,8 @@ import math
 
 from renderer.render_functions import RenderOrder
 
+from components.item import Item
+
 class Entity:
     """
     플레이어, 적, 아이템 등등 모든 것을 표현할 때 쓰는 객체.
@@ -18,7 +20,8 @@ class Entity:
         # 기타 속성들
         args_list = {'blocks':False, 'render_order':RenderOrder.CORPSE}
         entity_component_list = {'_Luminary':None, '_Fighter':None, '_Ai':None,
-                          '_Item':None, '_Inventory':None, '_Equippable':None,
+                          '_Item':None, '_Inventory':None,
+                          '_Equippable':None, '_Equipment':None,
                           '_Portal':None}
         total_list = {**args_list, **entity_component_list}
 
@@ -32,6 +35,10 @@ class Entity:
         for key, value in entity_component_list.items():
             if getattr(self, key , None):
                 setattr(getattr(self, key), 'owner', self)
+
+        if self._Equippable and not self._Item:
+            self._Item = Item()
+            self._Item.owner = self
 
     def distance_to(self, other):
             dx = other.x - self.x
