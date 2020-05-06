@@ -9,7 +9,9 @@ from init_constants import colors
 from enums.game_states import GameStates
 from menus import inventory_menu
 
-from init_constants import CENTER_X, CENTER_Y
+from init_constants import *
+
+SYS_LOG = read_yaml("system_log.yaml")
 
 class RenderOrder(Enum):
     # 높을수록 위에 표시한다. 즉 높이
@@ -45,9 +47,8 @@ def get_names_under_mouse(mouse, camera, entities, fov_map):
 
     return names.capitalize()
 
-def render_all(game_state, root, con, panel, entities, player, mouse, SYS_LOG,
-               game_map, fov_map, light_map,camera, message_log, fov_recompute,
-               screen_width, screen_height, bar_width, panel_height, panel_y, map_height, colors):
+def render_all(game_state, root, con, panel, entities, player, mouse,
+               game_map, fov_map, light_map, camera, message_log, fov_recompute):
     if fov_recompute:
         con.clear()
         for y in range(game_map.height):
@@ -87,7 +88,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse, SYS_LOG,
 
     con.print(0, 0, f"{SYS_LOG['depth']} {game_map.depth}", fg=tcod.white)
 
-    tcod.console_blit(con, 0, 0, screen_width, screen_height, root, 0, 0)
+    tcod.console_blit(con, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, root, 0, 0)
 
     tcod.console_set_default_background(panel, tcod.black)
 
@@ -99,15 +100,15 @@ def render_all(game_state, root, con, panel, entities, player, mouse, SYS_LOG,
         panel.print(message_log.x, y, message.text, fg=message.color)
         y += 1
 
-    render_bar(panel, 1, 1, bar_width, SYS_LOG['hp'], player._Fighter.hp, player._Fighter.max_hp,
+    render_bar(panel, 1, 1, BAR_WIDTH, SYS_LOG['hp'], player._Fighter.hp, player._Fighter.max_hp,
                tcod.light_red, tcod.darker_red)
 
-    render_bar(panel, screen_width- (bar_width + 1), 1, bar_width, SYS_LOG['sanity'], player._Fighter.sanity, player._Fighter.cap_sanity,
+    render_bar(panel, SCREEN_WIDTH- (BAR_WIDTH + 1), 1, BAR_WIDTH, SYS_LOG['sanity'], player._Fighter.sanity, player._Fighter.cap_sanity,
                tcod.light_blue, tcod.darker_blue)
 
     panel.print(1, 0, get_names_under_mouse(mouse, camera, entities, fov_map), fg=tcod.light_gray)
 
-    tcod.console_blit(panel, 0, 0, screen_width, panel_height, root, 0, panel_y)
+    tcod.console_blit(panel, 0, 0, SCREEN_WIDTH, PANEL_HEIGHT, root, 0, PANEL_Y)
 
     # 인벤토리
     if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
@@ -115,7 +116,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse, SYS_LOG,
             inventory_title = SYS_LOG["inventory_log"]
         else:
             inventory_title = SYS_LOG["drop_log"]
-        inventory_menu(root, con, inventory_title, player._Inventory, screen_width-2, screen_width, screen_height, map_height)
+        inventory_menu(root, con, inventory_title, player._Inventory, SCREEN_WIDTH-2, SCREEN_WIDTH, SCREEN_HEIGHT, MAP_HEIGHT)
 
 
 def clear_all_entities(con, entities, camera):

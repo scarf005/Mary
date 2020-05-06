@@ -15,6 +15,15 @@ enemies_nonexistant: "당신은 여기에 더 이상 적이 없다는 확신이 
 next_depth: "당신은 시공간의 균열 사이로 뛰어들었다."
 
 # 인벤토리
+equip:
+    log_format: "당신은 {1} {0}" #착용방식, 물건
+    ways_to_wear: 
+        WIElD: "손에 들었다."
+        OUTFIT: "입었다."
+        SCARF: "목에 둘렀다."
+        JEWELLERY: "착용했다."
+        
+    
 cannot_get_item: "바닥에 주울 만한 것이 없다."
 get_item: 
     log_format: "당신은 {0} 주웠다."
@@ -53,7 +62,7 @@ death_log:
 dead_entity:
     log_format: "{0}던 것)" # [였/이었]
     
-dead_player: "당신은 죽었다."
+dead_player: "당신은 쓰러졌다."
 
 # 타게팅
 target_message: '마우스 좌클릭으로 타일을 선택하거나, 마우스 우클릭으로 취소할 수 있다.'

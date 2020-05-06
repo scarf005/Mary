@@ -15,6 +15,14 @@ enemies_nonexistant: "Now you are more relieved that you are certain there's no 
 next_depth: 'You jump into the tear in the fabric of timespace.'
 
 # Inventory
+equip:
+    log_format: "You {0} {1}" #착용방식, 물건
+    ways_to_wear: 
+        WIElD: "wield"
+        OUTFIT: "wear"
+        SCARF: "wear"
+        JEWELLERY: "wear"
+        
 cannot_get_item: "There's notthing to pick up."
 get_item: 
     log_format: "You pick up {0}."
@@ -51,7 +59,7 @@ death_log:
 dead_entity:
     log_format: "What is left of {0})"
     
-dead_player: "You have died."
+dead_player: "You have fallen."
 
 # Targetting
 target_message: 'Left-click a tile to target, or right-click to cancel.'

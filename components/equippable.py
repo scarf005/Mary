@@ -4,10 +4,10 @@ sys.path.append('C:\\msys64\\home\\Pig\\Mary')
 
 from entity import Entity
 
-from fighter import Fighter
-from inventory import Inventory
-from equipment_slots import EquipmentSlots
-from equipment import Equipment
+from .fighter import Fighter
+from .inventory import Inventory
+from enums.equipment_slots import EquipmentSlots
+from .equipment import Equipment
 
 class Equippable:
     def __init__(self, slot, **kwargs):
@@ -35,6 +35,9 @@ if __name__ == "__main__":
     """
 
     # 목도리 장비
+    equip_comp = Equippable(EquipmentSlots.OUTFIT, sanity_resistance=10)
+    coat = Entity(0,0,'[',tcod.purple,"trench coat", _Equippable=equip_comp)
+
     equip_comp = Equippable(EquipmentSlots.SCARF, sanity_resistance=20)
     scarf = Entity(0,0,'^',tcod.violet,"violet scarf", _Equippable=equip_comp)
 
@@ -47,5 +50,8 @@ if __name__ == "__main__":
 
     # 장비 시도
     hearn._Inventory.add_item(scarf)
-    hearn._Equipment.toggle_equip(scarf)
+    results = hearn._Equipment.toggle_equip(scarf)
+    hearn._Inventory.add_item(coat)
+    hearn._Equipment.toggle_equip(coat)
     print(hearn._Equipment.total_sanity_resist)
+

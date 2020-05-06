@@ -45,7 +45,12 @@ class Inventory:
         item_component = item_entity._Item
 
         if item_component.use_function is None:
-            results.append({'message': Message(cout(SYS_LOG['item_unusable_log'],Batchim(item_entity.name,3)), tcod.light_crimson)})
+            equippable_component = item_entity._Equippable
+            # 장비 가능하면 장비하기
+            if equippable_component:
+                results.append({'equip': item_entity})
+            else:
+                results.append({'message': Message(cout(SYS_LOG['item_unusable_log'],Batchim(item_entity.name,3)), tcod.light_crimson)})
         else:
             # 타게팅 중
             if item_component.targeting and not (kwargs.get('target_x') or kwargs.get('target_y')):

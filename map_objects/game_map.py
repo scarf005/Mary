@@ -23,6 +23,10 @@ from components.fighter import Fighter
 from components.item import Item
 from components.luminary import Luminary
 from components.portals import Portal
+from components.equipment import Equipment
+from components.equippable import Equippable
+
+from enums.equipment_slots import EquipmentSlots
 
 # 렌더링
 from renderer.render_functions import RenderOrder
@@ -133,7 +137,7 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        item_chance = { "SC":10} #'BK': 20 # #'FJ':60, 'REG':30,'FB':10,
+        item_chance = {'SCF':5 } #'BK': 20 # #'FJ':60, 'REG':30,'FB':10, "SC":10
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)
@@ -159,6 +163,9 @@ class GameMap:
                               targeting_message=Message(SYS_LOG['target_message'], tcod.light_cyan),
                               damage=(3,8,5), radius=3)
                 item = self.create_item(ix, iy, '?', tcod.red, '화염 폭발의 주문서',item=i_comp)
+            elif kinds == 'SCF':
+                e_comp = Equippable(EquipmentSlots.SCARF, sanity_resistance=20)
+                item = Entity(ix,iy,'^',tcod.violet,"violet scarf", _Equippable=e_comp)
             entities.append(item)
 
         """

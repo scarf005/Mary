@@ -1,4 +1,4 @@
-from equipment_slots import EquipmentSlots
+from enums.equipment_slots import EquipmentSlots
 
 class Equipment:
     def __init__(self, **kwargs):
@@ -20,9 +20,10 @@ class Equipment:
             for equipment in self.slots_list:
                 # 가지고 있는 장비가 있는지 확인
                 equip = getattr(self, equipment, None)
+                print(equip)
                 equippable = getattr(equip, '_Equippable', None)
-                temp = getattr(equippable, equippable_value, None)
-                if temp: V += temp
+                bonus = getattr(equippable, equippable_value, None)
+                if bonus: V += bonus
 
         return V
 
@@ -33,17 +34,22 @@ class Equipment:
     def toggle_equip(self, equippable_entity):
         results = []
 
+        enum_slots_list = EquipmentSlots.list_enums()
         slot = equippable_entity._Equippable.slot
+        for enum in EquipmentSlots:
+            if slot == enum:
+                search = str(enum.name.lower())
+                self_slot_value = getattr(self, search, None)
 
-        if slot == EquipmentSlots.SCARF:
-            if self.scarf == equippable_entity:
-                self.scarf = None
-                results.append({'dequipped': equippable_entity})
-            else:
-                if self.scarf: # 바꿔치기
-                    results.append({'dequipped': self.scarf})
+                if self_slot_value == equippable_entity: # 손에 든 물건 빼기
+                    setattr(self, search, None)
+                    results.append({'dequipped': equippable_entity})
+                else:
+                    if self_slot_value: # 기존에 들던 물건 빼기
+                        results.append({'dequipped': self_slot_value})
 
-                self.scarf = equippable_entity
-                results.append({'equipped': equippable_entity})
+                    setattr(self, search, equippable_entity) # 바꿔치기
+                    results.append({'equipped': equippable_entity})
+                break
 
         return results

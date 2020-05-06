@@ -19,6 +19,8 @@ from components.fighter import Fighter
 from components.inventory import Inventory
 from components.luminary import Luminary
 from components.item import Item
+from components.equipment import Equipment
+from components.equippable import Equippable
 
 # 렌더링 기능
 from renderer.camera import Camera
@@ -55,8 +57,12 @@ def init_player_and_entities(player_name):
     fighter_component = Fighter(hp=30, sanity=100, defense=2, power=5)
     luminary_component = Luminary(luminosity=10)
     inventory_component = Inventory(26)
+    equipment_comp = Equipment()
 
-    player = Entity(int(MAP_WIDTH/2) , int(MAP_HEIGHT/2), '@', tcod.white, player_name , blocks=True, render_order=RenderOrder.ACTOR, _Luminary=luminary_component, _Fighter=fighter_component, _Inventory=inventory_component)
+    player = Entity(int(MAP_WIDTH/2) , int(MAP_HEIGHT/2), '@', tcod.white, player_name ,
+                    blocks=True, render_order=RenderOrder.ACTOR,
+                    _Luminary=luminary_component, _Fighter=fighter_component,
+                    _Inventory=inventory_component, _Equipment=equipment_comp)
     entities = [player]
 
     i_comp = Item(use_function=read,
@@ -67,6 +73,8 @@ def init_player_and_entities(player_name):
     i_comp = Item(use_function=talisman)
     Talisman = Entity(player.x,player.y, '*', tcod.lighter_purple,
                     '시계꽃 부적', render_order=RenderOrder.ITEM, _Item = i_comp)
+
+
 
     player._Inventory.items.append(Journal)
     player._Inventory.items.append(Talisman)
@@ -161,10 +169,8 @@ def main():
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
-        render_all(game_state, root, console, panel, entities, player, mouse, SYS_LOG,
-                   game_map, fov_map, light_map, camera, message_log, fov_recompute,
-                   SCREEN_WIDTH, SCREEN_HEIGHT,
-                   BAR_WIDTH, PANEL_HEIGHT, PANEL_Y, MAP_HEIGHT, colors)
+        render_all(game_state, root, console, panel, entities, player, mouse,
+                   game_map, fov_map, light_map, camera, message_log, fov_recompute,)
 
         context.present(root, keep_aspect=True, align=(0.5,0.5)) # integer_scaling=True align=(0.5,1))
 
@@ -326,6 +332,7 @@ def main():
         for r in player_turn_results:
             message = r.get('message')
             dead_entity = r.get('dead')
+            equip = r.get('equip')
             item_added = r.get('item_added')
             item_consumed = r.get('consumed')
             item_used = r.get('used')
@@ -347,6 +354,21 @@ def main():
                     message = kill_monster(dead_entity, game_map)
 
                 message_log.log(message)
+
+            if equip:
+                equip_results = player._Equipment.toggle_equip(equip)
+
+                for equip_result in equip_results:
+                    equipped = equip_result.get('equipped')
+                    dequipped = equip_result.get('dequipped')
+
+                    if equipped:
+                        message_log.log(Message('You equipped the {0}'.format(equipped.name)))
+
+                    if dequipped:
+                        message_log.log(Message('You dequipped the {0}'.format(dequipped.name)))
+
+                game_state = GameStates.ENEMY_TURN
 
             if item_added:
                 entities.remove(item_added)
