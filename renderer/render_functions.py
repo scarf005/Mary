@@ -6,12 +6,10 @@ from yaml_functions import read_yaml
 
 from renderer.lighting_functions import mix_rgb
 from init_constants import colors
-from game_states import GameStates
+from enums.game_states import GameStates
 from menus import inventory_menu
 
-from init_constants import *
-
-SYS_LOG = read_yaml("system_log.yaml")
+from init_constants import CENTER_X, CENTER_Y
 
 class RenderOrder(Enum):
     # 높을수록 위에 표시한다. 즉 높이
@@ -36,20 +34,18 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
 
 def get_names_under_mouse(mouse, camera, entities, fov_map):
     #카메라
-    (x, y) = (mouse.x - camera.x, mouse.y - camera.y)
+    (x, y) = (mouse.x - camera.x - CENTER_X, mouse.y - camera.y - CENTER_Y)
 
     names = [entity.name for entity in entities
              if entity.x == x and entity.y == y and fov_map.fov[entity.y, entity.x]]
     names = ', '.join(names)
 
+    if not names:
+        names = str((x,y))
+
     return names.capitalize()
 
-def draw_animation(con, camera, screen_width, screen_height, x, y, color):
-    MapX = x + camera.x
-    MapY = y + camera.y
-    draw_background(con, MapX, MapY, color, 30)
-
-def render_all(game_state, root, con, panel, entities, player, mouse,
+def render_all(game_state, root, con, panel, entities, player, mouse, SYS_LOG,
                game_map, fov_map, light_map,camera, message_log, fov_recompute,
                screen_width, screen_height, bar_width, panel_height, panel_y, map_height, colors):
     if fov_recompute:
@@ -60,8 +56,6 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
                 Mapx = x + camera.x + CENTER_X
                 Mapy = y + camera.y + CENTER_Y
 
-                #print(F"{camera.x},{camera.y}")
-
                 visible = fov_map.fov[y,x]
                 wall = game_map.tiles[y,x].block_sight
 
@@ -70,18 +64,18 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
                 else:
                     brightness = light_map[y,x]
 
-                if visible:
+                if visible: # 눈에 보일 때
                     game_map.tiles[y,x].explored = True
                     if wall:
                         draw_background(con, Mapx, Mapy, 'light_wall', brightness)
                     else:
                         draw_background(con, Mapx, Mapy, 'light_ground', brightness)
-                elif game_map.tiles[y,x].explored:
+                elif game_map.tiles[y,x].explored: # 한번 들렀을 때
                     if wall:
                         draw_background(con, Mapx, Mapy, 'dark_wall')
                     else:
                         draw_background(con, Mapx, Mapy, 'dark_ground')
-                else:
+                else:   # 시야 밖일 때
                     draw_background(con, Mapx, Mapy, 'pitch_black')
 
 

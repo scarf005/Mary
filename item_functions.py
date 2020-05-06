@@ -1,13 +1,16 @@
 import tcod
 import math, time
+import numpy as np
 from dice import roll_dice
 
 from random import randint
 from game_messages import Message
-from renderer.render_functions import draw_animation
+from renderer.animation_functions import refresh_console, draw_animation, get_line
 
 from yaml_functions import read_yaml, cout
 from batchim import Batchim
+
+from init_constants import CENTER_X, CENTER_Y, SCREEN_WIDTH, SCREEN_HEIGHT, colors
 
 SYS_LOG = read_yaml("system_log.yaml")
 ITEM_LOG = read_yaml("item_log.yaml")
@@ -77,12 +80,20 @@ def talisman(*args, **kwargs):
 
 def cast_spell(*args, **kwargs):
     results = []
+
+    root = kwargs.get('root')
+    animation = kwargs.get('animation')
+    context = kwargs.get('context')
+
     camera = kwargs.get('camera')
     screen_width = kwargs.get('screen_width')
     screen_height = kwargs.get('screen_height')
+
     fov_map = kwargs.get('fov_map')
+    game_map = kwargs.get('game_map')
 
     caster = args[0]
+
     entities = kwargs.get('entities')
     damage = roll_dice(kwargs.get('damage'))
     maximum_range = kwargs.get('maximum_range')
@@ -99,13 +110,31 @@ def cast_spell(*args, **kwargs):
                 closest_distance = distance
 
     if target:
-        draw_animation(0, camera, screen_width, screen_height, target.x, target.y, 'flash')
-        tcod.console_blit(0, 0, 0, screen_width, screen_height, 0, 0, 0)
+        path_map = np.ones((game_map.height,game_map.width),dtype='uint8')
+        pos = get_line(path_map,caster.x,caster.y,target.x,target.y)
+
+        chars = "!?#$%^&*\|;"
+        flash = tuple(colors.get('flash'))
+
+        for i in range(7):
+            for n, position in enumerate(pos):
+                if n == len(pos)-1:
+                    draw_animation(root, camera, position[1], position[0], "", col=flash)
+                else:
+                    draw_animation(animation, camera, position[1], position[0],
+                                string=chars[randint(0,len(chars)-1)], fg=tcod.white, bg=flash)
+
+            refresh_console(root, animation, context, 1, 0.5, 0.03)
 
         results.append({'consumed': True, 'target': target,
-                        'message': Message(F'A crackling stream of energy hits {target.name} for {damage} hit points.')})
+                        'message': Message(cout(ITEM_LOG['magic_attack'],
+                                                Batchim(ITEM_LOG['magic']['spell']['name']),
+                                                ITEM_LOG['magic']['spell']['effect'],
+                                                Batchim(target.name,1),
+                                                damage), tcod.orange)
+                                                })
         results.extend(target._Fighter.take_damage(damage))
-        time.sleep(0.1)
+
     else:
         results.append({'consumed': False, 'target': None, 'message': Message(SYS_LOG['no_close_enemy'], tcod.red)})
 
@@ -113,35 +142,43 @@ def cast_spell(*args, **kwargs):
 
 def cast_fireball(*args, **kwargs):
     results = []
+
+    animation = kwargs.get('animation')
+    root = kwargs.get('root')
+    context = kwargs.get('context')
+
     camera = kwargs.get('camera')
-    screen_width = kwargs.get('screen_width')
-    screen_height = kwargs.get('screen_height')
     fov_map = kwargs.get('fov_map')
 
     entities = kwargs.get('entities')
     damage_dice = kwargs.get('damage')
     radius = kwargs.get('radius')
     r = int((radius-1) / 2)
-    target_x = kwargs.get('target_x') - camera.x
-    target_y = kwargs.get('target_y') - camera.y
+    target_x = kwargs.get('target_x')
+    target_y = kwargs.get('target_y')
 
     if not fov_map.fov[target_y, target_x]:
         results.append({'consumed': False,
                         'message': Message(SYS_LOG['outside_fov'], tcod.yellow)})
         return results
 
+    ex = tuple(colors.get('explosion'))
     for x in range(target_x - r, target_x + r + 1):
         for y in range(target_y - r, target_y + r + 1):
-            draw_animation(0, camera, screen_width, screen_height, x,y, 'explosion')
+            draw_animation(animation, camera, x,y, " ", bg=ex)
 
-    tcod.console_blit(0, 0, 0, screen_width, screen_height, 0, 0, 0)
-    results.append({'consumed': True,
-                    'message': Message(F'The flaming sphere explodes!', tcod.orange)})
-    time.sleep(0.1)
+    refresh_console(root, animation, context, 0, 1 , 0.15)
+
+    results.append({'consumed': True, 'animate': True,
+                    'message': Message(ITEM_LOG['magic']['fireball']['describe'], tcod.orange)})
+
     for entity in entities:
-        #print(F"{entity.name} {entity.distance(target_x, target_y)}")
         if entity.distance(target_x, target_y) <= math.sqrt(2*(r**2)) and entity._Fighter:
             damage = roll_dice(damage_dice)
-            results.append({'message': Message(F'{entity.name} is blasted for {damage} hit points.', tcod.orange)})
+            results.append({'message': Message(cout(ITEM_LOG['magic_attack'],
+                                                Batchim(ITEM_LOG['magic']['fireball']['name']),
+                                                ITEM_LOG['magic']['fireball']['effect'],
+                                                Batchim(entity.name,1),
+                                                damage), tcod.orange)})
             results.extend(entity._Fighter.take_damage(damage))
     return results

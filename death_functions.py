@@ -2,7 +2,7 @@ import tcod
 
 from map_objects.game_map import GameMap
 
-from game_states import GameStates
+from enums.game_states import GameStates
 from renderer.render_functions import RenderOrder
 from game_messages import Message
 
@@ -12,9 +12,7 @@ from batchim import Batchim
 SYS_LOG = read_yaml("system_log.yaml")
 
 def kill_player(player):
-    player.char = '%'
-    player.color = tcod.dark_red
-
+    player.color = tcod.darker_gray
     return Message(SYS_LOG['dead_player'], tcod.red), GameStates.PLAYER_DEAD
 
 

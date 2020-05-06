@@ -2,7 +2,7 @@ import tcod
 import tcod.event
 import time
 
-from game_states import GameStates
+from enums.game_states import GameStates
 
 from yaml_functions import read_yaml
 
@@ -42,7 +42,7 @@ MOVE_KEYS = {  # key_symbol: (x, y)
 }
 
 PLAYER_INPUT = {
-    'q':'toggle_light',
+    'z':'toggle_light',
     ',':'pickup',
     '.':'rest',
     'i':'show_inventory',
@@ -83,6 +83,10 @@ class Keyboard(tcod.event.EventDispatch[None]):
                 self.result = {'exit': True}
                 self.get_out = True
 
+            elif event.sym == tcod.event.K_F5:
+                self.result = {'fullscreen': True}
+                self.get_out = True
+
             elif event.sym in MOVE_KEYS:
                 self.cmd_move(*MOVE_KEYS[event.sym])
 
@@ -113,7 +117,17 @@ class Keyboard(tcod.event.EventDispatch[None]):
         self.result = {'quit': True}
         self.get_out = True
 
-
+def toggle_fullscreen(context: tcod.context.Context) -> None:
+    """Toggle a context window between fullscreen and windowed modes."""
+    if not context.sdl_window_p:
+        return
+    fullscreen = tcod.lib.SDL_GetWindowFlags(context.sdl_window_p) & (
+        tcod.lib.SDL_WINDOW_FULLSCREEN | tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP
+    )
+    tcod.lib.SDL_SetWindowFullscreen(
+        context.sdl_window_p,
+        0 if fullscreen else tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP,
+    )
 
 def handle_input_per_state(state, mouse, context, game_state):
     if game_state == GameStates.PLAYERS_TURN:
@@ -138,11 +152,7 @@ def handle_input(state, mouse, context, available_key_list):
         state.dispatch(event)
         mouse.dispatch(event)
 
-        if event.type == "WINDOWRESIZED":
-            return {"window_resized": True}
-
         if state.get_out:
-            #print(f'done,{state.result}')
             return state.result
     return {}
 

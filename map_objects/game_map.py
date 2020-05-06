@@ -133,7 +133,7 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        item_chance = {'FJ':60, 'REG':30,'SC':20,"FB":10} #'BK': 20 #
+        item_chance = { "SC":10} #'BK': 20 # #'FJ':60, 'REG':30,'FB':10,
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)
@@ -152,7 +152,7 @@ class GameMap:
                 i_comp = Item(use_function=heal, amount=7, which='sanity')
                 item = self.create_item(ix, iy, '!', tcod.orange, '과일 주스',item=i_comp)
             elif kinds == 'SC':
-                i_comp = Item(use_function=cast_spell, damage=(1,30), maximum_range=5)
+                i_comp = Item(use_function=cast_spell, damage=(1,30), maximum_range=8)
                 item = self.create_item(ix, iy, '?', tcod.green, '마법 불꽃의 주문서',item=i_comp)
             elif kinds == 'FB':
                 i_comp = Item(use_function=cast_fireball, targeting=True,
@@ -177,7 +177,7 @@ class GameMap:
 
     def np_find_empty_cell(self, entities, game_map):
         while True:
-            y,x = game_map[randint(0,game_map.shape[0]),randint(0,game_map.shape[1])]
+            y,x = game_map[randint(0,game_map.shape[0]-1),randint(0,game_map.shape[1]-1)]
             if game_map[y,x] == 0:
                 for i in entities:
                     if y == i.y and x == i.x:

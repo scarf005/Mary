@@ -1,7 +1,13 @@
+import os
 import tcod
 from yaml_functions import read_yaml
 
 CONFIG = read_yaml("config.yaml","!default")
+
+# 폰트 로딩
+FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+GRAPHIC_PATH = '\\graphics\\fonts\\'
+FONT = FILE_PATH + GRAPHIC_PATH + CONFIG['FONT']
 
 FLAGS = tcod.context.SDL_WINDOW_RESIZABLE
 
@@ -10,7 +16,7 @@ SCREEN_HEIGHT = CONFIG['SCREEN_HEIGHT']
 
 WIDTH = int(SCREEN_WIDTH * CONFIG['FONT_WIDTH'])
 HEIGHT = int(SCREEN_HEIGHT * CONFIG['FONT_HEIGHT'])
-TILESET_TTF = tcod.tileset.load_truetype_font(CONFIG['FONT'],
+TILESET_TTF = tcod.tileset.load_truetype_font(FONT,
                                                 CONFIG['FONT_WIDTH'],
                                                 CONFIG['FONT_HEIGHT'])
 

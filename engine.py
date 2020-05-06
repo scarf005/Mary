@@ -7,7 +7,6 @@ import math, random, time
 from yaml_functions import read_yaml
 from batchim import Batchim
 
-
 # 게임 지도
 from map_objects.game_map import GameMap
 
@@ -29,12 +28,24 @@ from renderer.fov_functions import initialize_fov, recompute_fov
 
 # 조작 및 기타
 from game_messages import Message, MessageLog
-from game_states import GameStates
+from enums.game_states import GameStates
 from input_functions import Mouse, Keyboard, handle_input_per_state
 from debugs import Debug
 
 # 변수 정보
 from init_constants import *
+
+def toggle_fullscreen(context: tcod.context.Context) -> None:
+    """Toggle a context window between fullscreen and windowed modes."""
+    if not context.sdl_window_p:
+        return
+    fullscreen = tcod.lib.SDL_GetWindowFlags(context.sdl_window_p) & (
+        tcod.lib.SDL_WINDOW_FULLSCREEN | tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP
+    )
+    tcod.lib.SDL_SetWindowFullscreen(
+        context.sdl_window_p,
+        0 if fullscreen else tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP,
+    )
 
 def init_player_and_entities(player_name):
     """
@@ -111,7 +122,7 @@ def init_console():
     panel = tcod.Console(SCREEN_WIDTH, PANEL_HEIGHT)
     root = tcod.Console(*context.recommended_console_size())
 
-    return root, console, panel, context
+    return root, console, panel, animation, context
 
 def init_data():
     SYS_LOG = read_yaml("system_log.yaml")
@@ -130,7 +141,7 @@ def main():
 
     message_log, game_state, previous_game_state, targeting_item = init_message_and_states()
 
-    root, console, panel, context = init_console()
+    root, console, panel, animation, context = init_console()
 
     debug, mouse, keyboard = init_others()
 
@@ -140,7 +151,7 @@ def main():
     메인 루프
     """
     while not quit:
-        root = tcod.Console(*context.recommended_console_size())
+        #root = tcod.Console(*context.recommended_console_size())
 
         """
         화면 표시
@@ -150,7 +161,7 @@ def main():
 
         if light_recompute:
             light_map = initialize_light(game_map, fov_map, entities)
-        render_all(game_state, root, console, panel, entities, player, mouse,
+        render_all(game_state, root, console, panel, entities, player, mouse, SYS_LOG,
                    game_map, fov_map, light_map, camera, message_log, fov_recompute,
                    SCREEN_WIDTH, SCREEN_HEIGHT,
                    BAR_WIDTH, PANEL_HEIGHT, PANEL_Y, MAP_HEIGHT, colors)
@@ -202,8 +213,9 @@ def main():
 
         # 최대화면이 True일 시, 전체화면이 아니라면 콘솔을 전체화면으로 전환함
         if action.get('fullscreen'):
-            tcod.console_set_fullscreen(not tcod.console_is_fullscreen())
+            toggle_fullscreen(context)
 
+        #print(f'center x{CENTER_X},y{CENTER_Y}')
         """
         플레이어 차례에 플레이어가 할 수 있는 행동들
         """
@@ -289,19 +301,21 @@ def main():
 
             if game_state == GameStates.SHOW_INVENTORY:
                 player_turn_results.extend(player._Inventory.use(item, camera=camera,
-                                                                 entities=entities, fov_map=fov_map,
-                                                                 screen_width = SCREEN_WIDTH,
-                                                                 screen_height = SCREEN_HEIGHT))
+                                                                 entities=entities,
+                                                                 animation=animation, root= root, context=context,
+                                                                 fov_map=fov_map, game_map=game_map))
             elif game_state == GameStates.DROP_INVENTORY:
                 player_turn_results.extend(player._Inventory.drop_item(item))
 
         if game_state == GameStates.TARGETING:
             if mouse.click == "L":
-                target_x, target_y = mouse.x, mouse.y
+                target_x = mouse.x - camera.x - CENTER_X
+                target_y = mouse.y - camera.y - CENTER_Y
 
                 item_use_results = player._Inventory.use(targeting_item, entities=entities, fov_map=fov_map,
-                                                        camera=camera, screen_width = SCREEN_WIDTH, screen_height = SCREEN_HEIGHT,
+                                                        camera=camera, animation=animation, root= root, context=context,
                                                         target_x=target_x, target_y=target_y)
+
                 player_turn_results.extend(item_use_results)
             elif mouse.click == "R":
                 player_turn_results.append({'targeting_cancelled': True})
