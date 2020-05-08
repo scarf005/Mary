@@ -77,7 +77,7 @@ class Keyboard(tcod.event.EventDispatch[None]):
     def __init__(self):
         self.result = {}
         self.game_state = None
-        self.key_up = False
+        self.key_up = True
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
         #try:
@@ -94,18 +94,18 @@ class Keyboard(tcod.event.EventDispatch[None]):
             self.cmd_move(*MOVE_KEYS[event.sym])
 
         elif self.game_state == 'INVENTORY':
-            print(event.sym)
             if not event.repeat:
                 index = event.sym - ord('a')
                 if index >= 0:
                     self.result = {'inventory_index': index}
                     self.get_out = True
 
-        elif chr(event.sym) in self.key_list:
-            if self.key_up:
-                self.result = {self.key_list.get(chr(event.sym)): True}
-                self.key_up = False
-                self.get_out = True
+        elif event.sym <= 255 and event.sym >= 0:
+            if chr(event.sym) in self.key_list:
+                if self.key_up:
+                    self.result = {self.key_list.get(chr(event.sym)): True}
+                    self.key_up = False
+                    self.get_out = True
 
         #except:
         #    print("Fatal error")

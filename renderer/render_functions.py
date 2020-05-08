@@ -116,7 +116,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
             inventory_title = SYS_LOG["inventory_log"]
         else:
             inventory_title = SYS_LOG["drop_log"]
-        inventory_menu(root, con, inventory_title, player._Inventory, False)
+        inventory_menu(root, con, inventory_title, player._Inventory)
 
 
 def clear_all_entities(con, entities, camera):

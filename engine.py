@@ -1,8 +1,8 @@
-import tcod
-import tcod.event
-
 import numpy as np
 import math, random, time
+
+import tcod
+import tcod.event
 
 from yaml_functions import read_yaml
 from batchim import Batchim

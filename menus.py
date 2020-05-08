@@ -37,7 +37,7 @@ def menu(root, con, header, options, line_up=True):
     y = int(MAP_HEIGHT / 2 - height / 2)
     window.blit(root, x, y, 0, 0, MESSAGE_WIDTH, height, fg_alpha=1.0, bg_alpha=0.7)
 
-def inventory_menu(root, con, header, inventory, line_up):
+def inventory_menu(root, con, header, inventory):
     # show a menu with each item of the inventory as an option
     if len(inventory.items) == 0:
         options = ['Inventory is empty.']
@@ -46,7 +46,7 @@ def inventory_menu(root, con, header, inventory, line_up):
         for item in inventory.items:
             options.append(item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}")
 
-    menu(root, con, header, options, line_up)
+    menu(root, con, header, options, line_up=True)
 
 def character_screen(root, con, player):
     window = tcod.Console(MESSAGE_HEIGHT, SCREEN_HEIGHT)
