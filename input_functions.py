@@ -47,6 +47,7 @@ PLAYER_INPUT = {
     '.':'rest',
     'i':'show_inventory',
     'd':'drop_inventory',
+    '%':'show_character_screen',
     #'1':'toggle_wall',
     #'2':'create_luminary'
 }
@@ -75,35 +76,39 @@ class Mouse(tcod.event.EventDispatch[None]):
 class Keyboard(tcod.event.EventDispatch[None]):
     def __init__(self):
         self.result = {}
+        self.game_state = None
         self.key_up = False
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        try:
-            if event.sym == tcod.event.K_ESCAPE:
-                self.result = {'exit': True}
-                self.get_out = True
+        #try:
+        print(self.game_state)
+        if event.sym == tcod.event.K_ESCAPE:
+            self.result = {'exit': True}
+            self.get_out = True
 
-            elif event.sym == tcod.event.K_F5:
-                self.result = {'fullscreen': True}
-                self.get_out = True
+        elif event.sym == tcod.event.K_F5:
+            self.result = {'fullscreen': True}
+            self.get_out = True
 
-            elif event.sym in MOVE_KEYS:
-                self.cmd_move(*MOVE_KEYS[event.sym])
+        elif event.sym in MOVE_KEYS and self.game_state == 'PLAYER_TURN':
+            self.cmd_move(*MOVE_KEYS[event.sym])
 
-            elif self.key_list == "INVENTORY":
-                if not event.repeat:
-                    index = event.sym - ord('a')
-                    print(f'index:{index}')
-                    if index >= 0:
-                        self.result = {'inventory_index': index}
-                        self.get_out = True
-            elif chr(event.sym) in self.key_list:
-                if self.key_up:
-                    self.result = {self.key_list.get(chr(event.sym)): True}
-                    self.key_up = False
+        elif self.game_state == 'INVENTORY':
+            print(event.sym)
+            if not event.repeat:
+                index = event.sym - ord('a')
+                if index >= 0:
+                    self.result = {'inventory_index': index}
                     self.get_out = True
-        except:
-            print("Fatal error")
+
+        elif chr(event.sym) in self.key_list:
+            if self.key_up:
+                self.result = {self.key_list.get(chr(event.sym)): True}
+                self.key_up = False
+                self.get_out = True
+
+        #except:
+        #    print("Fatal error")
 
     def ev_keyup(self, event: tcod.event.KeyUp) -> None:
         self.key_up = True
@@ -129,22 +134,25 @@ def toggle_fullscreen(context: tcod.context.Context) -> None:
         0 if fullscreen else tcod.lib.SDL_WINDOW_FULLSCREEN_DESKTOP,
     )
 
-def handle_input_per_state(state, mouse, context, game_state):
+def handle_input_per_state(state, mouse, context, game_state, key_list=None):
     if game_state == GameStates.PLAYERS_TURN:
-        return handle_input(state, mouse, context, PLAYER_INPUT)
+        return handle_input(state, mouse, context, 'PLAYER_TURN', PLAYER_INPUT)
     elif game_state == GameStates.PLAYER_DEAD:
-        return handle_input(state, mouse, context, INVENTORY_INPUT)
+        return handle_input(state, mouse, context, 'INVENTORY')
     elif game_state == GameStates.TARGETING:
-        return handle_input(state, mouse, context, {})
+        return handle_input(state, mouse, context, 'TARGETING')
     elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
-        return handle_input(state, mouse, context, INVENTORY_INPUT)
+        return handle_input(state, mouse, context, 'INVENTORY')
+    elif game_state == GameStates.CHARACTER_SCREEN:
+        return handle_input(state, mouse, context, {})
 
     return {}
 
-def handle_input(state, mouse, context, available_key_list):
+def handle_input(state, mouse, context, game_state, key_list=None):
     mouse.click = None
     state.get_out = False
-    state.key_list = available_key_list
+    state.game_state = game_state
+    state.key_list = key_list
 
     for event in tcod.event.wait():
         context.convert_event(event)

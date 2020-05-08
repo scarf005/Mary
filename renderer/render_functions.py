@@ -7,7 +7,7 @@ from yaml_functions import read_yaml
 from renderer.lighting_functions import mix_rgb
 from init_constants import colors
 from enums.game_states import GameStates
-from menus import inventory_menu
+from menus import inventory_menu, character_screen
 
 from init_constants import *
 
@@ -116,7 +116,7 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
             inventory_title = SYS_LOG["inventory_log"]
         else:
             inventory_title = SYS_LOG["drop_log"]
-        inventory_menu(root, con, inventory_title, player._Inventory, SCREEN_WIDTH-2, SCREEN_WIDTH, SCREEN_HEIGHT, MAP_HEIGHT)
+        inventory_menu(root, con, inventory_title, player._Inventory, False)
 
 
 def clear_all_entities(con, entities, camera):

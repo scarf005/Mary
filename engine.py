@@ -198,6 +198,7 @@ def main():
         show_inventory = action.get('show_inventory')
         inventory_index = action.get('inventory_index')
         drop_inventory = action.get('drop_inventory')
+        show_character_screen = action.get('show_character_screen')
 
         toggle_light  = action.get('toggle_light')
         create_luminary = action.get('create_light')
@@ -210,7 +211,8 @@ def main():
         player_turn_results = []
 
         if exit:
-            if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
+            # 게임으로 돌아오기
+            if game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY, GameStates.CHARACTER_SCREEN):
                 game_state = previous_game_state
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled': True})
@@ -328,6 +330,11 @@ def main():
 
         if rest:
             game_state = GameStates.ENEMY_TURN
+
+        if show_character_screen:
+            previous_game_state = game_state
+            game_state = GameStates.CHARACTER_SCREEN
+
 
         for r in player_turn_results:
             message = r.get('message')
