@@ -6,6 +6,7 @@ from yaml_functions import read_yaml
 from batchim import 받침
 
 SYS_LOG = read_yaml("system_log.yaml")
+ITEM_LOG = read_yaml("item_log.yaml")
 
 def menu(root, con, header, options, line_up=True):
     """
@@ -49,7 +50,15 @@ def inventory_menu(root, con, header, inventory):
     else:
         options = []
         for item in inventory.items:
-            options.append(item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}")
+            if item._Equippable:
+                if item._Equippable.equipped:
+                    log = ITEM_LOG['equipping_log']
+                    log = f' ({log})'
+                else:
+                    log = ""
+                options.append(f'{item.name}{log}')
+            else:
+                options.append(item.name if item._Item.quantity == 1 else F"{item.name} x {item._Item.quantity}")
 
     menu(root, con, header, options, line_up=True)
 

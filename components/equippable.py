@@ -15,6 +15,7 @@ class Equippable:
         장비할 수 있는 물건들. 무기부터 장신구까지.
         """
         self.slot = slot
+        self.equipped = False
 
         # 기타 속성들
         attributes_list = {'attack_power':0, 'attack_type':None,

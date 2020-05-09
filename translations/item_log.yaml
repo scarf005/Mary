@@ -1,4 +1,5 @@
 # Item effects
+equipping_log: 'Equipped'
 
 # Reading
 read_sanity_better: 'This feels better.'

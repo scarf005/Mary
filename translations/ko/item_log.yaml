@@ -1,4 +1,5 @@
 # 아이템 효과
+equipping_log: '착용중'
 
 # 읽기
 read_sanity_better: 'This feels better.'
