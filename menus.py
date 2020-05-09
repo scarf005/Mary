@@ -1,6 +1,11 @@
 import tcod
+
 from init_constants import *
 
+from yaml_functions import read_yaml
+from batchim import 받침
+
+SYS_LOG = read_yaml("system_log.yaml")
 
 def menu(root, con, header, options, line_up=True):
     """
@@ -48,5 +53,40 @@ def inventory_menu(root, con, header, inventory):
 
     menu(root, con, header, options, line_up=True)
 
-def character_screen(root, con, player):
-    window = tcod.Console(MESSAGE_HEIGHT, SCREEN_HEIGHT)
+def character_screen(root, con, header, **kw_locations):
+
+    def handle_attr(target_object, route): #단일 경로 정보 하나를 찾음. 중첩 경로 지원
+        if len(route) == 1: #단일 정보
+            return getattr(target_object, route)
+        elif len(route) == 2: #이중 정보
+            return getattr(getattr(target_object, route[0]), route[1])
+        else:
+            print("The hell you put in?")
+
+    def find_location(target_object, **kwargs): #kwargs에서 필요한 객체를 찾아줌.
+        for name, objects in kwargs.items():
+            if name == target_object:
+                answer = objects
+                break
+        return answer
+
+    infos = []
+    kinds = SYS_LOG['character_info_log']['showing']
+    #print(f'kinds:{kinds}')
+    for key, value in kinds.items():
+        #print(f'value:{value}')
+        location = find_location(value['owner'], **kw_locations) #찾는 객체 이름.
+        name = value['name']
+        route = value['route']
+        load_type = value['type']
+
+        if load_type == 'value':
+            #print(f'location{location}, route {route}')
+            total_attr = handle_attr(location, route)
+
+        elif load_type == 'ratio':
+            total_attr = f'{handle_attr(location, route[0])}/{handle_attr(location, route[1])}'
+
+        infos.append(f'{name}: {total_attr}')
+
+    menu(root, con, header, infos, line_up=False)

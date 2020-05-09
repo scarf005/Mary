@@ -1,6 +1,6 @@
 from yaml_functions import LANG
 
-def Batchim(word, *args):
+def 받침(word, *args):
     """
     -: 이/가 1: 을/를 2: 은/는 3: 으로/로
     """
@@ -24,7 +24,7 @@ def Batchim(word, *args):
     else: return word
 
 if __name__ == "__main__":
-    print(Batchim("사람"))
-    print(Batchim("사람",1))
-    print(Batchim("사람",2))
-    print(Batchim("사람 ","그는 신인가?","그는 누구인가?"))
+    print(받침("사람"))
+    print(받침("사람",1))
+    print(받침("사람",2))
+    print(받침("사람 ","그는 신인가?","그는 누구인가?"))

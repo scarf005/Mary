@@ -20,7 +20,7 @@ class Equipment:
             for equipment in self.slots_list:
                 # 가지고 있는 장비가 있는지 확인
                 equip = getattr(self, equipment, None)
-                print(equip)
+                #print(equip)
                 equippable = getattr(equip, '_Equippable', None)
                 bonus = getattr(equippable, equippable_value, None)
                 if bonus: V += bonus

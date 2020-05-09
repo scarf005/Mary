@@ -118,6 +118,11 @@ def render_all(game_state, root, con, panel, entities, player, mouse,
             inventory_title = SYS_LOG["drop_log"]
         inventory_menu(root, con, inventory_title, player._Inventory)
 
+    # 플레이어 정보
+    if game_state == GameStates.CHARACTER_SCREEN:
+        character_screen(root, con, SYS_LOG['character_info_log']['header'],
+                         player=player, game_map=game_map)
+
 
 def clear_all_entities(con, entities, camera):
     # 목록에 있는 모든 객체를 제거한다.

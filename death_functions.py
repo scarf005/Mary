@@ -7,7 +7,7 @@ from renderer.render_functions import RenderOrder
 from game_messages import Message
 
 from yaml_functions import read_yaml, cout
-from batchim import Batchim
+from batchim import 받침
 
 SYS_LOG = read_yaml("system_log.yaml")
 
@@ -19,8 +19,8 @@ def kill_player(player):
 def kill_monster(monster, game_map):
     game_map.monsters -= 1
     capped = monster.name.capitalize()
-    death_message = Message(cout(SYS_LOG['death_log'],Batchim(capped)), tcod.orange)
-    monster.name = cout(SYS_LOG['dead_entity'],Batchim(capped,'(이었','(였'))
+    death_message = Message(cout(SYS_LOG['death_log'],받침(capped)), tcod.orange)
+    monster.name = cout(SYS_LOG['dead_entity'],받침(capped,'(이었','(였'))
     monster.char = '%'
     monster.color = tcod.dark_red
     monster.blocks = False

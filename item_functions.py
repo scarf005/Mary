@@ -8,7 +8,7 @@ from game_messages import Message
 from renderer.animation_functions import refresh_console, draw_animation, get_line
 
 from yaml_functions import read_yaml, cout
-from batchim import Batchim
+from batchim import 받침
 
 from init_constants import CENTER_X, CENTER_Y, SCREEN_WIDTH, SCREEN_HEIGHT, colors
 
@@ -128,9 +128,9 @@ def cast_spell(*args, **kwargs):
 
         results.append({'consumed': True, 'target': target,
                         'message': Message(cout(ITEM_LOG['magic_attack'],
-                                                Batchim(ITEM_LOG['magic']['spell']['name']),
+                                                받침(ITEM_LOG['magic']['spell']['name']),
                                                 ITEM_LOG['magic']['spell']['effect'],
-                                                Batchim(target.name,1),
+                                                받침(target.name,1),
                                                 damage), tcod.orange)
                                                 })
         results.extend(target._Fighter.take_damage(damage))
@@ -176,9 +176,9 @@ def cast_fireball(*args, **kwargs):
         if entity.distance(target_x, target_y) <= math.sqrt(2*(r**2)) and entity._Fighter:
             damage = roll_dice(damage_dice)
             results.append({'message': Message(cout(ITEM_LOG['magic_attack'],
-                                                Batchim(ITEM_LOG['magic']['fireball']['name']),
+                                                받침(ITEM_LOG['magic']['fireball']['name']),
                                                 ITEM_LOG['magic']['fireball']['effect'],
-                                                Batchim(entity.name,1),
+                                                받침(entity.name,1),
                                                 damage), tcod.orange)})
             results.extend(entity._Fighter.take_damage(damage))
     return results

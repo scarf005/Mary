@@ -1,11 +1,11 @@
-import numpy as np
-import math, random, time
-
 import tcod
 import tcod.event
 
-from yaml_functions import read_yaml
-from batchim import Batchim
+import numpy as np
+import math, random, time
+
+from yaml_functions import read_yaml, cout
+from batchim import 받침
 
 # 게임 지도
 from map_objects.game_map import GameMap
@@ -34,7 +34,7 @@ from enums.game_states import GameStates
 from input_functions import Mouse, Keyboard, handle_input_per_state
 from debugs import Debug
 
-# 변수 정보
+# 상수 정보
 from init_constants import *
 
 def toggle_fullscreen(context: tcod.context.Context) -> None:
@@ -369,11 +369,17 @@ def main():
                     equipped = equip_result.get('equipped')
                     dequipped = equip_result.get('dequipped')
 
+                    equip_log = SYS_LOG['equip_log']
+
                     if equipped:
-                        message_log.log(Message('You equipped the {0}'.format(equipped.name)))
+                        way = equipped._Equippable.slot.name
+                        msg = cout(equip_log,equip_log['ways_to_wear'][way],받침(equipped.name,1))
+                        message_log.log(Message(msg))
 
                     if dequipped:
-                        message_log.log(Message('You dequipped the {0}'.format(dequipped.name)))
+                        way = dequipped._Equippable.slot.name
+                        msg = cout(equip_log,equip_log['ways_to_unwear'][way],받침(dequipped.name,1))
+                        message_log.log(Message(msg))
 
                 game_state = GameStates.ENEMY_TURN
 

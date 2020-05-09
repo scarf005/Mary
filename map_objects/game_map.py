@@ -5,7 +5,7 @@ from random import randint, shuffle
 
 from game_messages import Message
 from yaml_functions import read_yaml, cout
-from batchim import Batchim
+from batchim import 받침
 
 # 지도
 from map_objects.rectangle import Rect
@@ -164,8 +164,12 @@ class GameMap:
                               damage=(3,8,5), radius=3)
                 item = self.create_item(ix, iy, '?', tcod.red, '화염 폭발의 주문서',item=i_comp)
             elif kinds == 'SCF':
+                scarfs_list = {'보라':tcod.violet,'빨강':tcod.dark_red,'초록':tcod.green,'파랑':tcod.blue}
+                from random import sample
+                pick = sample(list(scarfs_list),1)[0]
+
                 e_comp = Equippable(EquipmentSlots.SCARF, sanity_resistance=20)
-                item = Entity(ix,iy,'^',tcod.violet,"violet scarf", _Equippable=e_comp)
+                item = Entity(ix,iy,'>',scarfs_list[pick],f"{pick}색 목도리", _Equippable=e_comp)
             entities.append(item)
 
         """
@@ -184,7 +188,7 @@ class GameMap:
 
     def np_find_empty_cell(self, entities, game_map):
         while True:
-            y,x = game_map[randint(0,game_map.shape[0]-1),randint(0,game_map.shape[1]-1)]
+            y,x = game_map[randint(0,self.height-1),randint(0,self.width-1)]
             if game_map[y,x] == 0:
                 for i in entities:
                     if y == i.y and x == i.x:

@@ -1,8 +1,8 @@
 # 픽다트 관련
 
-talisman: 
+talisman:
     name: "Swallowstone Talisman"
-    log_format: "You look at the talisman. The devil of the talisman" {0}"
+    log_format: "You look at the talisman. The devil of the talisman {0}"
     quotes:
         - "askes you how are things going."
         - "tells you that she and Mary knew each other."

@@ -6,26 +6,42 @@ sanity: "정신력"
 player_name: "당신"
 
 # 레벨
-enemies_exist: 
+enemies_exist:
     - "혼자가 아니라는 기분이 든다."
     - "누군가 당신을 지켜보는 듯한 느낌이 든다."
     - "속이 메스껍다."
-    
+
 enemies_nonexistant: "당신은 여기에 더 이상 적이 없다는 확신이 든다. 이제 안심이 된다."
 next_depth: "당신은 시공간의 균열 사이로 뛰어들었다."
 
+# 플레이어 정보
+character_info_log:
+    header: "당신에 대하여\n"
+    showing:
+        hp:
+            name: "체력/최대 체력"
+        sanity:
+            name: "정신력/ 최대 정신력"
+        sanity_resist:
+            name: "정신력 저항"
+
 # 인벤토리
-equip:
-    log_format: "당신은 {1} {0}" #착용방식, 물건
-    ways_to_wear: 
-        WIElD: "손에 들었다."
-        OUTFIT: "입었다."
-        SCARF: "목에 둘렀다."
-        JEWELLERY: "착용했다."
-        
-    
+equip_log:
+    log_format: "당신은 {1} {0}." #착용방식, 물건
+    ways_to_wear:
+        WIElD: "손에 들었다"
+        OUTFIT: "입었다"
+        SCARF: "목에 둘렀다"
+        JEWELLERY: "착용했다"
+    ways_to_unwear:
+        WIElD: "손에서 내려놓았다"
+        OUTFIT: "벗었다"
+        SCARF: "목에서 풀었다"
+        JEWELLERY: "풀었다"
+
+
 cannot_get_item: "바닥에 주울 만한 것이 없다."
-get_item: 
+get_item:
     log_format: "당신은 {0} 주웠다."
 
 inventory_log: "무엇을 쓸까?\n"
@@ -34,7 +50,7 @@ inventory_full: '가방이 가득 차서 더 주울 수가 없다.'
 drop_log: "무엇들 떨어뜨릴까?\n"
 
 book_log: "당신을 책을 훝어보았다... 이 책은 "
-item_unusable_log: 
+item_unusable_log:
     log_format: "고민해 보았지만 {0} 마땅히 할 만한 일이 생각이 나지 않는다." #item_entity.name
 item_drop_log:
     log_format: "당신은 {0} 바닥에 떨어뜨렸다." #item.name
@@ -52,16 +68,16 @@ damage_log:
     log_format: '{0} {1}만큼 피해를 입었다.' # target.name,[은/는],damage
 fight_log:
     log_format: '{0} {1} {2}만큼 공격했다.' # entity_name,[이/가],target.name,[을/를],damage
-    
+
 fight_no_dmg_log:
     log_format: '{0} {1} 공격했지만 피해를 입지 않았다.' # entity_name, [이/가] target.name [을/를]
-    
+
 death_log:
     log_format: "{0} 죽었다!" #[이/가]
-    
+
 dead_entity:
     log_format: "{0}던 것)" # [였/이었]
-    
+
 dead_player: "당신은 쓰러졌다."
 
 # 타게팅

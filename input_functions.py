@@ -42,12 +42,12 @@ MOVE_KEYS = {  # key_symbol: (x, y)
 }
 
 PLAYER_INPUT = {
-    'z':'toggle_light',
+    'q':'toggle_light',
     ',':'pickup',
     '.':'rest',
     'i':'show_inventory',
     'd':'drop_inventory',
-    '%':'show_character_screen',
+    'p':'show_character_screen',
     #'1':'toggle_wall',
     #'2':'create_luminary'
 }
@@ -80,8 +80,7 @@ class Keyboard(tcod.event.EventDispatch[None]):
         self.key_up = True
 
     def ev_keydown(self, event: tcod.event.KeyDown) -> None:
-        #try:
-        print(self.game_state)
+        #print(self.game_state)
         if event.sym == tcod.event.K_ESCAPE:
             self.result = {'exit': True}
             self.get_out = True
@@ -100,15 +99,12 @@ class Keyboard(tcod.event.EventDispatch[None]):
                     self.result = {'inventory_index': index}
                     self.get_out = True
 
-        elif event.sym <= 255 and event.sym >= 0:
+        elif event.sym <= 255 and event.sym >= 0 and self.key_list:
             if chr(event.sym) in self.key_list:
                 if self.key_up:
                     self.result = {self.key_list.get(chr(event.sym)): True}
                     self.key_up = False
                     self.get_out = True
-
-        #except:
-        #    print("Fatal error")
 
     def ev_keyup(self, event: tcod.event.KeyUp) -> None:
         self.key_up = True
@@ -144,7 +140,7 @@ def handle_input_per_state(state, mouse, context, game_state, key_list=None):
     elif game_state in (GameStates.SHOW_INVENTORY, GameStates.DROP_INVENTORY):
         return handle_input(state, mouse, context, 'INVENTORY')
     elif game_state == GameStates.CHARACTER_SCREEN:
-        return handle_input(state, mouse, context, {})
+        return handle_input(state, mouse, context, 'CHAR_INFO')
 
     return {}
 

@@ -4,7 +4,7 @@ from game_messages import Message
 from random import randint
 
 from yaml_functions import read_yaml, cout
-from batchim import Batchim
+from batchim import 받침
 
 SYS_LOG = read_yaml("system_log.yaml")
 
@@ -62,11 +62,11 @@ class Fighter:
         entity_name = self.owner.name.capitalize()
         if damage > 0:
             results.append({'message': Message(cout(SYS_LOG['fight_log'],
-                                                    Batchim(entity_name,2),Batchim(target.name,1),
+                                                    받침(entity_name,2),받침(target.name,1),
                                                     damage),tcod.white)})
             results.extend(target._Fighter.take_damage(damage))
             results.extend(target._Fighter.take_damage(int(damage/randint(1,damage)),dmg_type='sanity'))
         else:
             results.append({'message': Message(cout(SYS_LOG['fight_no_dmg_log'],
-                                                    Batchim(entity_name),Batchim(target.name,1)),tcod.white)})
+                                                    받침(entity_name),받침(target.name,1)),tcod.white)})
         return results
