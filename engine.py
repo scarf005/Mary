@@ -240,9 +240,12 @@ def main():
                     target = get_blocking_entities_at_location(entities, destix, destiy)
 
                     if target:
+
                         battle = target._Fighter
 
-                        if battle:
+                        if target.name == "메리":
+                            pass
+                        elif battle:
                             attack_results = player._Fighter.attack(target)
                             player_turn_results.extend(attack_results)
                         else:
@@ -339,6 +342,7 @@ def main():
         for r in player_turn_results:
             message = r.get('message')
             dead_entity = r.get('dead')
+
             equip = r.get('equip')
             item_added = r.get('item_added')
             item_consumed = r.get('consumed')
@@ -406,9 +410,12 @@ def main():
         if game_state == GameStates.ENEMY_TURN:
             # 정신력 고갈 기능. 따로 변수로 넣던가 Gamemap에 넣어야 하나.
             if not game_map.monsters == 0:
-                clear_message_shown = False
 
+                clear_message_shown = False
                 sanity_damage = random.randint(int(-30/math.sqrt(game_map.depth)), game_map.monsters)
+                s_resist_percent = int((100 + 3*(fov_radius-1) + player._Equipment.total_sanity_resist)/100)
+                sanity_resistance = random.randint(0,int(10 * s_resist_percent))
+
                 if sanity_damage < 0:
                     sanity_damage = 0
                 else:
@@ -434,6 +441,12 @@ def main():
                     for er in enemy_turn_results:
                         message = er.get('message')
                         dead_entity = er.get('dead')
+                        game_won = er.get('game_won')
+
+                        if game_won:
+                            message_log.log(Message(SYS_LOG['found_mary_log'],tcod.green))
+                            message_log.log(Message(SYS_LOG['game_won_log'],tcod.green))
+                            game_state = GameStates.GOOD_ENDING
 
                         if message:
                             message_log.log(message)
@@ -453,7 +466,8 @@ def main():
                                 break
 
             else:
-                game_state = GameStates.PLAYERS_TURN
+                if not game_state == GameStates.GOOD_ENDING:
+                    game_state = GameStates.PLAYERS_TURN
 
         """
         디버그 기능들

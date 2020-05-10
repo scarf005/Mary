@@ -9,3 +9,5 @@ class GameStates(Enum):
     DROP_INVENTORY = 5
     TARGETING = 6
     CHARACTER_SCREEN = 7
+
+    GOOD_ENDING = 10

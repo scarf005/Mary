@@ -16,6 +16,7 @@ class Entity:
         self.char = char
         self.name = name
         self.color = color
+        self.description = "NULL"
 
         # 기타 속성들
         args_list = {'blocks':False, 'render_order':RenderOrder.CORPSE}

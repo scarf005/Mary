@@ -14,12 +14,12 @@ class Inventory:
     def add_item(self, item):
         results = []
 
-        if len(self.items) >= self.capacity:
+        if len(self.items) >= self.capacity: # 용량 초과
             results.append({
                 'item_added': None,
                 'message': Message(SYS_LOG["inventory_full"], tcod.yellow)
             })
-        else:
+        else: # 아이템 주움
             results.append({
                 'item_added': item,
                 'message': Message(cout(SYS_LOG["get_item"],받침(item.name,1)), tcod.light_green)

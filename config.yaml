@@ -2,7 +2,9 @@
 ### PREFERENCES ###
 
 # 폰트
-FONT: 'NanumSquareEB.ttf'
+FONT: 'NanumSquare_acEB.ttf'
+#'neodgm_code.ttf'
+#NanumSquareEB.ttf
 FONT_WIDTH: 16
 FONT_HEIGHT: 16
 
@@ -21,7 +23,7 @@ COLORS:
   flash : [74, 177, 255]
 
 # 화면 크기
-SCREEN_WIDTH: 42
+SCREEN_WIDTH: 45
 SCREEN_HEIGHT: 35
 
 ### 게임 기본 설정 ###

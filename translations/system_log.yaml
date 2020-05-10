@@ -13,6 +13,12 @@ enemies_exist:
     
 enemies_nonexistant: "Now you are more relieved that you are certain there's no more monsters here."
 next_depth: 'You jump into the tear in the fabric of timespace.'
+mary_depth: "You have a feeling that Mary's here."
+found_mary_log: "You have finally found Mary."
+game_won_log: >
+    Mary says, "You have come to save me. But how?" \n
+    Congratulations, you have found Mary! Now the only thing left is escaping into reality. \n
+    *** Thank you for playing the alpha version of MARY. ***
 
 # Player Infos
 character_info_log:
@@ -32,7 +38,7 @@ character_info_log:
             owner: 'player'
             type: 'value'
             route: ['_Equipment', 'total_sanity_resist']
-            name: "Sanity Resistance"
+            name: "Insanity Resistance"
 
 # Inventory
 equip_log:

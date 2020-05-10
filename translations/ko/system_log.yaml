@@ -13,6 +13,12 @@ enemies_exist:
 
 enemies_nonexistant: "당신은 여기에 더 이상 적이 없다는 확신이 든다. 이제 안심이 된다."
 next_depth: "당신은 시공간의 균열 사이로 뛰어들었다."
+mary_depth: "이곳에 메리가 있는 것 같다."
+found_mary_log: "당신은 마침내 메리를 찾아냈다."
+game_won_log: >
+    메리는 말한다. "나를 찾으러 와 주었구나... 하지만 어떻게?" \n
+    축하한다. 당신은 메리를 찾아냈다! 이제 현실로 돌아가는 일만 남았다. \n
+    *** 축하한다! 당신은 MARY의 알파 버전을 클리어했다. ***
 
 # 플레이어 정보
 character_info_log:
@@ -23,7 +29,7 @@ character_info_log:
         sanity:
             name: "정신력/ 최대 정신력"
         sanity_resist:
-            name: "정신력 저항"
+            name: "광기 저항"
 
 # 인벤토리
 equip_log:

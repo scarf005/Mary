@@ -18,7 +18,7 @@ from item_functions import heal, read, talisman, cast_spell, cast_fireball
 
 from random_utils import random_choice_from_dict
 
-from components.ai import BasicMonster
+from components.ai import BasicAi, MaryAi
 from components.fighter import Fighter
 from components.item import Item
 from components.luminary import Luminary
@@ -76,21 +76,39 @@ class GameMap:
         self.tiles = self.initialize_tiles()
         self.create_map_cave(player, entities, min_nook)
         player._Fighter.heal_sanity_capacity(player._Fighter.max_sanity // 2)
-        self.create_portal(entities, 10, player)
 
-        message_log.log(Message(SYS_LOG['next_depth'], tcod.light_violet))
+        if self.depth == 10:
+            self.place_mary(entities, player, 10)
+            message_log.log(Message(SYS_LOG['mary_depth'], tcod.violet))
+        else:
+            self.create_portal(entities, player, 10)
+            message_log.log(Message(SYS_LOG['next_depth'], tcod.light_violet))
         return entities
+
+    def find_min_dist_from(self, player, min_distance):
+        x, y, dist = 0, 0, 0
+        while (dist < min_distance or self.tiles[y,x].blocked):
+            #print(f'dist:{dist},x:{x},y:{y}')
+            x = randint(0, self.width-1)
+            y = randint(0, self.height-1)
+            dist = math.sqrt((x - player.x)**2 + (y - player.y)**2)
+        return x,y
+
+    def place_mary(self, entities, player, min_distance):
+        x,y = self.find_min_dist_from(player, min_distance)
+
+        l_comp = Luminary(luminosity = 15)
+        f_comp = Fighter(hp=30, defense=100, power=5)
+        mary = Entity(x,y, "@", tcod.light_yellow, '메리', blocks=True,
+                      render_order=RenderOrder.ACTOR, _Fighter=f_comp, _Luminary=l_comp, _Ai=MaryAi())
+        entities.append(mary)
 
     def create_portal(self, entities, min_distance, player):
         """
         다음 층으로 가는 포탈 생성.
         min_distance:플레이어로부터 떨어져야 하는 최소 거리
         """
-        x, y, dist = 0, 0, 0
-        while dist < min_distance or self.tiles[y,x].blocked:
-            x = randint(0, self.width-1)
-            y = randint(0, self.height-1)
-            dist = math.sqrt((x - player.x)**2 + (y - player.y)**2)
+        x,y = self.find_min_dist_from(player, min_distance)
 
         portal_comp = Portal(self.depth + 1)
         down_portal = Entity(x, y, 'O', tcod.light_purple, 'Gap',
@@ -112,7 +130,7 @@ class GameMap:
         # 몬스터 배치
         monster_chance = {'CI':80,'GS':20,"FA":10}
         for j in range(monster_num):
-            ai_comp = BasicMonster()
+            ai_comp = BasicAi()
             choice = random_choice_from_dict(monster_chance)
 
             if j < len(nooks):
@@ -137,7 +155,7 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        item_chance = {'SCF':5 } #'BK': 20 # #'FJ':60, 'REG':30,'FB':10, "SC":10
+        item_chance = {'FJ':60, 'REG':30,'FB':10, "SC":10, 'SCF':5 } #'BK': 20 # #
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)

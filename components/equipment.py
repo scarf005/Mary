@@ -41,13 +41,13 @@ class Equipment:
                 search = str(enum.name.lower())
                 self_slot_value = getattr(self, search, None)
 
-                if self_slot_value == equippable_entity: # 손에 든 물건 빼기
+                if self_slot_value == equippable_entity: # 이미 착용중인 물건 빼기
                     setattr(self, search, None)
                     equippable_entity._Equippable.equipped = False
                     results.append({'dequipped': equippable_entity})
                 else:
                     if self_slot_value: # 기존에 들던 물건 빼기
-                        equippable_entity._Equippable.equipped = False
+                        self_slot_value._Equippable.equipped = False
                         results.append({'dequipped': self_slot_value})
 
                     setattr(self, search, equippable_entity) # 바꿔치기

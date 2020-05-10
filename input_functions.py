@@ -133,7 +133,7 @@ def toggle_fullscreen(context: tcod.context.Context) -> None:
 def handle_input_per_state(state, mouse, context, game_state, key_list=None):
     if game_state == GameStates.PLAYERS_TURN:
         return handle_input(state, mouse, context, 'PLAYER_TURN', PLAYER_INPUT)
-    elif game_state == GameStates.PLAYER_DEAD:
+    elif game_state == GameStates.PLAYER_DEAD or game_state == GameStates.GOOD_ENDING:
         return handle_input(state, mouse, context, 'INVENTORY')
     elif game_state == GameStates.TARGETING:
         return handle_input(state, mouse, context, 'TARGETING')

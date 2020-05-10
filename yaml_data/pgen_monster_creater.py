@@ -10,7 +10,7 @@ from renderer.render_functions import RenderOrder
 # 엔티티
 from entity import Entity
 
-from components.ai import BasicMonster
+from components.ai import BasicAi
 from components.fighter import Fighter
 
 # 미리 생성된 몬스터들
@@ -48,7 +48,7 @@ def load_and_create_monster(monster_name, x=None,y=None):
 
     # 인공지능 부품
     ai = loadk('AI_comp')
-    if not ai: ai = BasicMonster()
+    if not ai: ai = BasicAi()
 
     #return Entity(x,y, name, char, color, blocks=True, render_order=RenderOrder.ACTOR, _Fighter=fighter, _Ai=ai )
 
