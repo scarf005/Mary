@@ -9,7 +9,7 @@ FONT_WIDTH: 16
 FONT_HEIGHT: 16
 
 # 언어
-LANGUAGE: "ko"
+#LANGUAGE: "ko"
 
 # 색상 팔레트
 COLORS:

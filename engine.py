@@ -87,7 +87,7 @@ def init_game_map(player, entities):
     """
     game_map = GameMap(MAP_WIDTH, MAP_HEIGHT)
     game_map.create_map_cave(player, entities, 3)
-    game_map.create_portal(entities, 10, player)
+    game_map.create_portal(entities, player, 10)
 
     fov_recompute = True
     fov_radius = max_fov_radius

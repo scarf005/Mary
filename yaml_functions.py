@@ -7,7 +7,9 @@ def init_language():
     기본 언어 설정. 없으면 영어. 글-로벌
     """
     yaml_data = read_yaml("config.yaml", '!default')
-    if yaml_data: return yaml_data.get('LANGUAGE') + "\\"
+    if yaml_data:
+        lang = yaml_data.get('LANGUAGE')
+        return lang + "\\" if lang else ""
     else: return ""
 
 def read_yaml(file, *args):

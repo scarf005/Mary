@@ -103,7 +103,7 @@ class GameMap:
                       render_order=RenderOrder.ACTOR, _Fighter=f_comp, _Luminary=l_comp, _Ai=MaryAi())
         entities.append(mary)
 
-    def create_portal(self, entities, min_distance, player):
+    def create_portal(self, entities, player, min_distance):
         """
         다음 층으로 가는 포탈 생성.
         min_distance:플레이어로부터 떨어져야 하는 최소 거리
@@ -206,7 +206,7 @@ class GameMap:
 
     def np_find_empty_cell(self, entities, game_map):
         while True:
-            y,x = game_map[randint(0,self.height-1),randint(0,self.width-1)]
+            y,x = randint(0,self.height-1), randint(0,self.width-1)
             if game_map[y,x] == 0:
                 for i in entities:
                     if y == i.y and x == i.x:
