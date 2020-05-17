@@ -39,17 +39,28 @@ character_info_log:
             type: 'value'
             route: ['_Equipment', 'total_sanity_resist']
             name: "Insanity Resistance"
+        power:
+            owner: 'player'
+            type: 'value'
+            route: ['_Fighter', 'power']
+            name: "Attack Power"
+        defense:
+            owner: 'player'
+            type: 'value'
+            route: ['_Fighter', 'defense']
+            name: "Armor Class"
+        
 
 # Inventory
 equip_log:
     log_format: "You {0} {1}." #착용방식, 물건
     ways_to_wear: 
-        WIElD: "wield"
+        WIELD: "wield"
         OUTFIT: "wear"
         SCARF: "wear"
         JEWELLERY: "wear"
     ways_to_unwear: 
-        WIElD: "unwield"
+        WIELD: "unwield"
         OUTFIT: "take off"
         SCARF: "take off"
         JEWELLERY: "take off"

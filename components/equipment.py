@@ -31,6 +31,14 @@ class Equipment:
     def total_sanity_resist(self):
         return self.get_total_bonus('sanity_resistance')
 
+    @property
+    def total_attack_power(self):
+        return self.get_total_bonus('attack_power')
+
+    @property
+    def total_defense_power(self):
+        return self.get_total_bonus('defense_power')
+
     def toggle_equip(self, equippable_entity):
         results = []
 

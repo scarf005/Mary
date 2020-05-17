@@ -19,8 +19,25 @@ class Fighter:
         self.cap_sanity = sanity
         self.sanity = sanity
 
-        self.defense = defense
-        self.power = power
+        self.base_defense = defense
+        self.base_power = power
+        #self.base_rsanity = 0
+
+    def get_value(self, base, which):
+        if self.owner and self.owner._Equipment:
+            bonus = getattr(self.owner._Equipment, which)
+        else:
+            bonus = 0
+        return getattr(self, base) + bonus
+
+    @property
+    def power(self):
+        return self.get_value('base_power','total_attack_power')
+
+    @property
+    def defense(self):
+        return self.get_value('base_defense','total_defense_power')
+
 
     def take_damage(self, amount, dmg_type='hp'):
         results = []

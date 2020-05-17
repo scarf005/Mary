@@ -19,7 +19,7 @@ class Equippable:
 
         # 기타 속성들
         attributes_list = {'attack_power':0, 'attack_type':None,
-                            'armour_class':0, 'sanity_resistance':0,
+                            'defense_power':0, 'sanity_resistance':0,
                             'max_hp':0, 'regen_hp':0,
                             'curse':None}
 

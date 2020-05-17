@@ -17,7 +17,7 @@ mary_depth: "이곳에 메리가 있는 것 같다."
 found_mary_log: "당신은 마침내 메리를 찾아냈다."
 game_won_log: >
     메리는 말한다. "나를 찾으러 와 주었구나... 하지만 어떻게?" \n
-    축하한다. 당신은 메리를 찾아냈다! 이제 현실로 돌아가는 일만 남았다. \n
+    당신은 메리를 찾아냈다! 이제 현실로 돌아가는 일만 남았다. \n
     *** 축하한다! 당신은 MARY의 알파 버전을 클리어했다. ***
 
 # 플레이어 정보
@@ -30,20 +30,24 @@ character_info_log:
             name: "정신력/ 최대 정신력"
         sanity_resist:
             name: "광기 저항"
+        power:
+            name: "공격력"
+        defense:
+            name: "방어력"
 
 # 인벤토리
 equip_log:
     log_format: "당신은 {1} {0}." #착용방식, 물건
     ways_to_wear:
-        WIElD: "손에 들었다"
+        WIELD: "손에 들었다"
         OUTFIT: "입었다"
         SCARF: "목에 둘렀다"
-        JEWELLERY: "착용했다"
+        JEWELLERY: "찼다"
     ways_to_unwear:
-        WIElD: "손에서 내려놓았다"
+        WIELD: "손에서 내려놓았다"
         OUTFIT: "벗었다"
         SCARF: "목에서 풀었다"
-        JEWELLERY: "풀었다"
+        JEWELLERY: "풀렀다"
 
 
 cannot_get_item: "바닥에 주울 만한 것이 없다."

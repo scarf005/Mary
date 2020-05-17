@@ -322,6 +322,7 @@ def main():
             if mouse.click == "L":
                 target_x = mouse.x - camera.x - CENTER_X
                 target_y = mouse.y - camera.y - CENTER_Y
+                print(f"타게팅 x,y: {target_x},{target_y}")
 
                 item_use_results = player._Inventory.use(targeting_item, entities=entities, fov_map=fov_map,
                                                         camera=camera, animation=animation, root= root, context=context,
@@ -412,6 +413,10 @@ def main():
             if not game_map.monsters == 0:
 
                 clear_message_shown = False
+
+                """
+                정신력 피해 계산
+                """
                 sanity_damage = random.randint(int(-30/math.sqrt(game_map.depth)), game_map.monsters)
                 s_resist_percent = int((100 + 3*(fov_radius-1) + player._Equipment.total_sanity_resist)/100)
                 sanity_resistance = random.randint(0,int(10 * s_resist_percent))
