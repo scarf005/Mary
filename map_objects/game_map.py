@@ -193,7 +193,7 @@ class GameMap:
                 e_comp = Equippable(EquipmentSlots.SCARF, sanity_resistance=resist)
                 item = Entity(ix,iy,'>',scarfs_list[pick],f"{pick}색 목도리", _Equippable=e_comp)
             elif kinds == 'SWD':
-                e_comp = Equippable(EquipmentSlots.WIELD, attack_power=10)
+                e_comp = Equippable(EquipmentSlots.WIELD, attack_power=5)
                 item = Entity(ix,iy,'/',tcod.gray,"검", _Equippable=e_comp)
             elif kinds == 'SLD':
                 e_comp = Equippable(EquipmentSlots.OUTFIT, defense_power=5)

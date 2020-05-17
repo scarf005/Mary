@@ -15,6 +15,9 @@ def kill_player(player):
     player.color = tcod.darker_gray
     return Message(SYS_LOG['dead_player'], tcod.red), GameStates.PLAYER_DEAD
 
+def insane_player(player):
+    player.color = tcod.darker_violet
+    return Message(SYS_LOG['insane_player'], tcod.red), GameStates.PLAYER_DEAD
 
 def kill_monster(monster, game_map):
     game_map.monsters -= 1

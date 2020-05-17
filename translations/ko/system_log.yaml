@@ -89,6 +89,7 @@ dead_entity:
     log_format: "{0}던 것)" # [였/이었]
 
 dead_player: "당신은 쓰러졌다."
+insane_player: "당신은 미쳐버렸다."
 
 # 타게팅
 target_message: '마우스 좌클릭으로 타일을 선택하거나, 마우스 우클릭으로 취소할 수 있다.'

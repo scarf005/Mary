@@ -12,7 +12,7 @@ from map_objects.game_map import GameMap
 
 # 앤티티와 컴포넌트
 from entity import Entity, get_blocking_entities_at_location
-from death_functions import kill_monster, kill_player
+from death_functions import kill_monster, kill_player, insane_player
 from item_functions import heal, read, talisman
 
 from components.fighter import Fighter
@@ -339,6 +339,9 @@ def main():
             previous_game_state = game_state
             game_state = GameStates.CHARACTER_SCREEN
 
+        if player._Fighter.sanity <= 0:
+            message, game_state = insane_player(player)
+            message_log.log(message)
 
         for r in player_turn_results:
             message = r.get('message')
@@ -457,6 +460,10 @@ def main():
                         if message:
                             message_log.log(message)
 
+                        if player._Fighter.sanity <= 0:
+                            message, game_state = insane_player(player)
+                            message_log.log(message)
+
                         if dead_entity:
                             if dead_entity == player:
                                 message, game_state = kill_player(dead_entity)
@@ -468,6 +475,7 @@ def main():
 
                             if game_state == GameStates.PLAYER_DEAD:
                                 break
+
                     if game_state == GameStates.PLAYER_DEAD:
                                 break
 

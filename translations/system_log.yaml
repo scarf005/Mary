@@ -102,6 +102,7 @@ dead_entity:
     log_format: "What is left of {0})"
     
 dead_player: "You have fallen."
+insane_player: "You have gone insane."
 
 # Targetting
 target_message: 'Left-click a tile to target, or right-click to cancel.'
