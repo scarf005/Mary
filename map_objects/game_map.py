@@ -98,7 +98,7 @@ class GameMap:
         x,y = self.find_min_dist_from(player, min_distance)
 
         l_comp = Luminary(luminosity = 15)
-        f_comp = Fighter(hp=30, defense=1000, power=5)
+        f_comp = Fighter(hp=10000, defense=10000, power=5) #귀찮아서 일단은 못죽이게 큰 수를 써놓음 ㅇㅇ
         mary = Entity(x,y, "@", tcod.light_yellow, '메리', blocks=True,
                       render_order=RenderOrder.ACTOR, _Fighter=f_comp, _Luminary=l_comp, _Ai=MaryAi())
         entities.append(mary)
@@ -155,8 +155,8 @@ class GameMap:
 
         # 아이템 배치, 아직 임시
         shuffle(nooks)
-        #item_chance = {'SLD':5}
-        item_chance = {'FJ':60, 'REG':30,'FB':10, "SC":10, 'FLW': 10, 'SCF':5, 'SWD':5, 'SLD':5} #'BK': 20 # #
+        #item_chance = {'FB':5}
+        item_chance = {'FJ':60, 'REG':30,'FB':10, "SC":10, 'FLW': 10, 'SCF':5, 'SWD':5, 'SLD':5, 'AM':1} #'BK': 20 # #
 
         for i in range(len(nooks)):
             kinds = random_choice_from_dict(item_chance)
@@ -172,7 +172,7 @@ class GameMap:
                 i_comp = Item(use_function=heal, amount=10)
                 item = self.create_item(ix, iy, '!', tcod.violet, '재생 물약',item=i_comp)
             elif kinds == 'FJ':
-                i_comp = Item(use_function=heal, amount=7, which='sanity')
+                i_comp = Item(use_function=heal, amount=15, which='sanity')
                 item = self.create_item(ix, iy, '!', tcod.orange, '과일 주스',item=i_comp)
             elif kinds == 'SC':
                 i_comp = Item(use_function=cast_spell, damage=(1,30), maximum_range=8)
@@ -186,17 +186,24 @@ class GameMap:
                 scarfs_list = {'보라':tcod.violet,'빨강':tcod.dark_red,'초록':tcod.green,'파랑':tcod.blue}
                 from random import sample
                 pick = sample(list(scarfs_list),1)[0]
-                e_comp = Equippable(EquipmentSlots.SCARF, sanity_resistance=100)
+                if pick == '초록':
+                    resist = 60
+                else:
+                    resist = 50
+                e_comp = Equippable(EquipmentSlots.SCARF, sanity_resistance=resist)
                 item = Entity(ix,iy,'>',scarfs_list[pick],f"{pick}색 목도리", _Equippable=e_comp)
             elif kinds == 'SWD':
                 e_comp = Equippable(EquipmentSlots.WIELD, attack_power=10)
                 item = Entity(ix,iy,'/',tcod.gray,"검", _Equippable=e_comp)
             elif kinds == 'SLD':
-                e_comp = Equippable(EquipmentSlots.OUTFIT, defense_power=10)
+                e_comp = Equippable(EquipmentSlots.OUTFIT, defense_power=5)
                 item = Entity(ix,iy,'}',tcod.lighter_gray, "방패", _Equippable=e_comp)
             elif kinds == 'FLW':
-                e_comp = Equippable(EquipmentSlots.JEWELLERY, sanity_resistance=50)
+                e_comp = Equippable(EquipmentSlots.JEWELLERY, sanity_resistance=20)
                 item = Entity(ix,iy,'*',tcod.white, "국화꽃 팔찌", _Equippable=e_comp)
+            elif kinds == "AM":
+                e_comp = Equippable(EquipmentSlots.JEWELLERY, sanity_resistance=-80, attack_power=10)
+                item = Entity(ix,iy,'&',tcod.white, "어딘가 잘못된 목걸이", _Equippable=e_comp)
             entities.append(item)
 
 

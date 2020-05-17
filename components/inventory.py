@@ -27,7 +27,7 @@ class Inventory:
 
             item_names = []
 
-            if hasattr(item, '_Equippable'): # 장비는 셀 수 없음; 총기같은 건 나중에 생각하자.
+            if item._Equippable: # 장비는 셀 수 없음; 총기같은 건 나중에 생각하자.
                 self.items.append(item)
             else:
                 for i in self.items:
