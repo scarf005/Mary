@@ -1,4 +1,4 @@
-import os
+import os, sys
 import yaml
 from pprint import pprint as pp
 
@@ -20,9 +20,21 @@ def read_yaml(file, *args):
     print_info = True if 'info' in args else False # 활성화하면 로드한 파일 내용을 나열해줌
     default = False if '!default' in args else True # 기본값은 DEFAULT_FOLDER에서 염
 
+    #print(__file__)
+    #print(f'__file__:{__file__}')
+    #print(f'sys:{sys.executable}')
+
     def set_file_path(file):
-        FILE_PATH = os.path.dirname(os.path.abspath(__file__))
-        return os.path.join(FILE_PATH, file)
+        if getattr(sys, 'frozen', False):
+            #print("yes this is an exe")
+            application_path = os.path.dirname(sys.executable)
+        elif __file__:
+            application_path = os.path.dirname(__file__)
+
+        return os.path.join(application_path, file)
+
+        #FILE_PATH = os.path.dirname(os.path.abspath(__file__))
+        #return os.path.join(FILE_PATH, file)
 
     def open_file(file_path):
         with open(file_path, 'r', encoding='UTF8') as file:

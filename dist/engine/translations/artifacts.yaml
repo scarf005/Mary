@@ -1,0 +1,15 @@
+# 픽다트 관련
+
+talisman:
+    name: "Swallowstone Talisman"
+    log_format: "You look at the talisman. The devil of the talisman {0}"
+    quotes:
+        - "askes you how are things going."
+        - "tells you that she and Mary knew each other."
+        - "says she think that you should hurry."
+        - "tells you that death is nothing compared to the meaningless of life."
+        - "smiles breifly."
+        - "worries about Mary."
+        - "assures you how time travel is completely possible even within the theory of relativity."
+        - "laughs softly."
+        - "tells you she could really have a walk, but is trapped in this talisman."
